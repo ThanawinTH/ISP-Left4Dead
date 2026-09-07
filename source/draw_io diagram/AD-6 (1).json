@@ -1,0 +1,398 @@
+{
+  "diagram": "AD-6",
+  "source": "b6935df3-AD6.drawio",
+  "pages": [
+    {
+      "page": "AD-6",
+      "title": "AD-6: Staff posts a class announcement",
+      "nodeCount": 13,
+      "edgeCount": 15,
+      "nodes": [
+        {
+          "id": "AD-6_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 214.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-6_open",
+          "type": "action",
+          "text": "Member opens\nannouncement form",
+          "geometry": {
+            "x": 156.0,
+            "y": 166.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_role",
+          "type": "decision",
+          "text": "Role is\nLecturer or TA?",
+          "geometry": {
+            "x": 116.0,
+            "y": 273.0,
+            "width": 226.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_hide",
+          "type": "error",
+          "text": "System does not display\nthe announcement form",
+          "geometry": {
+            "x": 60.0,
+            "y": 517.0,
+            "width": 185.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_enter",
+          "type": "action",
+          "text": "Staff enters\ntitle and body",
+          "geometry": {
+            "x": 243.0,
+            "y": 410.0,
+            "width": 126.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_val",
+          "type": "action",
+          "text": "System validates\nrequired fields",
+          "geometry": {
+            "x": 369.0,
+            "y": 517.0,
+            "width": 139.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_valid",
+          "type": "decision",
+          "text": "Valid?",
+          "geometry": {
+            "x": 374.0,
+            "y": 624.0,
+            "width": 133.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_verr",
+          "type": "error",
+          "text": "System displays\nvalidation errors",
+          "geometry": {
+            "x": 367.0,
+            "y": 744.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_cancel",
+          "type": "decision",
+          "text": "Cancel?",
+          "geometry": {
+            "x": 314.0,
+            "y": 851.0,
+            "width": 144.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_save",
+          "type": "action",
+          "text": "System saves announcement\nwith author and timestamp",
+          "geometry": {
+            "x": 554.0,
+            "y": 744.0,
+            "width": 199.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_app",
+          "type": "action",
+          "text": "Announcement appears for\nall classroom members",
+          "geometry": {
+            "x": 527.0,
+            "y": 858.0,
+            "width": 192.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_conf",
+          "type": "action",
+          "text": "System shows post\nconfirmation",
+          "geometry": {
+            "x": 498.0,
+            "y": 971.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-6_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 371.0,
+            "y": 1078.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-6_e0",
+          "source": "AD-6_s",
+          "target": "AD-6_open",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e1",
+          "source": "AD-6_open",
+          "target": "AD-6_role",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e2",
+          "source": "AD-6_role",
+          "target": "AD-6_hide",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-6_e3",
+          "source": "AD-6_hide",
+          "target": "AD-6_e",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e4",
+          "source": "AD-6_role",
+          "target": "AD-6_enter",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-6_e5",
+          "source": "AD-6_enter",
+          "target": "AD-6_val",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e6",
+          "source": "AD-6_val",
+          "target": "AD-6_valid",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e7",
+          "source": "AD-6_valid",
+          "target": "AD-6_verr",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-6_e8",
+          "source": "AD-6_verr",
+          "target": "AD-6_cancel",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e9",
+          "source": "AD-6_cancel",
+          "target": "AD-6_enter",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-6_e10",
+          "source": "AD-6_cancel",
+          "target": "AD-6_e",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-6_e11",
+          "source": "AD-6_valid",
+          "target": "AD-6_save",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-6_e12",
+          "source": "AD-6_save",
+          "target": "AD-6_app",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e13",
+          "source": "AD-6_app",
+          "target": "AD-6_conf",
+          "label": ""
+        },
+        {
+          "id": "AD-6_e14",
+          "source": "AD-6_conf",
+          "target": "AD-6_e",
+          "label": ""
+        }
+      ]
+    }
+  ]
+}

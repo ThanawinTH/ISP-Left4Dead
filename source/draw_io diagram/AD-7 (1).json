@@ -1,0 +1,436 @@
+{
+  "diagram": "AD-7",
+  "source": "3e2d70d1-AD7.drawio.txt",
+  "pages": [
+    {
+      "page": "AD-7",
+      "title": "AD-7: Staff exchange messages in the staff channel",
+      "nodeCount": 14,
+      "edgeCount": 18,
+      "nodes": [
+        {
+          "id": "AD-7_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 373.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-7_open",
+          "type": "action",
+          "text": "Member opens\nstaff channel",
+          "geometry": {
+            "x": 328.0,
+            "y": 167.0,
+            "width": 120.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_role",
+          "type": "decision",
+          "text": "Role is\nLecturer, TA or university staff?",
+          "geometry": {
+            "x": 275.0,
+            "y": 273.0,
+            "width": 226.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_deny",
+          "type": "error",
+          "text": "System denies access\nto the channel",
+          "geometry": {
+            "x": 60.0,
+            "y": 532.0,
+            "width": 166.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_load",
+          "type": "action",
+          "text": "System loads messages\noldest to newest",
+          "geometry": {
+            "x": 462.0,
+            "y": 410.0,
+            "width": 172.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_send",
+          "type": "decision",
+          "text": "Member sends\na message?",
+          "geometry": {
+            "x": 537.0,
+            "y": 517.0,
+            "width": 195.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_val",
+          "type": "action",
+          "text": "System validates\nnon-empty body",
+          "geometry": {
+            "x": 778.0,
+            "y": 654.0,
+            "width": 139.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_valid",
+          "type": "decision",
+          "text": "Valid?",
+          "geometry": {
+            "x": 781.0,
+            "y": 770.0,
+            "width": 133.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_draft",
+          "type": "error",
+          "text": "System keeps the draft\nand shows the error",
+          "geometry": {
+            "x": 643.0,
+            "y": 905.0,
+            "width": 179.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_save",
+          "type": "action",
+          "text": "System saves message with\nauthor and timestamp",
+          "geometry": {
+            "x": 870.0,
+            "y": 905.0,
+            "width": 199.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_wait",
+          "type": "action",
+          "text": "System waits up to 30 seconds",
+          "geometry": {
+            "x": 348.0,
+            "y": 662.0,
+            "width": 225.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_new",
+          "type": "decision",
+          "text": "New messages\nsince last check?",
+          "geometry": {
+            "x": 285.0,
+            "y": 761.0,
+            "width": 246.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_still",
+          "type": "decision",
+          "text": "Channel still open?",
+          "geometry": {
+            "x": 275.0,
+            "y": 898.0,
+            "width": 266.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-7_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 256.0,
+            "y": 1018.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-7_e0",
+          "source": "AD-7_s",
+          "target": "AD-7_open",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e1",
+          "source": "AD-7_open",
+          "target": "AD-7_role",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e2",
+          "source": "AD-7_role",
+          "target": "AD-7_deny",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-7_e3",
+          "source": "AD-7_deny",
+          "target": "AD-7_e",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e4",
+          "source": "AD-7_role",
+          "target": "AD-7_load",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-7_e5",
+          "source": "AD-7_load",
+          "target": "AD-7_send",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e6",
+          "source": "AD-7_send",
+          "target": "AD-7_val",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-7_e7",
+          "source": "AD-7_val",
+          "target": "AD-7_valid",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e8",
+          "source": "AD-7_valid",
+          "target": "AD-7_save",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-7_e9",
+          "source": "AD-7_valid",
+          "target": "AD-7_draft",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-7_e10",
+          "source": "AD-7_draft",
+          "target": "AD-7_send",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e11",
+          "source": "AD-7_save",
+          "target": "AD-7_load",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e12",
+          "source": "AD-7_send",
+          "target": "AD-7_wait",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-7_e13",
+          "source": "AD-7_wait",
+          "target": "AD-7_new",
+          "label": ""
+        },
+        {
+          "id": "AD-7_e14",
+          "source": "AD-7_new",
+          "target": "AD-7_load",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-7_e15",
+          "source": "AD-7_new",
+          "target": "AD-7_still",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-7_e16",
+          "source": "AD-7_still",
+          "target": "AD-7_send",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-7_e17",
+          "source": "AD-7_still",
+          "target": "AD-7_e",
+          "label": "[No]"
+        }
+      ]
+    }
+  ]
+}

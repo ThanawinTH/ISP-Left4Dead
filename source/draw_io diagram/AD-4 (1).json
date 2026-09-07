@@ -1,0 +1,398 @@
+{
+  "diagram": "AD-4",
+  "source": "e7f1b158-AD4.drawio",
+  "pages": [
+    {
+      "page": "AD-4",
+      "title": "AD-4: Staff creates or edits an activity",
+      "nodeCount": 13,
+      "edgeCount": 15,
+      "nodes": [
+        {
+          "id": "AD-4_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 227.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-4_open",
+          "type": "action",
+          "text": "Member opens\nactivity form",
+          "geometry": {
+            "x": 182.0,
+            "y": 166.0,
+            "width": 120.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_role",
+          "type": "decision",
+          "text": "Role is\nLecturer or TA?",
+          "geometry": {
+            "x": 129.0,
+            "y": 273.0,
+            "width": 226.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_hide",
+          "type": "error",
+          "text": "System does not display\nthe activity form",
+          "geometry": {
+            "x": 60.0,
+            "y": 517.0,
+            "width": 185.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_enter",
+          "type": "action",
+          "text": "Staff enters title, type, due\ndate, visibility, owner, status",
+          "geometry": {
+            "x": 213.0,
+            "y": 410.0,
+            "width": 238.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_val",
+          "type": "action",
+          "text": "System validates\nrequired fields",
+          "geometry": {
+            "x": 369.0,
+            "y": 517.0,
+            "width": 139.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_valid",
+          "type": "decision",
+          "text": "Valid?",
+          "geometry": {
+            "x": 374.0,
+            "y": 624.0,
+            "width": 133.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_verr",
+          "type": "error",
+          "text": "System displays\nvalidation errors",
+          "geometry": {
+            "x": 367.0,
+            "y": 744.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_cancel",
+          "type": "decision",
+          "text": "Cancel?",
+          "geometry": {
+            "x": 314.0,
+            "y": 851.0,
+            "width": 144.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_save",
+          "type": "action",
+          "text": "System saves activity",
+          "geometry": {
+            "x": 553.0,
+            "y": 752.0,
+            "width": 172.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_risk",
+          "type": "action",
+          "text": "System recalculates\nrisk status",
+          "geometry": {
+            "x": 529.0,
+            "y": 858.0,
+            "width": 159.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_conf",
+          "type": "action",
+          "text": "System shows save\nconfirmation",
+          "geometry": {
+            "x": 491.0,
+            "y": 971.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-4_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 371.0,
+            "y": 1078.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-4_e0",
+          "source": "AD-4_s",
+          "target": "AD-4_open",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e1",
+          "source": "AD-4_open",
+          "target": "AD-4_role",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e2",
+          "source": "AD-4_role",
+          "target": "AD-4_hide",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-4_e3",
+          "source": "AD-4_hide",
+          "target": "AD-4_e",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e4",
+          "source": "AD-4_role",
+          "target": "AD-4_enter",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-4_e5",
+          "source": "AD-4_enter",
+          "target": "AD-4_val",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e6",
+          "source": "AD-4_val",
+          "target": "AD-4_valid",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e7",
+          "source": "AD-4_valid",
+          "target": "AD-4_verr",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-4_e8",
+          "source": "AD-4_verr",
+          "target": "AD-4_cancel",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e9",
+          "source": "AD-4_cancel",
+          "target": "AD-4_enter",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-4_e10",
+          "source": "AD-4_cancel",
+          "target": "AD-4_e",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-4_e11",
+          "source": "AD-4_valid",
+          "target": "AD-4_save",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-4_e12",
+          "source": "AD-4_save",
+          "target": "AD-4_risk",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e13",
+          "source": "AD-4_risk",
+          "target": "AD-4_conf",
+          "label": ""
+        },
+        {
+          "id": "AD-4_e14",
+          "source": "AD-4_conf",
+          "target": "AD-4_e",
+          "label": ""
+        }
+      ]
+    }
+  ]
+}

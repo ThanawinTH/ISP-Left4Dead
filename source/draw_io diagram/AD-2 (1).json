@@ -1,0 +1,308 @@
+{
+  "diagram": "AD-2",
+  "source": "aa311014-AD2.drawio",
+  "pages": [
+    {
+      "page": "AD-2",
+      "title": "AD-2: User joins a classroom",
+      "nodeCount": 10,
+      "edgeCount": 12,
+      "nodes": [
+        {
+          "id": "AD-2_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 105.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-2_enter",
+          "type": "action",
+          "text": "User enters\njoin code",
+          "geometry": {
+            "x": 60.0,
+            "y": 166.0,
+            "width": 120.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_look",
+          "type": "action",
+          "text": "System looks up\nclassroom by code",
+          "geometry": {
+            "x": 138.0,
+            "y": 273.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_valid",
+          "type": "decision",
+          "text": "Code matches an\nactive classroom?",
+          "geometry": {
+            "x": 113.0,
+            "y": 380.0,
+            "width": 246.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_err",
+          "type": "error",
+          "text": "System shows\n\"classroom not found\"",
+          "geometry": {
+            "x": 113.0,
+            "y": 524.0,
+            "width": 172.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_cancel",
+          "type": "decision",
+          "text": "Cancel?",
+          "geometry": {
+            "x": 109.0,
+            "y": 637.0,
+            "width": 144.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_member",
+          "type": "decision",
+          "text": "Already a member?",
+          "geometry": {
+            "x": 326.0,
+            "y": 517.0,
+            "width": 246.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_add",
+          "type": "action",
+          "text": "System adds user\nwith Student role",
+          "geometry": {
+            "x": 393.0,
+            "y": 644.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_open",
+          "type": "action",
+          "text": "System opens classroom view\nfor the member's role",
+          "geometry": {
+            "x": 243.0,
+            "y": 757.0,
+            "width": 212.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-2_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 249.0,
+            "y": 864.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-2_e0",
+          "source": "AD-2_s",
+          "target": "AD-2_enter",
+          "label": ""
+        },
+        {
+          "id": "AD-2_e1",
+          "source": "AD-2_enter",
+          "target": "AD-2_look",
+          "label": ""
+        },
+        {
+          "id": "AD-2_e2",
+          "source": "AD-2_look",
+          "target": "AD-2_valid",
+          "label": ""
+        },
+        {
+          "id": "AD-2_e3",
+          "source": "AD-2_valid",
+          "target": "AD-2_err",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-2_e4",
+          "source": "AD-2_err",
+          "target": "AD-2_cancel",
+          "label": ""
+        },
+        {
+          "id": "AD-2_e5",
+          "source": "AD-2_cancel",
+          "target": "AD-2_enter",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-2_e6",
+          "source": "AD-2_cancel",
+          "target": "AD-2_e",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-2_e7",
+          "source": "AD-2_valid",
+          "target": "AD-2_member",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-2_e8",
+          "source": "AD-2_member",
+          "target": "AD-2_open",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-2_e9",
+          "source": "AD-2_member",
+          "target": "AD-2_add",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-2_e10",
+          "source": "AD-2_add",
+          "target": "AD-2_open",
+          "label": ""
+        },
+        {
+          "id": "AD-2_e11",
+          "source": "AD-2_open",
+          "target": "AD-2_e",
+          "label": ""
+        }
+      ]
+    }
+  ]
+}

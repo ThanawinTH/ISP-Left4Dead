@@ -1,0 +1,496 @@
+{
+  "diagram": "AD-5",
+  "source": "54d22258-AD5.drawio",
+  "pages": [
+    {
+      "page": "AD-5",
+      "title": "AD-5: System evaluates at-risk activities",
+      "nodeCount": 16,
+      "edgeCount": 20,
+      "nodes": [
+        {
+          "id": "AD-5_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 543.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-5_open",
+          "type": "action",
+          "text": "Staff opens\nactivity dashboard",
+          "geometry": {
+            "x": 482.0,
+            "y": 167.0,
+            "width": 152.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_get",
+          "type": "action",
+          "text": "System retrieves activities\nof the classroom",
+          "geometry": {
+            "x": 452.0,
+            "y": 274.0,
+            "width": 212.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_each",
+          "type": "action",
+          "text": "System takes the next activity\n(first match wins)",
+          "geometry": {
+            "x": 442.0,
+            "y": 381.0,
+            "width": 232.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_done",
+          "type": "decision",
+          "text": "Status = Done?",
+          "geometry": {
+            "x": 289.0,
+            "y": 488.0,
+            "width": 215.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_mdone",
+          "type": "action",
+          "text": "Mark as Completed",
+          "geometry": {
+            "x": 60.0,
+            "y": 622.0,
+            "width": 146.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_over",
+          "type": "decision",
+          "text": "Due date passed?",
+          "geometry": {
+            "x": 279.0,
+            "y": 608.0,
+            "width": 235.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_mover",
+          "type": "action",
+          "text": "Mark as Overdue",
+          "geometry": {
+            "x": 161.0,
+            "y": 742.0,
+            "width": 133.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_soon",
+          "type": "decision",
+          "text": "Due within 3 days?",
+          "geometry": {
+            "x": 334.0,
+            "y": 728.0,
+            "width": 255.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_msoon",
+          "type": "action",
+          "text": "Mark as Due Soon",
+          "geometry": {
+            "x": 243.0,
+            "y": 871.0,
+            "width": 139.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_un",
+          "type": "decision",
+          "text": "No owner and due\nwithin 7 days?",
+          "geometry": {
+            "x": 422.0,
+            "y": 848.0,
+            "width": 235.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_mun",
+          "type": "action",
+          "text": "Mark as Unassigned",
+          "geometry": {
+            "x": 324.0,
+            "y": 985.0,
+            "width": 152.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_mok",
+          "type": "action",
+          "text": "Mark as On Track",
+          "geometry": {
+            "x": 517.0,
+            "y": 985.0,
+            "width": 139.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_more",
+          "type": "decision",
+          "text": "More activities?",
+          "geometry": {
+            "x": 214.0,
+            "y": 1076.0,
+            "width": 235.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_disp",
+          "type": "action",
+          "text": "System displays activities ordered\nby due date with risk highlighting",
+          "geometry": {
+            "x": 203.0,
+            "y": 1196.0,
+            "width": 258.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-5_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 317.0,
+            "y": 1303.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-5_e0",
+          "source": "AD-5_s",
+          "target": "AD-5_open",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e1",
+          "source": "AD-5_open",
+          "target": "AD-5_get",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e2",
+          "source": "AD-5_get",
+          "target": "AD-5_each",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e3",
+          "source": "AD-5_each",
+          "target": "AD-5_done",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e4",
+          "source": "AD-5_done",
+          "target": "AD-5_mdone",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-5_e5",
+          "source": "AD-5_done",
+          "target": "AD-5_over",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-5_e6",
+          "source": "AD-5_over",
+          "target": "AD-5_mover",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-5_e7",
+          "source": "AD-5_over",
+          "target": "AD-5_soon",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-5_e8",
+          "source": "AD-5_soon",
+          "target": "AD-5_msoon",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-5_e9",
+          "source": "AD-5_soon",
+          "target": "AD-5_un",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-5_e10",
+          "source": "AD-5_un",
+          "target": "AD-5_mun",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-5_e11",
+          "source": "AD-5_un",
+          "target": "AD-5_mok",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-5_e12",
+          "source": "AD-5_mdone",
+          "target": "AD-5_more",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e13",
+          "source": "AD-5_mover",
+          "target": "AD-5_more",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e14",
+          "source": "AD-5_msoon",
+          "target": "AD-5_more",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e15",
+          "source": "AD-5_mun",
+          "target": "AD-5_more",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e16",
+          "source": "AD-5_mok",
+          "target": "AD-5_more",
+          "label": ""
+        },
+        {
+          "id": "AD-5_e17",
+          "source": "AD-5_more",
+          "target": "AD-5_each",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-5_e18",
+          "source": "AD-5_more",
+          "target": "AD-5_disp",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-5_e19",
+          "source": "AD-5_disp",
+          "target": "AD-5_e",
+          "label": ""
+        }
+      ]
+    }
+  ]
+}

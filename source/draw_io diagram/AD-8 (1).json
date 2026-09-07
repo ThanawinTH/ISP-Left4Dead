@@ -1,0 +1,522 @@
+{
+  "diagram": "AD-8",
+  "source": "bc5091b5-AD8.drawio",
+  "pages": [
+    {
+      "page": "AD-8",
+      "title": "AD-8: Student submits a file",
+      "nodeCount": 17,
+      "edgeCount": 20,
+      "nodes": [
+        {
+          "id": "AD-8_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 223.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-8_open",
+          "type": "action",
+          "text": "Member opens\nan assignment activity",
+          "geometry": {
+            "x": 149.0,
+            "y": 166.0,
+            "width": 179.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_role",
+          "type": "decision",
+          "text": "Role is Student and activity\naccepts submissions?",
+          "geometry": {
+            "x": 60.0,
+            "y": 273.0,
+            "width": 357.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_hide",
+          "type": "error",
+          "text": "System hides\nthe upload control",
+          "geometry": {
+            "x": 65.0,
+            "y": 501.0,
+            "width": 152.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_choose",
+          "type": "action",
+          "text": "Student chooses a file",
+          "geometry": {
+            "x": 244.0,
+            "y": 410.0,
+            "width": 179.0,
+            "height": 44.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_check",
+          "type": "action",
+          "text": "System checks\nfile size and type",
+          "geometry": {
+            "x": 258.0,
+            "y": 501.0,
+            "width": 152.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_allow",
+          "type": "decision",
+          "text": "Allowed?",
+          "geometry": {
+            "x": 257.0,
+            "y": 609.0,
+            "width": 153.0,
+            "height": 73.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_lim",
+          "type": "error",
+          "text": "System displays the limit and\ndoes not store the file",
+          "geometry": {
+            "x": 470.0,
+            "y": 743.0,
+            "width": 225.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_exist",
+          "type": "decision",
+          "text": "Existing submission\nby this student?",
+          "geometry": {
+            "x": 164.0,
+            "y": 728.0,
+            "width": 266.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_repl",
+          "type": "action",
+          "text": "System replaces\nthe previous file",
+          "geometry": {
+            "x": 192.0,
+            "y": 865.0,
+            "width": 146.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_new",
+          "type": "action",
+          "text": "System creates a\nnew submission record",
+          "geometry": {
+            "x": 378.0,
+            "y": 865.0,
+            "width": 172.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_store",
+          "type": "action",
+          "text": "System stores the file and records\nstudent, activity, time",
+          "geometry": {
+            "x": 235.0,
+            "y": 972.0,
+            "width": 258.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_late",
+          "type": "decision",
+          "text": "Uploaded after\nthe due date?",
+          "geometry": {
+            "x": 257.0,
+            "y": 1079.0,
+            "width": 215.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_ontime",
+          "type": "action",
+          "text": "System marks the\nsubmission on time",
+          "geometry": {
+            "x": 166.0,
+            "y": 1216.0,
+            "width": 152.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_mlate",
+          "type": "action",
+          "text": "System marks\nthe submission late",
+          "geometry": {
+            "x": 358.0,
+            "y": 1216.0,
+            "width": 159.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_conf",
+          "type": "action",
+          "text": "System shows\nupload confirmation",
+          "geometry": {
+            "x": 164.0,
+            "y": 1323.0,
+            "width": 159.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-8_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 158.0,
+            "y": 1430.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-8_e0",
+          "source": "AD-8_s",
+          "target": "AD-8_open",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e1",
+          "source": "AD-8_open",
+          "target": "AD-8_role",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e2",
+          "source": "AD-8_role",
+          "target": "AD-8_hide",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-8_e3",
+          "source": "AD-8_hide",
+          "target": "AD-8_e",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e4",
+          "source": "AD-8_role",
+          "target": "AD-8_choose",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-8_e5",
+          "source": "AD-8_choose",
+          "target": "AD-8_check",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e6",
+          "source": "AD-8_check",
+          "target": "AD-8_allow",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e7",
+          "source": "AD-8_allow",
+          "target": "AD-8_lim",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-8_e8",
+          "source": "AD-8_lim",
+          "target": "AD-8_choose",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e9",
+          "source": "AD-8_allow",
+          "target": "AD-8_exist",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-8_e10",
+          "source": "AD-8_exist",
+          "target": "AD-8_repl",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-8_e11",
+          "source": "AD-8_exist",
+          "target": "AD-8_new",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-8_e12",
+          "source": "AD-8_repl",
+          "target": "AD-8_store",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e13",
+          "source": "AD-8_new",
+          "target": "AD-8_store",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e14",
+          "source": "AD-8_store",
+          "target": "AD-8_late",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e15",
+          "source": "AD-8_late",
+          "target": "AD-8_mlate",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-8_e16",
+          "source": "AD-8_late",
+          "target": "AD-8_ontime",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-8_e17",
+          "source": "AD-8_ontime",
+          "target": "AD-8_conf",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e18",
+          "source": "AD-8_mlate",
+          "target": "AD-8_conf",
+          "label": ""
+        },
+        {
+          "id": "AD-8_e19",
+          "source": "AD-8_conf",
+          "target": "AD-8_e",
+          "label": ""
+        }
+      ]
+    }
+  ]
+}

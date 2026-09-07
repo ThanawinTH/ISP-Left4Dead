@@ -1,0 +1,364 @@
+{
+  "diagram": "AD-3",
+  "source": "a3f132b6-AD3.drawio",
+  "pages": [
+    {
+      "page": "AD-3",
+      "title": "AD-3: Lecturer assigns a member role",
+      "nodeCount": 12,
+      "edgeCount": 13,
+      "nodes": [
+        {
+          "id": "AD-3_s",
+          "type": "start",
+          "text": "",
+          "geometry": {
+            "x": 254.0,
+            "y": 90.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000"
+          }
+        },
+        {
+          "id": "AD-3_open",
+          "type": "action",
+          "text": "Member opens\nclass settings",
+          "geometry": {
+            "x": 206.0,
+            "y": 167.0,
+            "width": 126.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_owner",
+          "type": "decision",
+          "text": "Requester is the\nclassroom owner?",
+          "geometry": {
+            "x": 151.0,
+            "y": 273.0,
+            "width": 235.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_hide",
+          "type": "error",
+          "text": "System does not display\nthe member-role controls",
+          "geometry": {
+            "x": 60.0,
+            "y": 518.0,
+            "width": 192.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_list",
+          "type": "action",
+          "text": "System displays member list\nwith role controls",
+          "geometry": {
+            "x": 276.0,
+            "y": 411.0,
+            "width": 212.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_sel",
+          "type": "action",
+          "text": "Owner selects a member\nand chooses a new role",
+          "geometry": {
+            "x": 292.0,
+            "y": 518.0,
+            "width": 179.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_self",
+          "type": "decision",
+          "text": "Target is the\nowner themself?",
+          "geometry": {
+            "x": 246.0,
+            "y": 624.0,
+            "width": 226.0,
+            "height": 90.0
+          },
+          "style": {
+            "whiteSpace": "wrap",
+            "html": "1",
+            "fillColor": "#ffe599",
+            "strokeColor": "#e8b923",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_rej",
+          "type": "error",
+          "text": "System shows \"the owner's role\ncannot be changed\"",
+          "geometry": {
+            "x": 416.0,
+            "y": 762.0,
+            "width": 232.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#f4cccc",
+            "strokeColor": "#cc7c7c",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_save",
+          "type": "action",
+          "text": "System saves\nthe new role",
+          "geometry": {
+            "x": 256.0,
+            "y": 762.0,
+            "width": 120.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_apply",
+          "type": "action",
+          "text": "System applies new\npermissions to the member",
+          "geometry": {
+            "x": 217.0,
+            "y": 869.0,
+            "width": 199.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_conf",
+          "type": "action",
+          "text": "System shows\nconfirmation",
+          "geometry": {
+            "x": 237.0,
+            "y": 976.0,
+            "width": 120.0,
+            "height": 60.0
+          },
+          "style": {
+            "rounded": "1",
+            "whiteSpace": "wrap",
+            "html": "1",
+            "arcSize": "40",
+            "fillColor": "#cfe2f3",
+            "strokeColor": "#6fa8dc",
+            "strokeWidth": "1.5",
+            "fontSize": "12",
+            "fontColor": "#000000",
+            "verticalAlign": "middle",
+            "align": "center"
+          }
+        },
+        {
+          "id": "AD-3_e",
+          "type": "end",
+          "text": "",
+          "geometry": {
+            "x": 201.0,
+            "y": 1083.0,
+            "width": 30.0,
+            "height": 30.0
+          },
+          "style": {
+            "shape": "endState",
+            "html": "1",
+            "fillColor": "#000000",
+            "strokeColor": "#000000",
+            "strokeWidth": "2"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "AD-3_e0",
+          "source": "AD-3_s",
+          "target": "AD-3_open",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e1",
+          "source": "AD-3_open",
+          "target": "AD-3_owner",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e2",
+          "source": "AD-3_owner",
+          "target": "AD-3_hide",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-3_e3",
+          "source": "AD-3_hide",
+          "target": "AD-3_e",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e4",
+          "source": "AD-3_owner",
+          "target": "AD-3_list",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-3_e5",
+          "source": "AD-3_list",
+          "target": "AD-3_sel",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e6",
+          "source": "AD-3_sel",
+          "target": "AD-3_self",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e7",
+          "source": "AD-3_self",
+          "target": "AD-3_rej",
+          "label": "[Yes]"
+        },
+        {
+          "id": "AD-3_e8",
+          "source": "AD-3_rej",
+          "target": "AD-3_list",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e9",
+          "source": "AD-3_self",
+          "target": "AD-3_save",
+          "label": "[No]"
+        },
+        {
+          "id": "AD-3_e10",
+          "source": "AD-3_save",
+          "target": "AD-3_apply",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e11",
+          "source": "AD-3_apply",
+          "target": "AD-3_conf",
+          "label": ""
+        },
+        {
+          "id": "AD-3_e12",
+          "source": "AD-3_conf",
+          "target": "AD-3_e",
+          "label": ""
+        }
+      ]
+    }
+  ]
+}
