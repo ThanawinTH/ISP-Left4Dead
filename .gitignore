@@ -1,0 +1,120 @@
+# ---------------------------------------------------------------
+# ISP-Left4Dead — Course Support & Activity Dashboard
+# Stack: Node.js + Express, MySQL, Docker Compose
+# ---------------------------------------------------------------
+
+# ----- Secrets & environment -----------------------------------
+# NEVER commit Google OAuth2 credentials or database passwords (SRS-26).
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+credentials.json
+client_secret*.json
+secrets/
+
+# ----- Node.js -------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.npm/
+.node_repl_history
+*.tsbuildinfo
+.eslintcache
+package-lock.json.bak
+
+# Build output
+dist/
+build/
+out/
+.cache/
+coverage/
+.nyc_output/
+
+# ----- MySQL / database ----------------------------------------
+# Local database data directories and dumps — the schema and
+# migrations belong in the repo, the data does not.
+mysql-data/
+db-data/
+data/mysql/
+*.sql.gz
+*.dump
+!schema.sql
+!seed.sql
+!migrations/*.sql
+
+# ----- Uploaded submission files -------------------------------
+# Student uploads live in a Docker volume, never in git.
+uploads/
+storage/
+public/uploads/
+
+# ----- Docker --------------------------------------------------
+docker-compose.override.yml
+.docker/
+*.pid
+
+# ----- Logs & runtime ------------------------------------------
+logs/
+*.log
+pids/
+*.seed
+tmp/
+temp/
+
+# ----- Editors & IDEs ------------------------------------------
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.iml
+*.swp
+*.swo
+*~
+.history/
+
+# ----- Operating system ----------------------------------------
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+# Linux
+.directory
+.Trash-*
+
+# ----- Documents: keep the finals, ignore the scratch -----------
+# Office lock/temp files created while a .docx or .pptx is open
+~$*.doc*
+~$*.xls*
+~$*.ppt*
+*.tmp
+# LibreOffice lock files
+.~lock.*#
+# draw.io autosave / backup copies (keep the real .drawio files)
+*.drawio.bkp
+*.drawio.dtmp
+*.bkp
+
+# Exported previews we can always regenerate from the source diagram
+docs/**/*_preview.png
+docs/**/draft/
+
+# ----- Misc ----------------------------------------------------
+*.zip.part
+*.crdownload
+.venv/
+__pycache__/
+*.py[cod]
