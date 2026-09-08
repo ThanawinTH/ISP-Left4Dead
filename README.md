@@ -22,6 +22,9 @@ at-risk detection (Overdue / Due Soon / Unassigned), post announcements, coordin
 a staff-only channel, and receive student file submissions against a deadline. Students get a
 read-only schedule of class-visible activities and can upload their own work.
 
+Sign-in is delegated to Google OAuth2 and restricted to `@ku.th` accounts, so the system stores
+no passwords.
+
 ### Scope of this iteration
 
 | In scope | Out of scope |
@@ -54,20 +57,22 @@ read-only schedule of class-visible activities and can upload their own work.
 |---|---|
 | Software Requirement Specification (SRS-1 … SRS-27) | ✅ Complete |
 | KAOS goal refinement (SG-1 … SG-5) | ✅ Complete |
-| Use case diagram + 17 use cases | ✅ Complete |
+| Use case diagram + use case table | ✅ Complete |
 | User stories & User Requirement Specification | ✅ Complete |
 | Activity diagrams (AD-1 … AD-8) | ✅ Complete |
 | Software Proposal — architecture, data storage, dev environment | ✅ Complete |
-| Sequence diagrams for all SRS | ✅ Complete |
+| Sequence diagrams (SQD) | ✅ Complete |
 | Traceability matrices (Sub-Goal → SRS, SRS → SQD) | ✅ Complete |
-| Iteration report | ✅ Complete |
+| Iteration 1 report | ✅ Complete |
+| Project schedule (Gantt / Plane export) | ✅ Complete |
+| UI mockups (Figma) | 🟡 In progress |
 | Application source code | ⬜ Not started |
 | Database schema / migrations | ⬜ Not started |
 | Docker Compose environment | ⬜ Not started |
 | Test suite | ⬜ Not started |
 
-The `source/` folder currently holds **design artefacts only** (diagram exports and the project
-plan). Application code will be added under `source/` as implementation begins.
+`source/` is reserved for the application and is currently empty. All design and documentation
+artefacts live under `docs/`.
 
 ---
 
@@ -75,51 +80,51 @@ plan). Application code will be added under `source/` as implementation begins.
 
 ```
 ISP-Left4Dead/
-├── docs/                            ← all written deliverables (PDF)
-│   └── Left4Dead_Iteration_Report.pdf
-└── source/                          ← design artefacts, and application code once it exists
-    ├── draw_io diagram/             ← activity diagrams, exported as JSON
-    │   ├── AD-1 (1).json            Lecturer creates a classroom
-    │   ├── AD-2 (1).json            User joins a classroom
-    │   ├── AD-3 (1).json            Lecturer assigns a member role
-    │   ├── AD-4 (1).json            Staff creates or edits an activity
-    │   ├── AD-5 (1).json            System evaluates at-risk activities
-    │   ├── AD-6 (1).json            Staff posts a class announcement
-    │   ├── AD-7 (1).json            Staff exchange messages in the staff channel
-    │   └── AD-8 (1).json            Student submits a file
-    └── Gantt chart/                 ← project plan exported from Plane
-        └── first_po-*.json
+├── docs/                                  ← all documentation and design artefacts
+│   ├── SRS_Left4Dead.pdf                  Software Requirement Specification
+│   ├── SoftwareProposal_Left4Dead.pdf     Architecture, data storage, dev environment, sequence diagrams
+│   ├── Left4Dead_Iteration1_Report.pdf    Iteration 1 progress report
+│   ├── SRS_ActivityDiagrams_drawio/       Activity diagrams AD-1 … AD-8
+│   │   ├── AD-n.drawio                    editable draw.io source
+│   │   └── AD-n.json                      structured export (nodes + edges, diff-friendly)
+│   └── Gannt Chart/
+│       └── first_po-*.json                project schedule exported from Plane
+└── source/                                ← application code (not started yet)
 ```
 
 | Looking for… | Go to |
 |---|---|
-| Requirements, use cases, traceability matrices | `docs/` — the SRS / Software Proposal PDF |
-| Architecture, data storage and environment decisions | `docs/` — Software Proposal, Sections 10–12 |
-| Sequence diagrams (SQD) | `docs/` — Software Proposal, Section 13 |
-| Activity diagrams (AD-1 … AD-8) | `source/draw_io diagram/` |
-| Project schedule and task breakdown | `source/Gantt chart/` |
-| Progress narrative for the iteration | `docs/Left4Dead_Iteration_Report.pdf` |
+| Requirements, use cases, user stories, URS/SRS | `docs/SRS_Left4Dead.pdf` |
+| Architecture, data storage and environment decisions | `docs/SoftwareProposal_Left4Dead.pdf` |
+| Sequence diagrams (SQD) and traceability matrices | `docs/SoftwareProposal_Left4Dead.pdf` |
+| Activity diagrams (AD-1 … AD-8) | `docs/SRS_ActivityDiagrams_drawio/` |
+| Project schedule and task breakdown | `docs/Gannt Chart/` |
+| Progress narrative for the iteration | `docs/Left4Dead_Iteration1_Report.pdf` |
 
-### Opening the diagrams
+### Activity diagrams
 
-The files in `source/draw_io diagram/` are **structured JSON exports** — each one lists the
-diagram's nodes (with type: `start`, `action`, `decision`, `error`, `end`) and its edges with
-`[Yes]` / `[No]` labels. They are readable in any text editor and easy to diff in a pull request,
-but they are **not** the editable draw.io format.
+Each diagram is stored twice, on purpose:
 
-> **Note for the team:** please also commit the original `.drawio` files next to the JSON, so the
-> diagrams remain editable. To edit: open [app.diagrams.net](https://app.diagrams.net) →
-> **File → Open From → Device** → select the `.drawio` file.
+- **`AD-n.drawio`** — the editable source. Open at [app.diagrams.net](https://app.diagrams.net)
+  → **File → Open From → Device**.
+- **`AD-n.json`** — a structured export listing every node (`start`, `action`, `decision`,
+  `error`, `end`) and every edge with its `[Yes]` / `[No]` label. Readable in any editor and
+  reviewable in a pull request diff, unlike the XML.
 
-The Gantt chart JSON is an export from [Plane](https://plane.so). To regenerate it:
-**Workspace Settings → Exports →** choose the project **→** format **JSON → Export**, then
-download from *Previous exports*.
+> Note: `AD-7` is saved as `AD-7.drawio.txt`. draw.io still opens it, but renaming it to
+> `AD-7.drawio` would keep the set consistent.
+
+### Project schedule
+
+The Gantt data is a JSON export from [Plane](https://plane.so). To regenerate it:
+**Workspace Settings → Exports →** select the project **→ JSON → Export**, then download from
+*Previous exports* (links expire after 7 days).
 
 ---
 
 ## Planned technology stack
 
-Decided in the Software Proposal (Sections 10–12) and not yet implemented.
+Decided in the Software Proposal and not yet implemented.
 
 | Layer | Technology | Why |
 |---|---|---|
@@ -129,7 +134,7 @@ Decided in the Software Proposal (Sections 10–12) and not yet implemented.
 | Database | MySQL | Relational data with one authoritative role row per member per classroom |
 | File storage | Named Docker volume | Keeps uploaded submissions out of the database and out of the image |
 | Authentication | Google OAuth2, restricted to `@ku.th` | No passwords stored (SRS-26); non-university identities rejected (SRS-27) |
-| Environment | Docker + Docker Compose | Same runtime, database version and time zone on all four laptops and the demo machine |
+| Environment | Docker + Docker Compose | Same runtime, MySQL version and time zone on all four laptops and the demo machine |
 
 ---
 
@@ -159,7 +164,8 @@ The application will be available at `http://localhost:3000`.
 1. Branch from `main` — `feature/<short-description>` or `fix/<short-description>`
 2. Commit in small, described steps
 3. Open a pull request into `main` and have another member review it
-4. Keep `docs/` and `source/` in step: if a requirement changes, update the SRS **and** the affected diagram
+4. Keep documents and diagrams in step: if a requirement changes, update the SRS **and** the
+   affected `.drawio` file **and** re-export its `.json`
 
 ---
 
