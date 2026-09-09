@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Classrooms · KU Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ---------- Sidebar ---------- -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H13l-4.2 3.5a.6.6 0 0 1-1-.46V17H6.5A2.5 2.5 0 0 1 4 14.5v-9Z" fill="#fff"/>
+          <circle cx="12" cy="10" r="2.6" fill="#0f766e"/>
+        </svg>
+      </span>
+      <span>
+        <div class="sidebar__title">KU Classroom</div>
+        <div class="sidebar__subtitle">Course Support Portal</div>
+      </span>
+    </div>
+
+    <nav class="nav">
+      <a class="nav__item is-active" href="my-classrooms.html"><span class="dot"></span> Classes</a>
+      <a class="nav__item" href="class-schedule.html"><span class="dot"></span> Schedule</a>
+    </nav>
+
+    <div class="sidebar__user">
+      <span class="avatar">KS</span>
+      <span>
+        <div class="sidebar__user-name">Dr. K. Sombat</div>
+        <div class="sidebar__user-mail">kittipong.s@ku.th</div>
+      </span>
+    </div>
+  </aside>
+
+  <!-- ---------- Main ---------- -->
+  <div class="main">
+    <header class="header">
+      <div class="header__titles">
+        <h1>My Classrooms</h1>
+        <div class="header__sub">academic year 2023</div>
+      </div>
+      <div class="header__actions">
+        <a class="btn btn--primary" href="create-classroom.html">Create Class</a>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- UC-2 / SRS-4, SRS-5, SRS-6: join a classroom by code -->
+      <section class="joinbar">
+        <div>
+          <div class="joinbar__title">Join a Classroom</div>
+          <div class="joinbar__desc">Enter your unique classroom join code provided by your instructor.</div>
+        </div>
+        <form class="joinbar__form" id="joinForm" novalidate>
+          <input class="input input--code" id="joinCode" placeholder="Enter 6-digit Join Code"
+                 maxlength="8" autocomplete="off" aria-label="Join code">
+          <button class="btn btn--primary" type="submit">Join</button>
+        </form>
+      </section>
+
+      <h2 class="section-title">Your Classes</h2>
+
+      <div class="cards">
+
+        <a class="class-card" href="class-schedule.html">
+          <div class="class-card__top">
+            <div>
+              <div class="class-card__code">01204223</div>
+              <div class="class-card__name">Software Engineering</div>
+              <div class="class-card__owner">Dr. K. Sombat</div>
+            </div>
+            <span class="chip">2566/1</span>
+          </div>
+          <div class="class-card__foot">
+            <span class="chip chip--muted">Code: <b>KU-489A</b></span>
+            <span class="class-card__tas">3 TAs/Staff</span>
+            <span class="role role--lecturer">Lecturer</span>
+          </div>
+        </a>
+
+        <a class="class-card" href="class-schedule.html">
+          <div class="class-card__top">
+            <div>
+              <div class="class-card__code">01204341</div>
+              <div class="class-card__name">Computer Networks</div>
+              <div class="class-card__owner">Prof. A. Prasit</div>
+            </div>
+            <span class="chip">2566/1</span>
+          </div>
+          <div class="class-card__foot">
+            <span class="chip chip--muted">Code: <b>KU-901B</b></span>
+            <span class="class-card__tas">2 TAs/Staff</span>
+            <span class="role role--student">Student</span>
+          </div>
+        </a>
+
+        <a class="class-card" href="class-schedule.html">
+          <div class="class-card__top">
+            <div>
+              <div class="class-card__code">01204111</div>
+              <div class="class-card__name">Computer Programming</div>
+              <div class="class-card__owner">Dr. K. Sombat</div>
+            </div>
+            <span class="chip">2565/2</span>
+          </div>
+          <div class="class-card__foot">
+            <span class="chip chip--muted">Code: <b>KU-772C</b></span>
+            <span class="class-card__tas">4 TAs/Staff</span>
+            <span class="role role--lecturer">Lecturer</span>
+          </div>
+        </a>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/app.js"></script>
+<script>
+  // SRS-6: an unknown join code is rejected with a message, and the user
+  // stays on the page to try again.
+  const VALID_CODES = ['KU-489A', 'KU-901B', 'KU-772C'];
+  document.getElementById('joinForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const field = document.getElementById('joinCode');
+    const code = field.value.trim().toUpperCase();
+    if (!code) { field.classList.add('is-error'); KU.toast('Enter a join code first'); return; }
+    if (VALID_CODES.includes(code)) {
+      field.classList.remove('is-error');
+      KU.toast('Joined the classroom as Student');
+      setTimeout(() => location.href = 'class-schedule.html', 800);
+    } else {
+      field.classList.add('is-error');
+      KU.toast('Classroom not found — check the code and try again');
+    }
+  });
+  document.getElementById('joinCode').addEventListener('input', (e) =>
+    e.target.classList.remove('is-error'));
+</script>
+</body>
+</html>

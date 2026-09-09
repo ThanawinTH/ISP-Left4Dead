@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · KU Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="login">
+
+  <!-- ---------- Left brand panel ---------- -->
+  <aside class="login__brand">
+    <div class="brand-row">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H13l-4.2 3.5a.6.6 0 0 1-1-.46V17H6.5A2.5 2.5 0 0 1 4 14.5v-9Z" fill="#0f766e"/>
+          <circle cx="12" cy="10" r="2.6" fill="#ffffff"/>
+        </svg>
+      </span>
+      <span class="brand-name">KU Classroom</span>
+    </div>
+
+    <p class="login__tagline">
+      The academic dashboard designed specifically for Kasetsart University faculty, TAs, and
+      students. Manage coursework, assignments, activities, and communication instantly.
+    </p>
+
+    <!-- Placeholder illustration — replace with your Figma export (see README) -->
+    <div class="login__art">
+      <svg viewBox="0 0 512 288" xmlns="http://www.w3.org/2000/svg" role="img"
+           aria-label="Illustration of course staff working together">
+        <rect width="512" height="288" fill="#dbeae5"/>
+        <rect x="36" y="34" width="86" height="176" rx="4" fill="#3f6d64"/>
+        <rect x="46" y="52" width="66" height="8" rx="3" fill="#cfe3dd"/>
+        <rect x="46" y="72" width="52" height="8" rx="3" fill="#cfe3dd"/>
+        <rect x="46" y="92" width="60" height="8" rx="3" fill="#cfe3dd"/>
+        <rect x="46" y="112" width="44" height="8" rx="3" fill="#cfe3dd"/>
+        <path d="M176 34h120v150H176z" fill="#f4f7f2"/>
+        <path d="M176 34h120v18H176z" fill="#3f6d64"/>
+        <circle cx="236" cy="112" r="40" fill="#cfe3dd"/>
+        <rect x="330" y="52" width="140" height="86" rx="6" fill="#33564f"/>
+        <rect x="342" y="66" width="60" height="7" rx="3" fill="#9dc3ba"/>
+        <rect x="342" y="82" width="94" height="7" rx="3" fill="#9dc3ba"/>
+        <rect x="342" y="98" width="74" height="7" rx="3" fill="#6fa397"/>
+        <rect x="96" y="196" width="330" height="12" rx="6" fill="#b7cfc8"/>
+        <rect x="140" y="208" width="14" height="52" rx="4" fill="#7fa79d"/>
+        <rect x="360" y="208" width="14" height="52" rx="4" fill="#7fa79d"/>
+        <circle cx="196" cy="170" r="20" fill="#33564f"/>
+        <rect x="176" y="192" width="40" height="42" rx="12" fill="#3f6d64"/>
+        <circle cx="268" cy="164" r="19" fill="#33564f"/>
+        <rect x="249" y="186" width="38" height="48" rx="12" fill="#4c7d73"/>
+        <circle cx="340" cy="170" r="20" fill="#33564f"/>
+        <rect x="320" y="192" width="40" height="42" rx="12" fill="#3f6d64"/>
+      </svg>
+    </div>
+
+    <p class="login__footer">Kasetsart University Office of Computer Services © 2026</p>
+  </aside>
+
+  <!-- ---------- Right sign-in panel ---------- -->
+  <main class="login__panel">
+    <div class="login-card">
+      <h1>Welcome to Portal</h1>
+      <p class="login-card__sub">Sign in to access your digital classrooms</p>
+
+      <div class="notice">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 10V7a5 5 0 0 1 10 0v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <rect x="4" y="10" width="16" height="10" rx="2.5" fill="currentColor"/>
+        </svg>
+        Restricted to @ku.th accounts only
+      </div>
+
+      <!-- SRS-26 / SRS-27: authentication is delegated to Google OAuth2 and
+           restricted to the @ku.th domain. -->
+      <button class="btn-google" id="signIn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.74 2.98-4.3 2.98-7.35Z"/>
+          <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.59A10 10 0 0 0 12 22Z"/>
+          <path fill="#FBBC05" d="M6.41 13.92a6 6 0 0 1 0-3.83V7.5H3.06a10 10 0 0 0 0 9l3.35-2.58Z"/>
+          <path fill="#EA4335" d="M12 5.95c1.47 0 2.79.51 3.83 1.5l2.87-2.87C16.95 2.98 14.7 2 12 2a10 10 0 0 0-8.94 5.5l3.35 2.59C7.2 7.71 9.4 5.95 12 5.95Z"/>
+        </svg>
+        Sign in with KU Google Account
+      </button>
+
+      <p class="login__terms">
+        By logging in, you agree to the <a href="#">KU IT Policy &amp; Terms of Service</a>.
+      </p>
+    </div>
+  </main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/app.js"></script>
+<script>
+  document.getElementById('signIn').addEventListener('click', () => {
+    KU.toast('Signed in as kittipong.s@ku.th');
+    setTimeout(() => location.href = 'my-classrooms.html', 700);
+  });
+</script>
+</body>
+</html>
