@@ -185,6 +185,8 @@ a { color: inherit; text-decoration: none; }
 .nav__item .dot { width: 16px; height: 16px; border-radius: 4px; background: var(--slate-300); flex: none; }
 .nav__item.is-active { background: var(--teal-50); color: var(--teal-700); font-weight: 600; }
 .nav__item.is-active .dot { background: var(--teal-700); }
+.nav__item .nav__icon { width: 20px; height: 20px; flex: none; color: var(--slate-400); }
+.nav__item.is-active .nav__icon { color: var(--teal-700); }
 
 .sidebar__user {
   margin-top: auto; padding-top: 20px;
@@ -374,6 +376,8 @@ a { color: inherit; text-decoration: none; }
   border-radius: var(--r-full);
   padding: 4px 12px; font-size: 12px; font-weight: 600;
 }
+.codebox__badge.is-inactive { color: var(--slate-500); }
+.btn--sm { padding: 8px 14px; font-size: 13px; }
 .form-actions { display: flex; gap: 14px; margin-top: 28px; }
 .form-actions .btn { flex: 1; padding: 14px; }
 

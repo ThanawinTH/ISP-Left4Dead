@@ -76,8 +76,7 @@
         Restricted to @ku.th accounts only
       </div>
 
-      <!-- SRS-26 / SRS-27: authentication is delegated to Google OAuth2 and
-           restricted to the @ku.th domain. -->
+      <!-- SRS-26 / SRS-27: sign-in is restricted to the @ku.th domain. -->
       <button class="btn-google" id="signIn">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.74 2.98-4.3 2.98-7.35Z"/>
@@ -96,13 +95,112 @@
 
 </div>
 
+<!-- ---------- Sign-in dialog ---------- -->
+<div class="signin-backdrop" id="signInModal" hidden>
+  <div class="signin-card" role="dialog" aria-modal="true" aria-labelledby="signInTitle">
+    <div class="signin-card__head">
+      <svg class="signin-card__logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.74 2.98-4.3 2.98-7.35Z"/>
+        <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.59A10 10 0 0 0 12 22Z"/>
+        <path fill="#FBBC05" d="M6.41 13.92a6 6 0 0 1 0-3.83V7.5H3.06a10 10 0 0 0 0 9l3.35-2.58Z"/>
+        <path fill="#EA4335" d="M12 5.95c1.47 0 2.79.51 3.83 1.5l2.87-2.87C16.95 2.98 14.7 2 12 2a10 10 0 0 0-8.94 5.5l3.35 2.59C7.2 7.71 9.4 5.95 12 5.95Z"/>
+      </svg>
+      <h2 id="signInTitle">Sign in</h2>
+      <p>Use your Kasetsart University account</p>
+    </div>
+
+    <form id="signInForm" novalidate>
+      <label class="label" for="emailInput">Email</label>
+      <input class="input" id="emailInput" type="email" placeholder="yourname@ku.th" autocomplete="username">
+
+      <label class="label" for="passwordInput">Password</label>
+      <input class="input" id="passwordInput" type="password" placeholder="Password" autocomplete="current-password">
+
+      <div class="signin-card__error" id="signInError" hidden></div>
+
+      <div class="signin-card__actions">
+        <button class="btn btn--ghost" type="button" id="signInCancel">Cancel</button>
+        <button class="btn btn--primary" type="submit" id="signInSubmit">Next</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* Sign-in dialog — uses the same tokens as the rest of the UI */
+  .signin-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
+  .signin-backdrop[hidden]{display:none}
+  .signin-card{background:#fff;border-radius:16px;width:100%;max-width:380px;
+    padding:28px 28px 22px;box-shadow:0 18px 50px rgba(15,23,42,.25)}
+  .signin-card__head{text-align:center;margin-bottom:20px}
+  .signin-card__logo{width:34px;height:34px;margin-bottom:10px}
+  .signin-card__head h2{margin:0;font-size:21px;font-weight:700;color:#0f172a}
+  .signin-card__head p{margin:6px 0 0;font-size:13.5px;color:#64748b}
+  .signin-card .label{display:block;margin:14px 0 6px}
+  .signin-card .input{width:100%}
+  .signin-card__error{margin-top:12px;padding:9px 12px;border-radius:9px;
+    background:#fef2f2;color:#b91c1c;font-size:13px;line-height:1.4}
+  .signin-card__error[hidden]{display:none}
+  .signin-card__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+</style>
+
 <div class="toast" id="toast"></div>
 <script src="js/app.js"></script>
+<script src="js/api.js"></script>
 <script>
-  document.getElementById('signIn').addEventListener('click', () => {
-    KU.toast('Signed in as kittipong.s@ku.th');
-    setTimeout(() => location.href = 'my-classrooms.html', 700);
+  const modal    = document.getElementById('signInModal');
+  const emailEl  = document.getElementById('emailInput');
+  const pwEl     = document.getElementById('passwordInput');
+  const errEl    = document.getElementById('signInError');
+  const submitEl = document.getElementById('signInSubmit');
+
+  function showError(msg) {
+    errEl.textContent = msg;
+    errEl.hidden = false;
+  }
+
+  function openModal() {
+    errEl.hidden = true;
+    emailEl.value = '';
+    pwEl.value = '';
+    modal.hidden = false;
+    emailEl.focus();
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+  }
+
+  document.getElementById('signIn').addEventListener('click', openModal);
+  document.getElementById('signInCancel').addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  // SRS-27: the domain is checked again on the server; this is only a fast hint.
+  document.getElementById('signInForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = emailEl.value.trim().toLowerCase();
+    const password = pwEl.value;
+
+    if (!email || !password) { showError('Enter your email and password.'); return; }
+    if (!email.endsWith('@ku.th')) {
+      showError('Only @ku.th accounts can sign in.');
+      return;
+    }
+
+    submitEl.disabled = true;
+    try {
+      const data = await API.post('/auth/login', { email, password });
+      KU.toast('Signed in as ' + data.user.name);
+      setTimeout(() => location.href = 'my-classrooms.html', 600);
+    } catch (err) {
+      showError(err.message);
+      submitEl.disabled = false;
+    }
   });
+
+  [emailEl, pwEl].forEach(el => el.addEventListener('input', () => { errEl.hidden = true; }));
 </script>
 </body>
 </html>

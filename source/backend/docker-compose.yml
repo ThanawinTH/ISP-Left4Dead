@@ -1,0 +1,35 @@
+services:
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: ku_classroom
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-ppassword"]
+      interval: 5s
+      retries: 20
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: ku_classroom
+      SESSION_SECRET: dev-secret
+    volumes:
+      - ./:/app
+      - /app/node_modules
+      - ../frontend:/frontend:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dbdata:

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create Classroom · KU Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H13l-4.2 3.5a.6.6 0 0 1-1-.46V17H6.5A2.5 2.5 0 0 1 4 14.5v-9Z" fill="#fff"/>
+          <circle cx="12" cy="10" r="2.6" fill="#0f766e"/>
+        </svg>
+      </span>
+      <span>
+        <div class="sidebar__title">KU Classroom</div>
+        <div class="sidebar__subtitle">Course Support Portal</div>
+      </span>
+    </div>
+
+    <nav class="nav">
+      <a class="nav__item is-active" href="my-classrooms.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Classes</a>
+      <a class="nav__item" href="#"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Assignments</a>
+    </nav>
+
+    <div class="sidebar__user">
+      <span class="avatar">··</span>
+      <span>
+        <div class="sidebar__user-name">…</div>
+        <div class="sidebar__user-mail"></div>
+      </span>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="header">
+      <div class="header__titles">
+        <h1>Create Classroom</h1>
+        <div class="header__sub">Lecturer Control Panel</div>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- UC-1 / SRS-1, SRS-2, SRS-3 -->
+      <form class="form-card" id="createForm" novalidate>
+
+        <div class="field" id="f-name">
+          <label class="label" for="className">Classroom Name <span class="req">*</span></label>
+          <input class="input" id="className" placeholder="e.g. 01204491 Special Topics in CSE" autocomplete="off">
+          <div class="hint">A classroom name is required.</div>
+        </div>
+
+        <div class="field" id="f-sem">
+          <label class="label" for="semester">Semester <span class="req">*</span></label>
+          <input class="input" id="semester" placeholder="e.g. 2569/1" autocomplete="off">
+          <div class="hint">A semester is required.</div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="subject">Subject Code</label>
+          <input class="input" id="subject" placeholder="e.g. 01204491" autocomplete="off">
+        </div>
+
+        <!-- SRS-2: the system generates a code unique among active classrooms.
+             Shown here as a preview; it is issued on save. -->
+        <div class="codebox">
+          <div>
+            <div class="codebox__label">Auto-Generated Join Code</div>
+            <div style="display:flex;align-items:center;gap:18px;margin-top:6px;flex-wrap:wrap">
+              <span class="codebox__code" id="previewCode">—</span>
+              <button class="btn btn--ghost btn--sm" type="button" id="genCode">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 12a8 8 0 1 1-2.6-5.9M20 4v4h-4" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>Generate Code
+              </button>
+              <span class="codebox__note" id="codeNote">No code yet — press Generate Code, or one is issued when you save.</span>
+            </div>
+          </div>
+          <span class="codebox__badge is-inactive" id="codeBadge">Inactive</span>
+        </div>
+
+        <div class="form-actions">
+          <a class="btn btn--ghost" href="my-classrooms.html">Cancel</a>
+          <button class="btn btn--primary" type="submit">Create Classroom</button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script>
+  // SRS-2: the code is issued by the server on save, so this is only a placeholder.
+  document.getElementById('previewCode').textContent = '—';
+
+
+
+  let saving = false;   // stops a second click creating a second classroom
+
+  // SRS-2: the server picks the code and checks it is unused.
+  const genBtn = document.getElementById('genCode');
+  genBtn.addEventListener('click', async () => {
+    genBtn.disabled = true;
+    try {
+      const data = await API.get('/classrooms/preview-code');
+      document.getElementById('previewCode').textContent = data.join_code;
+      document.getElementById('codeNote').textContent =
+        'Reserved for this form. It becomes active once you create the classroom.';
+    } catch (err) {
+      KU.toast(err.message);
+    }
+    genBtn.disabled = false;
+  });
+
+  document.getElementById('createForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (saving) return;
+    const name = document.getElementById('className');
+    const sem  = document.getElementById('semester');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    let ok = true;
+
+    [['f-name', name], ['f-sem', sem]].forEach(([id, el]) => {
+      const bad = !el.value.trim();
+      document.getElementById(id).classList.toggle('is-error', bad);
+      el.classList.toggle('is-error', bad);
+      if (bad) ok = false;
+    });
+
+    if (!ok) { KU.toast('Fill in the required fields before saving'); return; }
+
+    saving = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating…';
+
+    try {
+      const data = await API.post('/classrooms', {
+        name: name.value.trim(),
+        semester: sem.value.trim(),
+        subject_code: document.getElementById('subject').value.trim() || null,
+        join_code: document.getElementById('previewCode').textContent.trim(),
+      });
+      document.getElementById('previewCode').textContent = data.classroom.join_code;
+      const badge = document.getElementById('codeBadge');
+      badge.textContent = 'Active';
+      badge.classList.remove('is-inactive');
+      document.getElementById('codeNote').textContent =
+        'This code is instantly active for student enrolment.';
+      KU.toast('Classroom created — join code ' + data.classroom.join_code);
+      setTimeout(() => location.href = 'my-classrooms.html', 1200);
+    } catch (err) {
+      KU.toast(err.message);
+      saving = false;                       // failed — let them try again
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create Classroom';
+    }
+  });
+
+  ['className', 'semester'].forEach(id => {
+    document.getElementById(id).addEventListener('input', (e) => {
+      e.target.classList.remove('is-error');
+      e.target.closest('.field').classList.remove('is-error');
+    });
+  });
+</script>
+</body>
+</html>
