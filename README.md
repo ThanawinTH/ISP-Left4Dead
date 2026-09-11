@@ -67,13 +67,32 @@ no passwords.
 | Project schedule (Gantt / Plane export) | ✅ Complete |
 | UI mockups (Figma) | ✅ Complete |
 | Application source code | 🟡 In progress |
-| Database schema / migrations | ⬜ Not started |
-| Docker Compose environment | ⬜ Not started |
+| Database schema (`users`, `classrooms`, `memberships`) | 🟡 In progress |
+| Docker Compose environment | ✅ Complete |
 | Test suite | ⬜ Not started |
 
-The UI is designed in Figma and the front-end pages are being built from those mockups; `source/`
-is reserved for the application and is still empty until the first code lands. All design and
-documentation artefacts live under `docs/`.
+The application now runs. `source/` holds a working Express + MySQL backend and the front-end
+pages built from the Figma mockups; all design and documentation artefacts stay under `docs/`.
+
+### What works so far
+
+| Area | State |
+|---|---|
+| Sign in, restricted to `@ku.th` (SRS-27) | ✅ Working |
+| Create a classroom + unique join code (SRS-1, SRS-2) | ✅ Working |
+| Join a classroom by code, as Student (SRS-4, SRS-5, SRS-6) | ✅ Working |
+| Classroom list and classroom header | ✅ Working |
+| Activities, at-risk detection, schedule (SRS-8 … SRS-14) | ⬜ Not built |
+| Announcements and staff channel (SRS-15 … SRS-20) | ⬜ Not built |
+| File submissions (SRS-21 … SRS-25) | ⬜ Not built |
+
+Two deliberate gaps against the SRS, both to be closed before the final iteration:
+
+- **Sign-in uses email + password as a stand-in for Google OAuth2.** Passwords are hashed with
+  scrypt and never stored in plain text, and the `@ku.th` domain check (SRS-27) is already
+  enforced — but SRS-26 requires no passwords at all, so this part gets replaced.
+- **Only two roles exist** (`lecturer`, `student`). The **TA** role from the SRS is not in the
+  schema yet.
 
 ---
 
@@ -90,7 +109,28 @@ ISP-Left4Dead/
 │   │   └── AD-n.json                      structured export (nodes + edges, diff-friendly)
 │   └── Gannt Chart/
 │       └── first_po-*.json                project schedule exported from Plane
-└── source/                                ← application code (not started yet)
+└── source/                                ← the application
+    ├── README.md                          how to run it, API list, what works
+    ├── backend/
+    │   ├── docker-compose.yml             app + MySQL containers
+    │   ├── Dockerfile                     node:20-alpine
+    │   ├── package.json                   express, express-session, mysql2
+    │   ├── server.js                      app entry point, session + static files
+    │   ├── db/schema.sql                  users, classrooms, memberships
+    │   └── src/
+    │       ├── db.js                      MySQL pool, q() and one() helpers
+    │       ├── auth.js                    sign-in, scrypt hashing, @ku.th check, requireAuth
+    │       ├── classrooms.js              list, create, join, join-code generation
+    │       └── routes.js                  API route table
+    └── frontend/
+        ├── index.html                     sign in
+        ├── my-classrooms.html             classroom list + join by code
+        ├── create-classroom.html          create a classroom
+        ├── class-schedule.html            classroom header + join code
+        ├── css/styles.css
+        └── js/
+            ├── app.js                     toast + clipboard helpers
+            └── api.js                     fetch wrapper, sidebar user, sign-out
 ```
 
 | Looking for… | Go to |
@@ -101,6 +141,9 @@ ISP-Left4Dead/
 | Activity diagrams (AD-1 … AD-8) | `docs/SRS_ActivityDiagrams_drawio/` |
 | Project schedule and task breakdown | `docs/Gannt Chart/` |
 | Progress narrative for the iteration | `docs/Left4Dead_Iteration1_Report.pdf` |
+| How to run the app, API endpoints, what works | `source/README.md` |
+| Backend code and database schema | `source/backend/` |
+| Front-end pages built from the Figma mockups | `source/frontend/` |
 
 ### Activity diagrams
 
@@ -125,7 +168,8 @@ The Gantt data is a JSON export from [Plane](https://plane.so). To regenerate it
 
 ## Planned technology stack
 
-Decided in the Software Proposal and not yet implemented.
+Decided in the Software Proposal. Everything below is now in place except authentication, which
+still uses an email + password stand-in.
 
 | Layer | Technology | Why |
 |---|---|---|
@@ -134,47 +178,43 @@ Decided in the Software Proposal and not yet implemented.
 | Frontend | HTML, CSS, client-side JavaScript | Server-rendered views, no build step to maintain |
 | Database | MySQL | Relational data with one authoritative role row per member per classroom |
 | File storage | Named Docker volume | Keeps uploaded submissions out of the database and out of the image |
-| Authentication | Google OAuth2, restricted to `@ku.th` | No passwords stored (SRS-26); non-university identities rejected (SRS-27) |
+| Authentication | Google OAuth2, restricted to `@ku.th` | No passwords stored (SRS-26); non-university identities rejected (SRS-27). **Currently email + password with scrypt hashing; the `@ku.th` check is already live, OAuth2 is not** |
 | Environment | Docker + Docker Compose | Same runtime, MySQL version and time zone on all four laptops and the demo machine |
 
 ---
 
 ## Getting started
 
-### Today
-
-This repository currently contains **documentation only** — there is no application to run yet.
-Clone it and read the PDFs under `docs/`:
+**Prerequisites:** Docker Desktop installed and showing *Engine running* (WSL 2 backend on
+Windows). Nothing else — Node and MySQL both run inside containers, so there is no local install
+and no `.env` to fill in.
 
 ```bash
 git clone https://github.com/ThanawinTH/ISP-Left4Dead.git
-cd ISP-Left4Dead
-```
+cd ISP-Left4Dead/source/backend
 
-### Once the application lands
-
-The commands below are the **planned** workflow. They will not work until `source/` contains the
-Express app, a `Dockerfile`, a `compose.yaml` and a committed `.env.example` — none of which
-exist yet.
-
-```bash
 docker compose up --build     # starts the Express app and the MySQL container
 ```
 
-Before the first run, create your own `.env` from the template and fill in the Google OAuth2
-client ID and secret. The copy command differs by shell:
+Open **http://localhost:3000**. Sign in with any `@ku.th` email and a password of at least six
+characters — the first sign-in for an address creates the account, and after that the password
+has to match.
 
-```powershell
-Copy-Item .env.example .env   # PowerShell
-copy .env.example .env        # Command Prompt
-cp .env.example .env          # Git Bash, macOS, Linux
-```
+Stop with `Ctrl+C`. `docker compose down -v` also deletes the database volume, so the next start
+is a clean database.
 
-The application will be available at `http://localhost:3000`.
+> **Note the working directory:** `docker-compose.yml` lives in `source/backend/`, not at the
+> repository root. Running `docker compose` anywhere else will not find it.
 
-**Prerequisites:** Docker Desktop (WSL 2 backend on Windows) must be installed and running.
-`docker compose` — two words — is Compose v2, which ships with Docker Desktop; the older
-`docker-compose` script is no longer supported.
+`docker compose` — two words — is Compose v2 and ships with Docker Desktop. The older
+hyphenated `docker-compose` script is retired.
+
+### Before this is deployed anywhere
+
+The database password and session secret are currently written into `docker-compose.yml` as
+development defaults (`password`, `dev-secret`). That is fine on a laptop, but they must move to
+a git-ignored `.env` before the app runs anywhere real — along with the Google OAuth2 client ID
+and secret once SRS-26 is implemented.
 
 > `.env` is git-ignored on purpose — **never commit OAuth2 credentials or database passwords.**
 > Add a placeholder `.env.example` instead, listing the variable names with empty values.
