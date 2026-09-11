@@ -51,7 +51,7 @@ no passwords.
 
 ## Current project status
 
-> **Phase: Design & documentation complete — implementation not yet started.**
+> **Phase: Design & documentation complete — implementation in progress.**
 
 | Deliverable | Status |
 |---|---|
@@ -65,14 +65,15 @@ no passwords.
 | Traceability matrices (Sub-Goal → SRS, SRS → SQD) | ✅ Complete |
 | Iteration 1 report | ✅ Complete |
 | Project schedule (Gantt / Plane export) | ✅ Complete |
-| UI mockups (Figma) | 🟡 In progress |
-| Application source code | ⬜ Not started |
+| UI mockups (Figma) | ✅ Complete |
+| Application source code | 🟡 In progress |
 | Database schema / migrations | ⬜ Not started |
 | Docker Compose environment | ⬜ Not started |
 | Test suite | ⬜ Not started |
 
-`source/` is reserved for the application and is currently empty. All design and documentation
-artefacts live under `docs/`.
+The UI is designed in Figma and the front-end pages are being built from those mockups; `source/`
+is reserved for the application and is still empty until the first code lands. All design and
+documentation artefacts live under `docs/`.
 
 ---
 
