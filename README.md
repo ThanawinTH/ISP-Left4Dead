@@ -141,19 +141,40 @@ Decided in the Software Proposal and not yet implemented.
 
 ## Getting started
 
-Application code has not been committed yet. Once the Docker Compose environment lands, the
-intended workflow is:
+### Today
+
+This repository currently contains **documentation only** — there is no application to run yet.
+Clone it and read the PDFs under `docs/`:
 
 ```bash
 git clone https://github.com/ThanawinTH/ISP-Left4Dead.git
 cd ISP-Left4Dead
+```
 
-cp .env.example .env          # then fill in the Google OAuth2 client ID and secret
+### Once the application lands
 
+The commands below are the **planned** workflow. They will not work until `source/` contains the
+Express app, a `Dockerfile`, a `compose.yaml` and a committed `.env.example` — none of which
+exist yet.
+
+```bash
 docker compose up --build     # starts the Express app and the MySQL container
 ```
 
+Before the first run, create your own `.env` from the template and fill in the Google OAuth2
+client ID and secret. The copy command differs by shell:
+
+```powershell
+Copy-Item .env.example .env   # PowerShell
+copy .env.example .env        # Command Prompt
+cp .env.example .env          # Git Bash, macOS, Linux
+```
+
 The application will be available at `http://localhost:3000`.
+
+**Prerequisites:** Docker Desktop (WSL 2 backend on Windows) must be installed and running.
+`docker compose` — two words — is Compose v2, which ships with Docker Desktop; the older
+`docker-compose` script is no longer supported.
 
 > `.env` is git-ignored on purpose — **never commit OAuth2 credentials or database passwords.**
 > Add a placeholder `.env.example` instead, listing the variable names with empty values.
