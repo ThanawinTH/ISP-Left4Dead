@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Classrooms · KU Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ---------- Sidebar ---------- -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H13l-4.2 3.5a.6.6 0 0 1-1-.46V17H6.5A2.5 2.5 0 0 1 4 14.5v-9Z" fill="#fff"/>
+          <circle cx="12" cy="10" r="2.6" fill="#0f766e"/>
+        </svg>
+      </span>
+      <span>
+        <div class="sidebar__title">KU Classroom</div>
+        <div class="sidebar__subtitle">Course Support Portal</div>
+      </span>
+    </div>
+
+    <nav class="nav">
+      <a class="nav__item is-active" href="my-classrooms.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Classes</a>
+      <a class="nav__item" href="#" data-soon="Assignments"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Assignments</a>
+    </nav>
+
+    <div class="sidebar__user">
+      <span class="avatar">··</span>
+      <span>
+        <div class="sidebar__user-name">…</div>
+        <div class="sidebar__user-mail"></div>
+      </span>
+    </div>
+  </aside>
+
+  <!-- ---------- Main ---------- -->
+  <div class="main">
+    <header class="header">
+      <div class="header__titles">
+        <h1>My Classrooms</h1>
+        <div class="header__sub" id="academicYear"></div>
+      </div>
+      <div class="header__actions">
+        <a class="btn btn--primary" href="create-classroom.html">Create Class</a>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- UC-2 / SRS-4, SRS-5, SRS-6: join a classroom by code -->
+      <section class="joinbar">
+        <div>
+          <div class="joinbar__title">Join a Classroom</div>
+          <div class="joinbar__desc">Enter your unique classroom join code provided by your instructor.</div>
+        </div>
+        <form class="joinbar__form" id="joinForm" novalidate>
+          <input class="input input--code" id="joinCode" placeholder="Enter 6-digit Join Code"
+                 maxlength="8" autocomplete="off" aria-label="Join code">
+          <button class="btn btn--primary" type="submit">Join</button>
+        </form>
+      </section>
+
+      <h2 class="section-title">Your Classes</h2>
+
+      <div class="cards" id="cards"></div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/app.js"></script>
+<script src="js/api.js"></script>
+<script>
+  const ROLE_LABEL = { lecturer: 'Lecturer', ta: 'TA', staff: 'Staff', student: 'Student' };
+
+  function cardHTML(c) {
+    const roleClass = c.role === 'student' ? 'role--student' : 'role--lecturer';
+    const code = c.join_code
+      ? `<span class="chip chip--muted">Code: <b>${c.join_code}</b></span>` : '';
+    return `
+      <a class="class-card" href="class-schedule.html?id=${c.id}">
+        <div class="class-card__top">
+          <div>
+            <div class="class-card__code">${c.subject_code || ''}</div>
+            <div class="class-card__name">${c.name}</div>
+            <div class="class-card__owner">${c.owner_name}</div>
+          </div>
+          <span class="chip">${c.semester}</span>
+        </div>
+        <div class="class-card__foot">
+          ${code}
+          <span class="class-card__tas">${c.staff_count} TAs/Staff</span>
+          <span class="role ${roleClass}">${ROLE_LABEL[c.role]}</span>
+        </div>
+      </a>`;
+  }
+
+  async function loadClasses() {
+    const host = document.getElementById('cards');
+    try {
+      const data = await API.get('/classrooms');
+      host.innerHTML = data.classrooms.length
+        ? data.classrooms.map(cardHTML).join('')
+        : '<div class="empty"><strong>No classrooms yet</strong>Join one with a code, or create one.</div>';
+    } catch (err) {
+      host.innerHTML = '<div class="empty"><strong>Could not load classrooms</strong>' + err.message + '</div>';
+    }
+  }
+
+  // SRS-4, SRS-6: an unknown join code is rejected and the user stays here.
+  document.getElementById('joinForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const field = document.getElementById('joinCode');
+    const code = field.value.trim().toUpperCase();
+    if (!code) { field.classList.add('is-error'); KU.toast('Enter a join code first'); return; }
+    try {
+      const data = await API.post('/classrooms/join', { code });
+      field.classList.remove('is-error');
+      field.value = '';
+      KU.toast('Joined ' + data.classroom.name + ' as Student');
+      // Thai academic year: Buddhist year, rolling over in June.
+  (() => {
+    const now = new Date();
+    const year = now.getFullYear() + 543 + (now.getMonth() >= 5 ? 0 : -1);
+    document.getElementById('academicYear').textContent = 'academic year ' + year;
+  })();
+
+  loadClasses();
+    } catch (err) {
+      field.classList.add('is-error');
+      KU.toast(err.message);
+    }
+  });
+
+  document.getElementById('joinCode').addEventListener('input', (e) =>
+    e.target.classList.remove('is-error'));
+
+  loadClasses();
+
+  document.querySelectorAll('[data-soon]').forEach(el =>
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      KU.toast(el.dataset.soon + ' — not built yet');
+    }));
+</script>
+</body>
+</html>
