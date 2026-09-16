@@ -15,7 +15,9 @@ async function freeJoinCode() {
 /** GET /api/classrooms — the ones this user is in. */
 async function list(req, res) {
   const rows = await q(
-    `SELECT c.id, c.name, c.semester, c.subject_code, c.join_code, m.role, u.name AS owner_name
+    `SELECT c.id, c.name, c.semester, c.subject_code, c.join_code, m.role, u.name AS owner_name,
+            (SELECT COUNT(*) FROM memberships x
+              WHERE x.classroom_id = c.id AND x.role IN ('ta','staff')) AS staff_count
        FROM memberships m
        JOIN classrooms c ON c.id = m.classroom_id
        JOIN users u      ON u.id = c.owner_id

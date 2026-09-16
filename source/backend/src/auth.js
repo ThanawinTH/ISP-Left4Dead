@@ -54,4 +54,46 @@ function requireAuth(req, res, next) {
   next();
 }
 
-module.exports = { login, me, logout, requireAuth };
+/* ---------- classroom guards (US-4) ---------- */
+
+/** Roles that are allowed to change things inside a classroom. */
+const STAFF_ROLES = ['lecturer', 'ta', 'staff'];
+
+/**
+ * Finds the caller's membership for the classroom in :id and hangs it on the
+ * request. We read the role from the database on every request instead of
+ * trusting the session, so a promotion takes effect straight away - the member
+ * never has to leave and rejoin the classroom.
+ */
+async function loadMembership(req, res, next) {
+  const row = await one(
+    `SELECT m.role, c.owner_id
+       FROM memberships m
+       JOIN classrooms c ON c.id = m.classroom_id
+      WHERE m.classroom_id = ? AND m.user_id = ?`,
+    [req.params.id, req.session.user.id]);
+
+  if (!row) return res.status(403).json({ error: 'You are not a member of this classroom' });
+
+  req.role = row.role;
+  req.isOwner = row.owner_id === req.session.user.id;
+  req.isStaff = STAFF_ROLES.includes(row.role);
+  next();
+}
+
+/** Only the lecturer who created the classroom may change someone's role. */
+function requireOwner(req, res, next) {
+  if (!req.isOwner) return res.status(403).json({ error: 'Only the classroom owner can do this' });
+  next();
+}
+
+/** Lecturer, TA and staff may edit; students may not. Ready for US-5 and US-6. */
+function requireStaff(req, res, next) {
+  if (!req.isStaff) return res.status(403).json({ error: 'Staff role required' });
+  next();
+}
+
+module.exports = {
+  login, me, logout, requireAuth,
+  loadMembership, requireOwner, requireStaff,
+};

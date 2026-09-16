@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS classrooms (
 CREATE TABLE IF NOT EXISTS memberships (
   classroom_id INT NOT NULL,
   user_id      INT NOT NULL,
-  role         ENUM('lecturer','student') NOT NULL DEFAULT 'student',
+  role         ENUM('lecturer','ta','staff','student') NOT NULL DEFAULT 'student',
   PRIMARY KEY (classroom_id, user_id),
   FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id)      REFERENCES users(id)
