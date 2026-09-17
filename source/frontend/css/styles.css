@@ -534,3 +534,101 @@ a { color: inherit; text-decoration: none; }
   .joinbar__form { margin-left: 0; }
   .input--code { width: 100%; }
 }
+
+/* ---------- members page (US-4) ----------
+   Paste at the end of css/styles.css. Uses the tokens from :root at the top. */
+
+/* the teal join-code banner */
+.joincode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: var(--teal-50);
+  border: 1px solid #99f6e4;
+  border-radius: 14px;
+  padding: 18px 24px;
+  margin-bottom: 26px;
+}
+.joincode__label { font-size: 15px; font-weight: 700; color: var(--teal-700); }
+.joincode__note { margin-top: 4px; font-size: 13px; color: var(--slate-500); }
+.joincode__right { display: flex; align-items: center; gap: 18px; }
+.joincode__code {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: var(--teal-700);
+}
+
+/* count line above the table */
+.members__bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.members__count { margin: 0; font-size: 17px; font-weight: 700; color: var(--slate-900); }
+.members__showing { font-size: 13px; color: var(--slate-500); }
+
+/* the table */
+.table {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.table__row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.4fr 1fr 110px;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--slate-100);
+  font-size: 14px;
+}
+.table__row:last-child { border-bottom: none; }
+.table__row--head {
+  background: var(--slate-50);
+  padding: 12px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--slate-500);
+}
+.table__right { text-align: right; }
+
+.table__cell--name { display: flex; align-items: center; gap: 12px; }
+.table__name { font-weight: 700; color: var(--slate-900); }
+.table__mail { color: var(--slate-500); }
+
+/* small avatar, tinted by role like the design */
+.avatar--sm { width: 30px; height: 30px; font-size: 11px; flex: none; }
+.avatar--lecturer { background: var(--teal-50);   color: var(--teal-700); }
+.avatar--ta       { background: var(--blue-100);  color: var(--blue-700); }
+.avatar--staff    { background: var(--amber-100); color: var(--amber-700); }
+.avatar--student  { background: var(--slate-100); color: var(--slate-600); }
+
+/* the two new role badges - lecturer and student already exist above */
+.role--ta    { background: var(--blue-100);  color: var(--blue-700); }
+.role--staff { background: var(--amber-100); color: var(--amber-700); }
+
+/* "Edit Role" reads as a link, not a button */
+.linkbtn {
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--teal-700);
+  cursor: pointer;
+}
+.linkbtn:hover { text-decoration: underline; }
+.linkbtn--muted { color: var(--slate-500); }
+
+.select--sm { padding: 6px 28px 6px 10px; font-size: 13px; }
+
+@media (max-width: 900px) {
+  .table__row { grid-template-columns: 1fr; gap: 8px; }
+  .table__row--head { display: none; }
+  .table__right { text-align: left; }
+}
