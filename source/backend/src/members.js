@@ -49,7 +49,20 @@ async function setRole(req, res) {
     return res.status(404).json({ error: 'That person is not in this classroom' });
   }
 
-  res.json({ ok: true, user_id: targetId, role });
+  // Only TAs can be put on an assignment. If this person is no longer a TA,
+  // take them off the ones they were given - the assignments themselves stay,
+  // they just have one fewer TA on them.
+  let removed = 0;
+  if (role !== 'ta') {
+    const drop = await q(
+      `DELETE s FROM assignment_staff s
+         JOIN assignments a ON a.id = s.assignment_id
+        WHERE s.user_id = ? AND a.classroom_id = ?`,
+      [targetId, req.params.id]);
+    removed = drop.affectedRows || 0;
+  }
+
+  res.json({ ok: true, user_id: targetId, role, unassigned: removed });
 }
 
 module.exports = { list, setRole };

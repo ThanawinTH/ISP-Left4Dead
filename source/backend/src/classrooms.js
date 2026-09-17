@@ -39,9 +39,13 @@ async function create(req, res) {
     return res.status(400).json({ error: 'Classroom name and semester are required' });
   }
 
-  // Keep the previewed code if it is still free, otherwise pick a new one.
+  // Keep the previewed code if it still looks like one of ours and is free.
+  // Anything else - a placeholder, a typo, a hand-written request - is ignored
+  // and the server issues a fresh code instead.
   let code = String(req.body.join_code || '').trim().toUpperCase();
-  if (!code || await one('SELECT id FROM classrooms WHERE join_code = ?', [code])) {
+  const looksRight = /^KU-[A-Z0-9]{4}$/.test(code);
+
+  if (!looksRight || await one('SELECT id FROM classrooms WHERE join_code = ?', [code])) {
     code = await freeJoinCode();
   }
 
