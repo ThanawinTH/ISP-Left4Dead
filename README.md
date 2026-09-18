@@ -64,7 +64,7 @@ no passwords.
 | Sequence diagrams (SQD) | ✅ Complete |
 | Traceability matrix (Sub-Goal → SRS → SQD) | ✅ Complete |
 | Iteration 1 report | ✅ Complete |
-| Iteration 2 report | 🟡 Written, not yet in `docs/` |
+| Iteration 2 report | ✅ Complete |
 | Project schedule (Gantt / Plane export) | ✅ Complete |
 | UI mockups (Figma) | ✅ Complete |
 | Application source code | 🟡 In progress |
