@@ -111,4 +111,78 @@ async function create(req, res) {
   res.status(201).json({ id: result.insertId });
 }
 
-module.exports = { list, create };
+/**
+ * PATCH /api/classrooms/:id/assignments/:assignmentId
+ * The lecturer edits an assignment they already made. Same rules as creating
+ * one: a title and a valid due date, and any TA named must be a TA here.
+ * Only the fields sent are changed.
+ */
+async function update(req, res) {
+  const assignmentId = Number(req.params.assignmentId);
+
+  const existing = await one(
+    'SELECT id FROM assignments WHERE id = ? AND classroom_id = ?',
+    [assignmentId, req.params.id]);
+  if (!existing) return res.status(404).json({ error: 'Assignment not found' });
+
+  const fields = [];
+  const values = [];
+  const set = (column, value) => { fields.push(`${column} = ?`); values.push(value); };
+
+  if (req.body.title !== undefined) {
+    const title = String(req.body.title).trim();
+    if (!title) return res.status(400).json({ error: 'A title is required' });
+    set('title', title);
+  }
+
+  if (req.body.due_at !== undefined) {
+    if (!req.body.due_at || isNaN(Date.parse(req.body.due_at))) {
+      return res.status(400).json({ error: 'A valid due date is required' });
+    }
+    const year = new Date(req.body.due_at).getFullYear();
+    if (year < 2020 || year > 2100) {
+      return res.status(400).json({ error: 'That due date does not look right - check the year' });
+    }
+    set('due_at', toSqlDate(req.body.due_at));
+  }
+
+  if (req.body.description !== undefined) set('description', req.body.description || null);
+  if (req.body.points !== undefined) set('points', Number(req.body.points) || 0);
+  if (req.body.staff_note !== undefined) set('staff_note', String(req.body.staff_note || '').trim() || null);
+
+  if (req.body.staff_due_at !== undefined) {
+    set('staff_due_at', req.body.staff_due_at && !isNaN(Date.parse(req.body.staff_due_at))
+      ? toSqlDate(req.body.staff_due_at)
+      : null);
+  }
+
+  if (VISIBILITIES.includes(req.body.visibility)) set('visibility', req.body.visibility);
+
+  if (fields.length) {
+    values.push(assignmentId);
+    await q(`UPDATE assignments SET ${fields.join(', ')} WHERE id = ?`, values);
+  }
+
+  // Replacing the TA list is simpler than working out what changed, and the
+  // table is tiny.
+  if (Array.isArray(req.body.staff_ids)) {
+    const staffIds = [...new Set(req.body.staff_ids.map(Number).filter(Boolean))];
+
+    for (const userId of staffIds) {
+      const ta = await one(
+        "SELECT user_id FROM memberships WHERE classroom_id = ? AND user_id = ? AND role = 'ta'",
+        [req.params.id, userId]);
+      if (!ta) return res.status(400).json({ error: 'You can only assign TAs of this classroom' });
+    }
+
+    await q('DELETE FROM assignment_staff WHERE assignment_id = ?', [assignmentId]);
+    for (const userId of staffIds) {
+      await q('INSERT INTO assignment_staff (assignment_id, user_id) VALUES (?, ?)',
+        [assignmentId, userId]);
+    }
+  }
+
+  res.json({ ok: true, id: assignmentId });
+}
+
+module.exports = { list, create, update };

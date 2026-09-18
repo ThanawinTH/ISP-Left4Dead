@@ -36,5 +36,7 @@ router.get('/classrooms/:id/assignments',
   mw(auth.loadMembership), go(assignments.list));
 router.post('/classrooms/:id/assignments',
   mw(auth.loadMembership), auth.requireOwner, go(assignments.create));
+router.patch('/classrooms/:id/assignments/:assignmentId',
+  mw(auth.loadMembership), auth.requireOwner, go(assignments.update));
 
 module.exports = router;
