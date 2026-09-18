@@ -1,5 +1,5 @@
 /* ==========================================================================
-   KU Classroom — Course Support & Activity Dashboard
+   KU Classroom — Course Support & Assignment Dashboard
    Front-end stylesheet. Values sampled directly from the Figma exports.
    ========================================================================== */
 
@@ -423,7 +423,7 @@ a { color: inherit; text-decoration: none; }
 .week__flag { margin-left: auto; font-size: 12.5px; color: var(--slate-500); }
 .week__flag b { color: var(--red-600); }
 
-.activity {
+.assignment {
   width: 100%; text-align: left;
   display: flex; align-items: center; gap: 16px;
   background: var(--white);
@@ -433,22 +433,22 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 12px;
   transition: border-color .15s, box-shadow .15s;
 }
-.activity:hover { border-color: var(--teal-600); }
-.activity.is-selected {
+.assignment:hover { border-color: var(--teal-600); }
+.assignment.is-selected {
   border-color: var(--teal-700);
   box-shadow: 0 0 0 3px rgba(15,118,110,.12);
   background: var(--teal-50);
 }
-.activity__main { min-width: 0; flex: 1; }
-.activity__title { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
-.activity__meta {
+.assignment__main { min-width: 0; flex: 1; }
+.assignment__title { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
+.assignment__meta {
   margin-top: 5px;
   display: flex; align-items: center; gap: 14px;
   font-size: 12.5px; color: var(--slate-500);
 }
-.activity__meta .sq { width: 12px; height: 12px; border-radius: 3px; background: var(--slate-300); flex: none; }
-.activity__pts { font-size: 16px; font-weight: 700; color: var(--teal-700); flex: none; }
-.activity__end { display: flex; align-items: center; gap: 8px; flex: none; }
+.assignment__meta .sq { width: 12px; height: 12px; border-radius: 3px; background: var(--slate-300); flex: none; }
+.assignment__pts { font-size: 16px; font-weight: 700; color: var(--teal-700); flex: none; }
+.assignment__end { display: flex; align-items: center; gap: 8px; flex: none; }
 
 .badge {
   border-radius: var(--r-full);
@@ -463,7 +463,7 @@ a { color: inherit; text-decoration: none; }
 .badge--inprogress { background: var(--blue-100);  color: var(--blue-700); }
 .badge--notstarted { background: var(--gray-100);  color: var(--slate-600); }
 
-/* ---------- Activity details panel ---------- */
+/* ---------- Assignment details panel ---------- */
 .panel {
   background: var(--white);
   border: 1px solid var(--slate-200);
@@ -632,3 +632,203 @@ a { color: inherit; text-decoration: none; }
   .table__row--head { display: none; }
   .table__right { text-align: left; }
 }
+/* ---------- assignments (US-5) ----------
+   Paste at the end of css/styles.css. */
+
+/* search box in the filter bar */
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 180px;
+  padding: 0 14px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--white);
+}
+.search svg { width: 17px; height: 17px; color: var(--slate-400); flex: none; }
+.search input {
+  border: none;
+  outline: none;
+  padding: 10px 0;
+  font: inherit;
+  font-size: 14px;
+  width: 100%;
+  background: none;
+  color: var(--slate-900);
+}
+
+/* create-assignment form */
+.form-row { display: flex; gap: 18px; align-items: flex-start; }
+.field--grow { flex: 1; }
+.field--points { width: 120px; }
+.field--type { width: 190px; }
+.select--block { width: 100%; }
+.hint--plain { color: var(--slate-500); display: block; }
+
+.form-actions--split { justify-content: space-between; align-items: center; }
+.form-actions__right { display: flex; gap: 12px; }
+
+@media (max-width: 760px) {
+  .form-row { flex-direction: column; gap: 0; }
+  .field--points, .field--type { width: 100%; }
+}
+
+/* extras on the create-assignment form (US-5) */
+.field__head { display: flex; align-items: center; justify-content: space-between; }
+.label--sub { font-size: 12px; font-weight: 500; color: var(--slate-500); }
+
+.iconadd {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--teal-700);
+  line-height: 0;
+}
+.iconadd svg { width: 20px; height: 20px; }
+
+/* fields that are drawn but not wired up yet */
+[data-soon] { cursor: pointer; }
+input[data-soon] { background: var(--slate-50); color: var(--slate-500); }
+
+/* keep field labels on one line so the * does not wrap */
+.label { white-space: nowrap; }
+.field--points { width: 150px; }
+
+/* pick several TAs for one assignment (US-5) */
+.picker {
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--white);
+}
+.picker__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--slate-100);
+  cursor: pointer;
+  font-size: 14px;
+}
+.picker__item:last-child { border-bottom: none; }
+.picker__item:hover { background: var(--slate-50); }
+.picker__item input { width: 16px; height: 16px; accent-color: var(--teal-700); }
+.picker__name { font-weight: 600; color: var(--slate-900); }
+.picker__mail { color: var(--slate-500); font-size: 13px; }
+.picker__empty { padding: 14px; color: var(--slate-500); font-size: 13.5px; }
+
+.panel__staff { margin-top: 8px; font-size: 13.5px; color: var(--slate-500); }
+
+/* ---------- assignment details panel: staff actions ---------- */
+.panel__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.panel__head .panel__title { margin: 0; }
+.panel__head .panel__sub { margin: 2px 0 0; }
+.panel__head .linkbtn { flex: none; font-size: 13px; white-space: nowrap; }
+
+.panel__badge { margin-top: 12px; }
+.panel__staff { margin-top: 10px; font-size: 13px; color: var(--slate-500); }
+
+.panel__actions { display: flex; gap: 10px; margin-bottom: 12px; }
+
+/* these sit after the base .btn rules on purpose, and are scoped so they win */
+.panel__actions .btn--danger,
+.panel .btn--danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #fff;
+}
+.panel__actions .btn--blue,
+.panel .btn--blue {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.panel .btn--block { width: 100%; justify-content: center; }
+
+/* ---------- form spacing (create assignment) ----------
+   .field carries the gap on its own, but a .form-row wraps two fields, so the
+   row needs the gap and its children need none - otherwise rows collapse onto
+   whatever follows them. */
+.form-card .form-row { margin-bottom: 22px; align-items: flex-start; }
+.form-card .form-row .field { margin-bottom: 0; }
+.form-card > .field { margin-bottom: 22px; }
+.form-card > .field:last-of-type { margin-bottom: 22px; }
+.form-card .form-actions { margin-top: 30px; }
+
+/* the greyed-out fields that are not built yet sit closer together, so they
+   read as one block rather than three unrelated inputs */
+.form-card .field--soon { margin-bottom: 12px; }
+
+/* The hidden attribute loses to any rule that sets display, which is most of
+   our components. This makes hidden mean hidden. */
+[hidden] { display: none !important; }
+
+/* date + 24-hour time, side by side. A plain text box for the time keeps it
+   24-hour regardless of the computer's regional format. */
+.datetime { display: flex; gap: 10px; }
+.datetime .input { flex: 1; }
+.datetime .input--time { flex: none; width: 110px; text-align: center; letter-spacing: .04em; }
+
+/* group heading: title (and any overdue flag) on one line, the count under it */
+.week__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 2px;
+  align-items: baseline;
+}
+.week__title { grid-column: 1; grid-row: 1; }
+.week__flag  { grid-column: 2; grid-row: 1; justify-self: end; }
+.week__count { grid-column: 1; grid-row: 2; }
+
+/* details panel rhythm */
+.panel hr { margin: 20px 0; border: none; border-top: 1px solid var(--slate-200); }
+.panel__desc { margin: 8px 0 0; line-height: 1.6; }
+.panel__label { margin-bottom: 2px; }
+
+.panel__actions { margin-bottom: 0; }
+.panel .btn--block { margin-top: 10px; }
+.panel__actions + .btn--block { margin-top: 12px; }
+
+/* what a TA has been asked to do on this assignment */
+.mytask {
+  background: var(--teal-50);
+  border: 1px solid #99f6e4;
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  margin: 14px 0;
+}
+.mytask__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--teal-700);
+  margin-bottom: 6px;
+}
+.mytask__due { font-size: 13.5px; font-weight: 600; color: var(--slate-900); }
+.mytask__note { margin: 6px 0 0; font-size: 13px; color: var(--slate-600); line-height: 1.5; }
+
+/* marks a row the lecturer handed to a TA */
+.mine {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--teal-50);
+  color: var(--teal-700);
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.mine svg { width: 13px; height: 13px; }
+.mine--count { background: var(--slate-100); color: var(--slate-600); }

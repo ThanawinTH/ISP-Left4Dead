@@ -102,9 +102,14 @@ function startEditing(row, member) {
   select.addEventListener('change', async () => {
     select.disabled = true;
     try {
-      await API.patch(`/classrooms/${classroomId}/members/${member.id}`, { role: select.value });
+      const res = await API.patch(`/classrooms/${classroomId}/members/${member.id}`,
+        { role: select.value });
       member.role = select.value;                       // keep our copy in step
-      KU.toast('Role updated to ' + ROLE_LABEL[select.value]);
+
+      // Say so if they were taken off assignments on the way out of the TA role.
+      KU.toast(res.unassigned
+        ? `Role updated to ${ROLE_LABEL[select.value]} — removed from ${res.unassigned} assignment${res.unassigned === 1 ? '' : 's'}`
+        : 'Role updated to ' + ROLE_LABEL[select.value]);
     } catch (err) {
       KU.toast(err.message);
     }
@@ -137,6 +142,9 @@ document.getElementById('resetCode').addEventListener('click', () => {
     document.getElementById('memberCount').textContent = 'No classroom selected';
     return;
   }
+  // the class menu on this page has to point back at the right classroom
+  document.getElementById('assignmentLink').href = 'class-schedule.html?id=' + classroomId;
+
   try {
     await loadJoinCode();
     await loadMembers();
