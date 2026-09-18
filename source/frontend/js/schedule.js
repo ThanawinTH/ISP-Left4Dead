@@ -247,7 +247,7 @@ function renderPanel() {
         <div class="panel__sub">Selected assignment</div>
       </div>
       ${state.isOwner
-        ? '<button class="linkbtn" data-soon="Edit assignment">Edit</button>'
+        ? `<a class="linkbtn" href="create-assignment.html?id=${classroomId}&edit=${a.id}">Edit</a>`
         : ''}
     </div>
 

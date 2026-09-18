@@ -832,3 +832,6 @@ input[data-soon] { background: var(--slate-50); color: var(--slate-500); }
 }
 .mine svg { width: 13px; height: 13px; }
 .mine--count { background: var(--slate-100); color: var(--slate-600); }
+
+a.linkbtn { text-decoration: none; }
+a.linkbtn:hover { text-decoration: underline; }

@@ -4,10 +4,50 @@
    "Save as Draft" keeps it staff-only until someone posts it.
    ========================================================================== */
 
-const classroomId = new URLSearchParams(location.search).get('id');
+const params = new URLSearchParams(location.search);
+const classroomId = params.get('id');
+const editingId = params.get('edit');          // set when we arrived from Edit
 const backToClass = 'class-schedule.html?id=' + classroomId;
 
 let saving = false;   // stops a double click creating two assignments
+
+/** Splits a stored "2026-10-20 23:59:00" into the two boxes on the form. */
+function fillDateTime(dateId, timeId, stored) {
+  if (!stored) return;
+  const [date, time] = String(stored).replace('T', ' ').split(' ');
+  document.getElementById(dateId).value = date;
+  document.getElementById(timeId).value = (time || '').slice(0, 5);
+}
+
+/**
+ * When we arrive with ?edit=, load that assignment and put its values in the
+ * form. There is no single-assignment endpoint, so we take it from the list.
+ */
+async function loadForEditing() {
+  const { assignments } = await API.get(`/classrooms/${classroomId}/assignments`);
+  const a = assignments.find(x => String(x.id) === editingId);
+  if (!a) { KU.toast('That assignment no longer exists'); return; }
+
+  document.getElementById('title').value = a.title;
+  document.getElementById('points').value = a.points;
+  document.getElementById('description').value = a.description || '';
+  document.getElementById('staffNote').value = a.staff_note || '';
+  fillDateTime('dueDate', 'dueTime', a.due_at);
+  fillDateTime('staffDue', 'staffTime', a.staff_due_at);
+
+  // tick the TAs already on it
+  const names = (a.staff_names || '').split(', ').filter(Boolean);
+  document.querySelectorAll('#staffPicker input').forEach(box => {
+    const label = box.closest('.picker__item').querySelector('.picker__name').textContent;
+    box.checked = names.includes(label);
+  });
+
+  // the page is an edit form now, so say so
+  document.querySelector('.header__titles h1').textContent = 'Edit Assignment';
+  document.getElementById('publish').textContent =
+    a.visibility === 'class' ? 'Save Changes' : 'Save and Publish';
+  document.getElementById('saveDraft').textContent = 'Save as Draft';
+}
 
 /** Fills the subtitle under the page title with the classroom's name. */
 async function loadClassroom() {
@@ -77,19 +117,26 @@ async function save(visibility, button) {
   button.disabled = true;
   button.textContent = 'Saving…';
 
-  try {
-    await API.post(`/classrooms/${classroomId}/assignments`, {
-      title: title.value.trim(),
-      points: Number(document.getElementById('points').value) || 0,
-      description: document.getElementById('description').value.trim() || null,
-      due_at: new Date(`${dueDate.value}T${dueTime.value}`).toISOString(),
-      staff_ids: pickedStaff(),
-      staff_due_at: staffDueISO(),
-      staff_note: document.getElementById('staffNote').value.trim() || null,
-      visibility,
-    });
+  const body = {
+    title: title.value.trim(),
+    points: Number(document.getElementById('points').value) || 0,
+    description: document.getElementById('description').value.trim() || null,
+    due_at: new Date(`${dueDate.value}T${dueTime.value}`).toISOString(),
+    staff_ids: pickedStaff(),
+    staff_due_at: staffDueISO(),
+    staff_note: document.getElementById('staffNote').value.trim() || null,
+    visibility,
+  };
 
-    KU.toast(visibility === 'class' ? 'Assignment published' : 'Draft saved');
+  try {
+    if (editingId) {
+      await API.patch(`/classrooms/${classroomId}/assignments/${editingId}`, body);
+    } else {
+      await API.post(`/classrooms/${classroomId}/assignments`, body);
+    }
+
+    KU.toast(editingId ? 'Assignment saved'
+           : visibility === 'class' ? 'Assignment published' : 'Draft saved');
     setTimeout(() => location.href = backToClass, 900);
   } catch (err) {
     KU.toast(err.message);
@@ -149,6 +196,7 @@ function staffDueISO() {
   try {
     await loadClassroom();
     await loadStaff();
+    if (editingId) await loadForEditing();
   } catch (err) {
     KU.toast(err.message);
   }
