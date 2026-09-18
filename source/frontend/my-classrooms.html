@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=31">
+<link rel="stylesheet" href="css/styles.css?v=32">
 </head>
 <body>
 
@@ -60,10 +60,10 @@
       <section class="joinbar">
         <div>
           <div class="joinbar__title">Join a Classroom</div>
-          <div class="joinbar__desc">Enter your unique classroom join code provided by your instructor.</div>
+          <div class="joinbar__desc">Enter the join code your instructor gave you, like KU-489A. The dash is optional.</div>
         </div>
         <form class="joinbar__form" id="joinForm" novalidate>
-          <input class="input input--code" id="joinCode" placeholder="Enter 6-digit Join Code"
+          <input class="input input--code" id="joinCode" placeholder="Enter join code, e.g. KU-489A"
                  maxlength="8" autocomplete="off" aria-label="Join code">
           <button class="btn btn--primary" type="submit">Join</button>
         </form>
@@ -77,8 +77,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=31"></script>
-<script src="js/api.js?v=31"></script>
+<script src="js/app.js?v=32"></script>
+<script src="js/api.js?v=32"></script>
 <script>
   const ROLE_LABEL = { lecturer: 'Lecturer', ta: 'TA', staff: 'Staff', student: 'Student' };
 

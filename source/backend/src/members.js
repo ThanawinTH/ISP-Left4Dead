@@ -54,12 +54,17 @@ async function setRole(req, res) {
   // they just have one fewer TA on them.
   let removed = 0;
   if (role !== 'ta') {
-    const drop = await q(
-      `DELETE s FROM assignment_staff s
-         JOIN assignments a ON a.id = s.assignment_id
-        WHERE s.user_id = ? AND a.classroom_id = ?`,
-      [targetId, req.params.id]);
-    removed = drop.affectedRows || 0;
+    try {
+      const drop = await q(
+        `DELETE FROM assignment_staff
+          WHERE user_id = ?
+            AND assignment_id IN (SELECT id FROM assignments WHERE classroom_id = ?)`,
+        [targetId, req.params.id]);
+      removed = drop.affectedRows || 0;
+    } catch (err) {
+      // Tidying up the assignments must never stop the role change itself.
+      console.error('could not clear assignment_staff:', err.message);
+    }
   }
 
   res.json({ ok: true, user_id: targetId, role, unassigned: removed });

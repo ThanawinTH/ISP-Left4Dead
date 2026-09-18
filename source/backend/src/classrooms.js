@@ -2,6 +2,18 @@ const { q, one } = require('./db');
 
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';   // no I O 0 1 — easy to read aloud
 
+/**
+ * People read the code off a screen and type it back, so they leave out the
+ * dash, use lower case, or paste it with a space on the end. Anything that has
+ * the right letters and digits should get in.
+ */
+function normaliseJoinCode(input) {
+  const bare = String(input || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!bare) return '';
+  const body = bare.startsWith('KU') ? bare.slice(2) : bare;
+  return 'KU-' + body;
+}
+
 /** SRS-2: a code no active classroom is using. */
 async function freeJoinCode() {
   for (let i = 0; i < 20; i++) {
@@ -61,8 +73,10 @@ async function create(req, res) {
 
 /** POST /api/classrooms/join  { code } — SRS-4, SRS-5: always joins as Student. */
 async function join(req, res) {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  if (!code) return res.status(400).json({ error: 'Enter a join code first' });
+  const code = normaliseJoinCode(req.body.code);
+  if (!code || code === 'KU-') {
+    return res.status(400).json({ error: 'Enter a join code first' });
+  }
 
   const classroom = await one('SELECT id, name FROM classrooms WHERE join_code = ?', [code]);
   if (!classroom) {
