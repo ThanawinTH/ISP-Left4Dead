@@ -92,6 +92,27 @@ function badge(a) {
   return { key: 'inprogress', value: 'assigned', label: 'Assigned' };
 }
 
+/* ---------- US-7 dashboard columns (SRS-13) ----------
+   Staff see who set each assignment, which TAs are on it and where the work
+   is up to. Students do not - those are staff details. */
+
+const STATUS_LABEL = { notstarted: 'Not Started', inprogress: 'In Progress', done: 'Done' };
+
+function staffColumns(a) {
+  const tas = (a.staff || []).map(s => s.name);
+  return `
+        <span class="col" title="Created by">
+          <span class="col__k">Owner</span> ${esc(a.created_by_name)}
+        </span>
+        <span class="col ${tas.length ? '' : 'col--none'}" title="${esc(tas.join(', '))}">
+          <span class="col__k">TAs</span> ${tas.length ? esc(tas.join(', ')) : 'None'}
+        </span>
+        <span class="col">
+          <span class="col__k">Status</span>
+          <span class="status status--${esc(a.status)}">${esc(STATUS_LABEL[a.status] || a.status)}</span>
+        </span>`;
+}
+
 /** Overdue is worth flagging on the week header, whoever is looking. */
 const isOverdue = (a) => a.status !== 'done' && parseDue(a.due_at) < new Date();
 
@@ -210,6 +231,7 @@ function rowHTML(a) {
       <span class="assignment__title">${esc(a.title)}</span>
       <span class="assignment__meta">
         <span><span class="sq"></span> Due: ${esc(dueText(a.due_at))}</span>
+        ${state.isStaff ? staffColumns(a) : ''}
       </span>
     </span>
     <span class="assignment__pts">${a.points} pts</span>
@@ -261,6 +283,7 @@ function renderPanel() {
     <div class="panel__pts">${a.points} pts</div>
     <div class="panel__badge"><span class="badge badge--${b.key}">${b.label}</span></div>
     ${a.staff_names ? `<div class="panel__staff">TAs: ${esc(a.staff_names)}</div>` : ''}
+    ${state.isStaff ? `<div class="panel__staff">Status: <span class="status status--${esc(a.status)}">${esc(STATUS_LABEL[a.status] || a.status)}</span></div>` : ''}
     ${state.isOwner ? myTask(a) : ''}
 
     <hr>
