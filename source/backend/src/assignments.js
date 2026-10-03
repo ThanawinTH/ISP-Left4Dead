@@ -27,7 +27,8 @@ async function list(req, res) {
   const assignments = await q(
     `SELECT a.id, a.title, a.description, a.points, a.due_at, a.visibility,
             a.staff_due_at, a.staff_note, a.status, c.name AS created_by_name,
-            GROUP_CONCAT(u.name ORDER BY u.name SEPARATOR ', ') AS staff_names,
+            IF(COUNT(u.id) = 0, JSON_ARRAY(),
+               JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'name', u.name))) AS staff,
             MAX(s.user_id = ?) AS assigned_to_me
        FROM assignments a
        JOIN users c ON c.id = a.created_by
@@ -35,10 +36,16 @@ async function list(req, res) {
        LEFT JOIN users u            ON u.id = s.user_id
       WHERE a.classroom_id = ?${onlyClassVisible}
       GROUP BY a.id
-      ORDER BY a.due_at ASC`,
+      ORDER BY a.due_at ASC, a.id ASC`,
     [req.session.user.id, req.params.id]);
 
+  // US-7 (SRS-13): the assigned TAs come back as a real list so the dashboard
+  // can show them as a column. staff_names stays for the pages that read it.
   assignments.forEach(a => {
+    if (typeof a.staff === 'string') a.staff = JSON.parse(a.staff);
+    a.staff = (a.staff || []).filter(s => s && s.id)
+      .sort((x, y) => x.name.localeCompare(y.name));
+    a.staff_names = a.staff.map(s => s.name).join(', ') || null;
     a.can_grade = req.isOwner || (req.role === 'ta' && Number(a.assigned_to_me) === 1);
     delete a.assigned_to_me;
   });
