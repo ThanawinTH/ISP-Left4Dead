@@ -12,8 +12,9 @@ const state = {
   isOwner: false,     // the lecturer - the only one who can create or edit
   isStaff: false,     // lecturer, TA and University staff - they see drafts
   role: 'student',
-  status: 'all',
   search: '',
+  atRisk: [],         // US-8: the student's at-risk rows, from ?atRisk=1
+  riskOnly: false,    // the "At risk only" toggle
 };
 
 const $ = (id) => document.getElementById(id);
@@ -82,14 +83,23 @@ function badge(a) {
       : { key: 'notstarted', label: 'Not Posted' };
   }
 
-  // Submitted is stored as the "done" status for now. It becomes a real check
-  // against the student's upload once submissions exist.
-  if (a.status === 'done') return { key: 'done', value: 'submitted', label: 'Submitted' };
+  // US-8: the server decides the risk (SRS-12), so every page agrees on it.
+  return RISK_BADGE[a.risk] || RISK_BADGE.ok;
+}
 
-  const hoursLeft = (parseDue(a.due_at) - new Date()) / 36e5;
-  if (hoursLeft < 0) return { key: 'overdue', value: 'overdue', label: 'Overdue' };
-  if (hoursLeft < 72) return { key: 'duesoon', value: 'duesoon', label: 'Due Soon' };
-  return { key: 'inprogress', value: 'assigned', label: 'Assigned' };
+const RISK_BADGE = {
+  duesoon: { key: 'duesoon',    label: 'Due Soon' },
+  closed:  { key: 'notstarted', label: 'Closed' },
+  ok:      { key: 'inprogress', label: 'Assigned' },
+};
+
+const isAtRisk = (a) => a.risk === 'duesoon';
+const isClosed = (a) => a.risk === 'closed';
+
+/** "Due in 5h", "Due in 2d" - how close, for the at-risk box. */
+function riskWhen(a) {
+  const hours = Math.max(0, (parseDue(a.due_at) - new Date()) / 36e5);
+  return hours >= 24 ? `Due in ${Math.round(hours / 24)}d` : `Due in ${Math.max(1, Math.round(hours))}h`;
 }
 
 /* ---------- US-7 dashboard columns (SRS-13) ----------
@@ -114,7 +124,6 @@ function staffColumns(a) {
 }
 
 /** Overdue is worth flagging on the week header, whoever is looking. */
-const isOverdue = (a) => a.status !== 'done' && parseDue(a.due_at) < new Date();
 
 /* ---------- loading ---------- */
 
@@ -138,22 +147,29 @@ async function loadAssignments() {
   button.hidden = !state.isOwner;
   button.href = 'create-assignment.html?id=' + classroomId;
 
-  // Staff read Posted / Not Posted, so the urgency filter is students only.
-  $('filterStatus').hidden = state.isStaff;
+  // US-8 is for students: the at-risk list comes from the server's own filter
+  // (SRS-13), so the box and the toggle show exactly what ?atRisk=1 returns.
+  $('riskToggle').hidden = state.isStaff;
+  if (!state.isStaff) {
+    const risky = await API.get(`/classrooms/${classroomId}/assignments?atRisk=1`);
+    state.atRisk = risky.assignments;
+    $('riskCount').textContent = state.atRisk.length;
+    $('riskCount').hidden = state.atRisk.length === 0;
+  }
 }
 
 /* ---------- filtering ---------- */
 
 function visible() {
   const term = state.search.trim().toLowerCase();
-  return state.assignments.filter(a =>
-    (state.status === 'all' || badge(a).value === state.status) &&
-    (!term || a.title.toLowerCase().includes(term)));
+  const source = state.riskOnly ? state.atRisk : state.assignments;
+  return source.filter(a => !term || a.title.toLowerCase().includes(term));
 }
 
 /* ---------- the list ---------- */
 
 function renderList() {
+  renderRiskBox();
   const rows = visible();
   const host = $('weeks');
   const empty = $('emptyState');
@@ -163,10 +179,12 @@ function renderList() {
     host.innerHTML = '';
 
     // Say why the list is empty - nothing here at all, or nothing matching.
-    const filtering = state.search.trim() !== '' || state.status !== 'all';
-    empty.innerHTML = filtering
-      ? `<strong>No assignments match</strong>Try clearing the search or the status filter.`
-      : `<strong>No assignments yet</strong>Nothing has been added to this classroom.`;
+    const filtering = state.search.trim() !== '';
+    empty.innerHTML = state.riskOnly && !filtering
+      ? `<strong>You're on track</strong>Nothing is due in the next 3 days.`
+      : filtering
+        ? `<strong>No assignments match</strong>Try clearing the search.`
+        : `<strong>No assignments yet</strong>Nothing has been added to this classroom.`;
     return;
   }
 
@@ -183,14 +201,14 @@ function renderList() {
     .sort((x, y) => (x[0] === 'today' ? -1 : y[0] === 'today' ? 1 : x[0] - y[0]));
 
   host.innerHTML = ordered.map(([key, items]) => {
-    // Overdue is a student's problem - staff see Posted / Not Posted instead.
-    const overdue = state.isStaff ? 0 : items.filter(isOverdue).length;
+    // Due soon is a student's problem - staff see Posted / Not Posted instead.
+    const soon = state.isStaff ? 0 : items.filter(isAtRisk).length;
     return `
       <section class="week">
         <div class="week__head">
           <span class="week__title">${esc(groupLabel(key))}</span>
           <span class="week__count">${items.length} assignment${items.length === 1 ? '' : 's'}</span>
-          ${overdue ? `<span class="week__flag"><b>${overdue} overdue</b></span>` : ''}
+          ${soon ? `<span class="week__flag week__flag--soon"><b>${soon} due soon</b></span>` : ''}
         </div>
         ${items.map(rowHTML).join('')}
       </section>`;
@@ -202,6 +220,51 @@ function renderList() {
       renderList();
       renderPanel();
     }));
+}
+
+/* ---------- US-8: what needs attention (students) ----------
+   A short box above the schedule with the at-risk assignments, most urgent
+   first. Hidden when there are none, and while "At risk only" is on - the list
+   below already is that. */
+
+function renderRiskBox() {
+  const box = $('riskBox');
+  const rows = state.atRisk;
+  if (state.isStaff || state.riskOnly || !rows.length) { box.hidden = true; return; }
+
+  box.hidden = false;
+  box.innerHTML = `
+    <div class="risk__head">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 4 2.8 19.5h18.4L12 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 10v4.2M12 17.2v.1" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span>${rows.length} assignment${rows.length === 1 ? ' is' : 's are'} due soon</span>
+      <button class="linkbtn risk__all" id="riskShowAll">Show only these</button>
+    </div>
+    ${rows.map(a => `
+      <button class="risk__row" data-id="${a.id}">
+        <span class="risk__main">
+          <span class="risk__title">${esc(a.title)}</span>
+          <span class="risk__due">Due ${esc(dueText(a.due_at))}</span>
+        </span>
+        <span class="badge badge--${a.risk}">${riskWhen(a)}</span>
+      </button>`).join('')}`;
+
+  box.querySelectorAll('.risk__row').forEach(el =>
+    el.addEventListener('click', () => {
+      state.selected = Number(el.dataset.id);
+      renderList();
+      renderPanel();
+    }));
+  $('riskShowAll').addEventListener('click', () => setRiskOnly(true));
+}
+
+function setRiskOnly(on) {
+  state.riskOnly = on;
+  $('riskToggle').querySelectorAll('.seg__btn').forEach(b =>
+    b.classList.toggle('is-on', (b.dataset.risk === 'only') === on));
+  renderList();
 }
 
 function rowHTML(a) {
@@ -226,7 +289,7 @@ function rowHTML(a) {
       : '';
 
   return `
-  <button class="assignment ${a.id === state.selected ? 'is-selected' : ''}" data-id="${a.id}">
+  <button class="assignment ${a.id === state.selected ? 'is-selected' : ''} ${!state.isStaff && (isAtRisk(a) || isClosed(a)) ? 'assignment--' + a.risk : ''}" data-id="${a.id}">
     <span class="assignment__main">
       <span class="assignment__title">${esc(a.title)}</span>
       <span class="assignment__meta">
@@ -317,6 +380,19 @@ function myTask(a) {
  * so when you click it.
  */
 function studentSubmission(a) {
+  // Past the due date the assignment is closed - no more uploads (US-8).
+  if (isClosed(a)) {
+    return `
+    <hr>
+    <div class="panel__label">Submission</div>
+    <div class="closed-note">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span><b>This assignment is closed</b>The due date was ${esc(dueText(a.due_at))}.</span>
+    </div>`;
+  }
   return `
     <hr>
     <div class="panel__label">Submission</div>
@@ -393,9 +469,9 @@ function wireSoonButtons() {
 
 /* ---------- controls ---------- */
 
-$('filterStatus').addEventListener('change', (e) => {
-  state.status = e.target.value;
-  renderList();
+$('riskToggle').addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg__btn');
+  if (btn) setRiskOnly(btn.dataset.risk === 'only');
 });
 
 $('searchBox').addEventListener('input', (e) => {

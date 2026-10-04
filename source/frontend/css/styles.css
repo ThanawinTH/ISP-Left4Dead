@@ -848,3 +848,38 @@ a.linkbtn:hover { text-decoration: underline; }
 .status--notstarted { background: var(--gray-100);  color: var(--slate-600); }
 .status--inprogress { background: var(--blue-100);  color: var(--blue-700); }
 .status--done       { background: var(--green-100); color: var(--green-700); }
+
+/* ---------- US-8 at-risk assignments (students) ---------- */
+.seg { display: inline-flex; flex: none; padding: 4px; gap: 4px; background: var(--slate-100);
+       border-radius: var(--r-md); }
+.seg__btn { display: inline-flex; align-items: center; gap: 7px; border: 0; background: transparent;
+            font: inherit; font-size: 13.5px; font-weight: 600; color: var(--slate-600);
+            padding: 7px 14px; border-radius: var(--r-sm); cursor: pointer; white-space: nowrap; }
+.seg__btn.is-on { background: var(--white); color: var(--teal-700); box-shadow: 0 1px 3px rgba(15,23,42,.1); }
+.seg__n { font-size: 11.5px; font-weight: 700; padding: 1px 7px; border-radius: var(--r-full);
+          background: var(--amber-100); color: var(--amber-700); }
+
+.risk { background: var(--white); border: 1px solid var(--slate-200); border-left: 4px solid var(--amber-700);
+        border-radius: var(--r-lg); padding: 16px 20px 8px; margin-bottom: 26px; }
+.risk__head { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--amber-700);
+              margin-bottom: 6px; }
+.risk__head svg { width: 20px; height: 20px; flex: none; }
+.risk__all { margin-left: auto; font-size: 13px; }
+.risk__row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+             text-align: left; background: none; border: 0; border-top: 1px solid var(--slate-200);
+             padding: 12px 0; font: inherit; cursor: pointer; }
+.risk__row:hover .risk__title { color: var(--teal-700); }
+.risk__main { display: grid; gap: 3px; min-width: 0; }
+.risk__title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.risk__due { font-size: 13px; color: var(--slate-500); }
+
+.assignment--duesoon { border-left: 4px solid var(--amber-700); }
+.assignment--closed  { background: var(--slate-100); }
+.assignment--closed .assignment__title { color: var(--slate-500); }
+.week__flag--soon b { color: var(--amber-700); }
+
+.closed-note { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
+               background: var(--slate-100); border: 1px solid var(--slate-200);
+               border-radius: var(--r-lg); color: var(--slate-600); font-size: 13.5px; }
+.closed-note svg { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+.closed-note b { display: block; color: var(--slate-900); margin-bottom: 2px; }

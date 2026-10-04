@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=32">
+<link rel="stylesheet" href="css/styles.css?v=33">
 </head>
 <body>
 
@@ -76,13 +76,11 @@
                 <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
               </svg>Class Assignment
             </a>
-            <select class="select" id="filterStatus">
-              <option value="all">All Statuses</option>
-              <option value="assigned">Assigned</option>
-              <option value="duesoon">Due Soon</option>
-              <option value="overdue">Overdue</option>
-              <option value="submitted">Submitted</option>
-            </select>
+            <!-- US-8: students switch between everything and only what's at risk -->
+            <div class="seg" id="riskToggle" hidden>
+              <button class="seg__btn is-on" data-risk="all">All</button>
+              <button class="seg__btn" data-risk="only">Due soon <span class="seg__n" id="riskCount" hidden>0</span></button>
+            </div>
             <div class="search">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/>
@@ -91,6 +89,9 @@
               <input id="searchBox" placeholder="Search" autocomplete="off">
             </div>
           </div>
+
+          <!-- US-8: at-risk assignments for a student, above the schedule -->
+          <div class="risk" id="riskBox" hidden></div>
 
           <div id="weeks"></div>
           <div class="empty" id="emptyState" hidden>
@@ -107,9 +108,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=32"></script>
-<script src="js/api.js?v=32"></script>
-<script src="js/schedule.js?v=32"></script>
+<script src="js/app.js?v=33"></script>
+<script src="js/api.js?v=33"></script>
+<script src="js/schedule.js?v=33"></script>
 <script>
   // Menu items that are designed but not built yet.
   document.querySelectorAll('[data-soon]').forEach(el =>
