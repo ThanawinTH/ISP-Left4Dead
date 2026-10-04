@@ -5,6 +5,22 @@ const { q, one } = require('./db');
 const VISIBILITIES = ['class', 'staff'];
 const STATUSES = ['notstarted', 'inprogress', 'done'];
 
+/*
+ * US-8 (SRS-12): at-risk for a student, worked out in SQL so every page agrees.
+ *   closed  - the due date has passed; the assignment no longer takes work
+ *   duesoon - due within the next 3 days; this is what "at risk" means
+ *   ok      - everything else
+ * Dates are stored in UTC, so they are compared with UTC_TIMESTAMP().
+ * "Not submitted" joins in here once submissions exist (US-14).
+ */
+const DUE_SOON_DAYS = 3;
+const STUDENT_RISK = `
+  CASE
+    WHEN a.due_at <  UTC_TIMESTAMP()                                 THEN 'closed'
+    WHEN a.due_at <  UTC_TIMESTAMP() + INTERVAL ${DUE_SOON_DAYS} DAY THEN 'duesoon'
+    ELSE 'ok'
+  END`;
+
 /** The browser sends an ISO date; MySQL wants "YYYY-MM-DD HH:MM:SS". */
 function toSqlDate(value) {
   return new Date(value).toISOString().slice(0, 19).replace('T', ' ');
@@ -22,6 +38,14 @@ function toSqlDate(value) {
 async function list(req, res) {
   const onlyClassVisible = req.isStaff ? '' : " AND a.visibility = 'class'";
 
+  // US-8 is a student story: only students get a risk, and only they can
+  // narrow the list to the at-risk rows (SRS-13).
+  const forStudent = !req.isStaff;
+  const riskColumn = forStudent ? `, ${STUDENT_RISK} AS risk` : '';
+  const atRiskOnly = forStudent && req.query.atRisk === '1'
+    ? " HAVING risk = 'duesoon'"
+    : '';
+
   // can_grade is true when this person is one of the TAs the lecturer added to
   // that assignment. The lecturer gets it on everything.
   const assignments = await q(
@@ -29,13 +53,13 @@ async function list(req, res) {
             a.staff_due_at, a.staff_note, a.status, c.name AS created_by_name,
             IF(COUNT(u.id) = 0, JSON_ARRAY(),
                JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'name', u.name))) AS staff,
-            MAX(s.user_id = ?) AS assigned_to_me
+            MAX(s.user_id = ?) AS assigned_to_me${riskColumn}
        FROM assignments a
        JOIN users c ON c.id = a.created_by
        LEFT JOIN assignment_staff s ON s.assignment_id = a.id
        LEFT JOIN users u            ON u.id = s.user_id
       WHERE a.classroom_id = ?${onlyClassVisible}
-      GROUP BY a.id
+      GROUP BY a.id${atRiskOnly}
       ORDER BY a.due_at ASC, a.id ASC`,
     [req.session.user.id, req.params.id]);
 
