@@ -451,7 +451,7 @@ function staffActions(a) {
     <hr>
     <div class="panel__actions">
       ${posted ? '' : '<button class="btn btn--primary" data-soon="Post Assignment">Post Assignment</button>'}
-      <button class="btn btn--danger" data-soon="Delete">Delete</button>
+      <button class="btn btn--danger" id="btnDelete" data-id="${a.id}">Delete</button>
     </div>
     ${posted
       ? `<button class="btn btn--primary btn--block" data-soon="Check the submitted status">
@@ -465,6 +465,35 @@ function staffActions(a) {
 function wireSoonButtons() {
   document.querySelectorAll('#panel [data-soon]').forEach(el =>
     el.addEventListener('click', () => KU.toast(el.dataset.soon + ' — not built yet')));
+  wireDelete();
+}
+
+/**
+ * Lecturer only - the button is never drawn for anyone else, and the server
+ * refuses everyone else with 403 anyway (US-9, SRS-14). Asks first: a deleted
+ * assignment and its TA list cannot be brought back.
+ */
+function wireDelete() {
+  const btn = document.getElementById('btnDelete');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const id = Number(btn.dataset.id);
+    const a = state.assignments.find(x => x.id === id);
+    if (!a || !confirm(`Delete "${a.title}"? This can't be undone.`)) return;
+
+    btn.disabled = true;
+    try {
+      await API.del(`/classrooms/${classroomId}/assignments/${id}`);
+      state.assignments = state.assignments.filter(x => x.id !== id);
+      state.selected = null;
+      renderList();
+      renderPanel();
+      KU.toast('Assignment deleted');
+    } catch (err) {
+      btn.disabled = false;
+      KU.toast(err.message);
+    }
+  });
 }
 
 /* ---------- controls ---------- */
