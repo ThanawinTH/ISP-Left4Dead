@@ -216,4 +216,19 @@ async function update(req, res) {
   res.json({ ok: true, id: assignmentId });
 }
 
-module.exports = { list, create, update };
+/**
+ * DELETE /api/classrooms/:id/assignments/:assignmentId
+ * Only the lecturer who owns the classroom (requireOwner, in the route).
+ * A student is refused with 403 before getting here - US-9 (SRS-14).
+ * The assignment's TA rows go with it (ON DELETE CASCADE).
+ */
+async function remove(req, res) {
+  const assignmentId = Number(req.params.assignmentId);
+  const result = await q(
+    'DELETE FROM assignments WHERE id = ? AND classroom_id = ?',
+    [assignmentId, req.params.id]);
+  if (!result.affectedRows) return res.status(404).json({ error: 'Assignment not found' });
+  res.json({ ok: true, id: assignmentId });
+}
+
+module.exports = { list, create, update, remove };

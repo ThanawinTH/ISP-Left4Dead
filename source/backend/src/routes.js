@@ -39,4 +39,8 @@ router.post('/classrooms/:id/assignments',
 router.patch('/classrooms/:id/assignments/:assignmentId',
   mw(auth.loadMembership), auth.requireOwner, go(assignments.update));
 
+/* US-9 (SRS-14): only the lecturer deletes. Students, TAs and staff get 403. */
+router.delete('/classrooms/:id/assignments/:assignmentId',
+  mw(auth.loadMembership), auth.requireOwner, go(assignments.remove));
+
 module.exports = router;
