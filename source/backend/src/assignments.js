@@ -21,6 +21,10 @@ const STUDENT_RISK = `
     ELSE 'ok'
   END`;
 
+/* TAs check student work, so their deadline cannot come before the students'
+   due date - there would be nothing submitted yet to check. */
+const TA_DUE_ERROR = "The TA check date can't be before the students' due date";
+
 /** The browser sends an ISO date; MySQL wants "YYYY-MM-DD HH:MM:SS". */
 function toSqlDate(value) {
   return new Date(value).toISOString().slice(0, 19).replace('T', ' ');
@@ -113,6 +117,10 @@ async function create(req, res) {
     : null;
   const staffNote = String(req.body.staff_note || '').trim() || null;
 
+  if (staffDue && new Date(req.body.staff_due_at) < new Date(dueAt)) {
+    return res.status(400).json({ error: TA_DUE_ERROR });
+  }
+
   // Only TAs of this classroom can be given an assignment. Anything else in the
   // list is rejected rather than quietly ignored.
   const staffIds = Array.isArray(req.body.staff_ids)
@@ -152,9 +160,18 @@ async function update(req, res) {
   const assignmentId = Number(req.params.assignmentId);
 
   const existing = await one(
-    'SELECT id FROM assignments WHERE id = ? AND classroom_id = ?',
+    'SELECT id, due_at, staff_due_at FROM assignments WHERE id = ? AND classroom_id = ?',
     [assignmentId, req.params.id]);
   if (!existing) return res.status(404).json({ error: 'Assignment not found' });
+
+  // Check the two dates as they will be after this edit, so moving either one
+  // can't leave the TA date before the students' due date.
+  const nextDue = req.body.due_at !== undefined ? req.body.due_at : existing.due_at;
+  const nextStaffDue = req.body.staff_due_at !== undefined ? req.body.staff_due_at : existing.staff_due_at;
+  if (nextDue && nextStaffDue && !isNaN(Date.parse(nextDue)) && !isNaN(Date.parse(nextStaffDue))
+      && new Date(nextStaffDue) < new Date(nextDue)) {
+    return res.status(400).json({ error: TA_DUE_ERROR });
+  }
 
   const fields = [];
   const values = [];
@@ -231,4 +248,34 @@ async function remove(req, res) {
   res.json({ ok: true, id: assignmentId });
 }
 
-module.exports = { list, create, update, remove };
+/**
+ * PATCH /api/classrooms/:id/assignments/:assignmentId/status
+ * Where the staff work is up to (SRS-11). The lecturer can set it on any
+ * assignment; a TA only on one the lecturer gave them. Everyone else gets 403.
+ */
+async function setStatus(req, res) {
+  const assignmentId = Number(req.params.assignmentId);
+  const status = req.body.status;
+  if (!STATUSES.includes(status)) {
+    return res.status(400).json({ error: 'Status must be notstarted, inprogress or done' });
+  }
+
+  const existing = await one(
+    'SELECT id FROM assignments WHERE id = ? AND classroom_id = ?',
+    [assignmentId, req.params.id]);
+  if (!existing) return res.status(404).json({ error: 'Assignment not found' });
+
+  if (!req.isOwner) {
+    const assigned = req.role === 'ta' && await one(
+      'SELECT 1 AS ok FROM assignment_staff WHERE assignment_id = ? AND user_id = ?',
+      [assignmentId, req.session.user.id]);
+    if (!assigned) {
+      return res.status(403).json({ error: 'Only the lecturer or a TA on this assignment can change its status' });
+    }
+  }
+
+  await q('UPDATE assignments SET status = ? WHERE id = ?', [status, assignmentId]);
+  res.json({ ok: true, id: assignmentId, status });
+}
+
+module.exports = { list, create, update, remove, setStatus };

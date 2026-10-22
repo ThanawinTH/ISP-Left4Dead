@@ -39,6 +39,11 @@ router.post('/classrooms/:id/assignments',
 router.patch('/classrooms/:id/assignments/:assignmentId',
   mw(auth.loadMembership), auth.requireOwner, go(assignments.update));
 
+/* Status (SRS-11): the lecturer, or a TA the lecturer put on the assignment.
+   The handler checks which, since it depends on the assignment. */
+router.patch('/classrooms/:id/assignments/:assignmentId/status',
+  mw(auth.loadMembership), go(assignments.setStatus));
+
 /* US-9 (SRS-14): only the lecturer deletes. Students, TAs and staff get 403. */
 router.delete('/classrooms/:id/assignments/:assignmentId',
   mw(auth.loadMembership), auth.requireOwner, go(assignments.remove));
