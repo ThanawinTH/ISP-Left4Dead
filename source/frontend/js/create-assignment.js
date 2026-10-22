@@ -34,6 +34,7 @@ async function loadForEditing() {
   document.getElementById('staffNote').value = a.staff_note || '';
   fillDateTime('dueDate', 'dueTime', a.due_at);
   fillDateTime('staffDue', 'staffTime', a.staff_due_at);
+  document.getElementById('staffDue').min = document.getElementById('dueDate').value;
 
   // tick the TAs already on it
   const names = (a.staff_names || '').split(', ').filter(Boolean);
@@ -112,6 +113,17 @@ async function save(visibility, button) {
     return;
   }
 
+  // The TA check date can't come before the students' due date (nothing to
+  // check yet). The server refuses it too; this just says so sooner.
+  const staffDue = staffDueISO();
+  const studentDue = new Date(`${dueDate.value}T${dueTime.value}`);
+  const staffOk = check('f-staffdue', document.getElementById('staffDue'),
+    !staffDue || new Date(staffDue) >= studentDue);
+  if (!staffOk) {
+    KU.toast("The TA check date can't be before the students' due date");
+    return;
+  }
+
   saving = true;
   const label = button.textContent;
   button.disabled = true;
@@ -173,8 +185,13 @@ function staffDueISO() {
   });
 });
 
+// The date picker for TAs can't go earlier than the students' due date.
+document.getElementById('dueDate').addEventListener('change', (e) => {
+  document.getElementById('staffDue').min = e.target.value || '2020-01-01';
+});
+
 // Clear the red state as soon as someone starts fixing the field.
-['title', 'dueDate', 'dueTime'].forEach(id => {
+['title', 'dueDate', 'dueTime', 'staffDue', 'staffTime'].forEach(id => {
   document.getElementById(id).addEventListener('input', (e) => {
     e.target.classList.remove('is-error');
     e.target.closest('.field').classList.remove('is-error');

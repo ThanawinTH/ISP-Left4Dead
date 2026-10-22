@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=34">
+<link rel="stylesheet" href="css/styles.css?v=35">
 </head>
 <body>
 
@@ -96,13 +96,14 @@
           </div>
         </div>
 
-        <div class="field">
-          <label class="label label--sub" for="staffDue">Add due date to staff</label>
+        <div class="field" id="f-staffdue">
+          <label class="label label--sub" for="staffDue">TA check date</label>
           <div class="datetime">
             <input class="input" id="staffDue" type="date" min="2020-01-01" max="2100-12-31">
             <input class="input input--time" id="staffTime" placeholder="23:59"
                    inputmode="numeric" maxlength="5" autocomplete="off">
           </div>
+          <div class="hint">TAs check submitted work, so this must be on or after the students' due date.</div>
         </div>
 
         <div class="field">
@@ -138,9 +139,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=34"></script>
-<script src="js/api.js?v=34"></script>
-<script src="js/create-assignment.js?v=34"></script>
+<script src="js/app.js?v=35"></script>
+<script src="js/api.js?v=35"></script>
+<script src="js/create-assignment.js?v=35"></script>
 <script>
   // Anything marked data-soon is in the design but not built yet.
   document.querySelectorAll('[data-soon]').forEach(el => {
