@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=35">
+<link rel="stylesheet" href="css/styles.css?v=36">
 </head>
 <body>
 
@@ -76,8 +76,11 @@
         Restricted to @ku.th accounts only
       </div>
 
-      <!-- SRS-26 / SRS-27: sign-in is restricted to the @ku.th domain. -->
-      <button class="btn-google" id="signIn">
+      <!-- US-16 (SRS-26, SRS-27): Google signs the person in; the server only
+           lets @ku.th addresses through and never sees a password. -->
+      <div class="login-error" id="loginError" role="alert" hidden></div>
+
+      <a class="btn-google" id="signIn" href="/api/auth/google">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.74 2.98-4.3 2.98-7.35Z"/>
           <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.59A10 10 0 0 0 12 22Z"/>
@@ -85,7 +88,17 @@
           <path fill="#EA4335" d="M12 5.95c1.47 0 2.79.51 3.83 1.5l2.87-2.87C16.95 2.98 14.7 2 12 2a10 10 0 0 0-8.94 5.5l3.35 2.59C7.2 7.71 9.4 5.95 12 5.95Z"/>
         </svg>
         Sign in with KU Google Account
-      </button>
+      </a>
+
+      <!-- Local testing only: shown when TEST_LOGIN=1 in .env, never in the demo. -->
+      <form class="testlogin" id="testLogin" hidden>
+        <div class="testlogin__head">Test login <span>TEST_LOGIN=1 · local only</span></div>
+        <div class="testlogin__row">
+          <input class="input" id="testEmail" type="email" placeholder="student1@ku.th" autocomplete="off">
+          <button class="btn btn--primary" type="submit">Sign in</button>
+        </div>
+        <div class="testlogin__hint">Any @ku.th email. Use another browser or Incognito to be a second person.</div>
+      </form>
 
       <p class="login__terms">
         By logging in, you agree to the <a href="#">KU IT Policy &amp; Terms of Service</a>.
@@ -95,112 +108,66 @@
 
 </div>
 
-<!-- ---------- Sign-in dialog ---------- -->
-<div class="signin-backdrop" id="signInModal" hidden>
-  <div class="signin-card" role="dialog" aria-modal="true" aria-labelledby="signInTitle">
-    <div class="signin-card__head">
-      <svg class="signin-card__logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.05H12v3.88h5.38a4.6 4.6 0 0 1-2 3.02v2.5h3.24c1.89-1.74 2.98-4.3 2.98-7.35Z"/>
-        <path fill="#34A853" d="M12 22c2.7 0 4.96-.9 6.62-2.42l-3.24-2.5c-.9.6-2.05.96-3.38.96-2.6 0-4.8-1.76-5.59-4.12H3.06v2.59A10 10 0 0 0 12 22Z"/>
-        <path fill="#FBBC05" d="M6.41 13.92a6 6 0 0 1 0-3.83V7.5H3.06a10 10 0 0 0 0 9l3.35-2.58Z"/>
-        <path fill="#EA4335" d="M12 5.95c1.47 0 2.79.51 3.83 1.5l2.87-2.87C16.95 2.98 14.7 2 12 2a10 10 0 0 0-8.94 5.5l3.35 2.59C7.2 7.71 9.4 5.95 12 5.95Z"/>
-      </svg>
-      <h2 id="signInTitle">Sign in</h2>
-      <p>Use your Kasetsart University account</p>
-    </div>
-
-    <form id="signInForm" novalidate>
-      <label class="label" for="emailInput">Email</label>
-      <input class="input" id="emailInput" type="email" placeholder="yourname@ku.th" autocomplete="username">
-
-      <label class="label" for="passwordInput">Password</label>
-      <input class="input" id="passwordInput" type="password" placeholder="Password" autocomplete="current-password">
-
-      <div class="signin-card__error" id="signInError" hidden></div>
-
-      <div class="signin-card__actions">
-        <button class="btn btn--ghost" type="button" id="signInCancel">Cancel</button>
-        <button class="btn btn--primary" type="submit" id="signInSubmit">Next</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <style>
-  /* Sign-in dialog — uses the same tokens as the rest of the UI */
-  .signin-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.45);
-    display:flex;align-items:center;justify-content:center;padding:20px;z-index:60}
-  .signin-backdrop[hidden]{display:none}
-  .signin-card{background:#fff;border-radius:16px;width:100%;max-width:380px;
-    padding:28px 28px 22px;box-shadow:0 18px 50px rgba(15,23,42,.25)}
-  .signin-card__head{text-align:center;margin-bottom:20px}
-  .signin-card__logo{width:34px;height:34px;margin-bottom:10px}
-  .signin-card__head h2{margin:0;font-size:21px;font-weight:700;color:#0f172a}
-  .signin-card__head p{margin:6px 0 0;font-size:13.5px;color:#64748b}
-  .signin-card .label{display:block;margin:14px 0 6px}
-  .signin-card .input{width:100%}
-  .signin-card__error{margin-top:12px;padding:9px 12px;border-radius:9px;
-    background:#fef2f2;color:#b91c1c;font-size:13px;line-height:1.4}
-  .signin-card__error[hidden]{display:none}
-  .signin-card__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+  /* Why the last sign-in was refused (US-16) */
+  .login-error{margin:12px 0 16px;padding:12px 14px;border-radius:10px;
+    background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;font-size:13.5px;line-height:1.5}
+  .login-error b{display:block;margin-bottom:2px}
+  .login-error[hidden]{display:none}
+  a.btn-google{text-decoration:none}
+  .testlogin{margin-top:16px;padding:14px;border:1px dashed #f59e0b;border-radius:10px;background:#fffbeb}
+  .testlogin[hidden]{display:none}
+  .testlogin__head{font-size:13px;font-weight:700;color:#92400e;margin-bottom:8px}
+  .testlogin__head span{font-weight:500;color:#b45309;margin-left:6px}
+  .testlogin__row{display:flex;gap:8px}
+  .testlogin__row .input{flex:1;min-width:0}
+  .testlogin__hint{font-size:12px;color:#92400e;margin-top:6px}
 </style>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=35"></script>
-<script src="js/api.js?v=35"></script>
+<script src="js/app.js?v=36"></script>
+<script src="js/api.js?v=36"></script>
 <script>
-  const modal    = document.getElementById('signInModal');
-  const emailEl  = document.getElementById('emailInput');
-  const pwEl     = document.getElementById('passwordInput');
-  const errEl    = document.getElementById('signInError');
-  const submitEl = document.getElementById('signInSubmit');
+  // The server sends people back here with ?error=... when Google sign-in
+  // does not go through. Turn that into a message they can act on.
+  const MESSAGES = {
+    domain:    ['Only @ku.th accounts can sign in.',
+                'You signed in with {email}. Choose your Kasetsart University account instead. No account was created.'],
+    cancelled: ['Sign-in was cancelled.', 'Try again when you are ready.'],
+    failed:    ['Sign-in did not go through.', 'Please try again.'],
+    setup:     ['Google sign-in is not set up yet.',
+                'Add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to source/backend/.env, then restart the app.'],
+  };
 
-  function showError(msg) {
-    errEl.textContent = msg;
-    errEl.hidden = false;
+  const params = new URLSearchParams(location.search);
+  const reason = params.get('error');
+  if (MESSAGES[reason]) {
+    const box = document.getElementById('loginError');
+    const [title, detail] = MESSAGES[reason];
+    box.innerHTML = '<b></b><span></span>';
+    box.querySelector('b').textContent = title;
+    box.querySelector('span').textContent = detail.replace('{email}', params.get('email') || 'another account');
+    box.hidden = false;
+    history.replaceState(null, '', location.pathname);   // a refresh starts clean
   }
 
-  function openModal() {
-    errEl.hidden = true;
-    emailEl.value = '';
-    pwEl.value = '';
-    modal.hidden = false;
-    emailEl.focus();
-  }
+  // Local testing: the test login box only appears when the server has TEST_LOGIN=1.
+  fetch('/api/auth/test-login').then(r => r.ok && r.json()).then(d => {
+    if (!d || !d.enabled) return;
+    const form = document.getElementById('testLogin');
+    form.hidden = false;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('testEmail').value.trim();
+      try {
+        await API.post('/auth/test-login', { email });
+        location.href = 'my-classrooms.html';
+      } catch (err) { KU.toast(err.message); }
+    });
+  }).catch(() => {});
 
-  function closeModal() {
-    modal.hidden = true;
-  }
-
-  document.getElementById('signIn').addEventListener('click', openModal);
-  document.getElementById('signInCancel').addEventListener('click', closeModal);
-  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-
-  // SRS-27: the domain is checked again on the server; this is only a fast hint.
-  document.getElementById('signInForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = emailEl.value.trim().toLowerCase();
-    const password = pwEl.value;
-
-    if (!email || !password) { showError('Enter your email and password.'); return; }
-    if (!email.endsWith('@ku.th')) {
-      showError('Only @ku.th accounts can sign in.');
-      return;
-    }
-
-    submitEl.disabled = true;
-    try {
-      const data = await API.post('/auth/login', { email, password });
-      KU.toast('Signed in as ' + data.user.name);
-      setTimeout(() => location.href = 'my-classrooms.html', 600);
-    } catch (err) {
-      showError(err.message);
-      submitEl.disabled = false;
-    }
-  });
-
-  [emailEl, pwEl].forEach(el => el.addEventListener('input', () => { errEl.hidden = true; }));
+  // Already signed in? Skip the login page.
+  API.get('/auth/me').then(() => location.href = 'my-classrooms.html').catch(() => {});
 </script>
 </body>
 </html>
