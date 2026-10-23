@@ -10,7 +10,16 @@ const go = (fn) => (req, res, next) => fn(req, res).catch(next);
 /** Same idea, but for async middleware - it also needs next() to carry on. */
 const mw = (fn) => (req, res, next) => fn(req, res, next).catch(next);
 
-router.post('/auth/login', go(auth.login));
+/* US-16: sign in with Google, @ku.th only (SRS-26, SRS-27). */
+router.get('/auth/google', auth.googleStart);
+router.get('/auth/google/callback', go(auth.googleCallback));
+
+/* For the automated tests only - this route does not exist unless TEST_LOGIN=1. */
+if (process.env.TEST_LOGIN === '1') {
+  router.get('/auth/test-login', (req, res) => res.json({ enabled: true }));   // lets the login page show the box
+  router.post('/auth/test-login', go(auth.testLogin));
+}
+
 router.get('/auth/me', auth.me);
 router.post('/auth/logout', auth.logout);
 

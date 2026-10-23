@@ -5,8 +5,7 @@ USE ku_classroom;
 CREATE TABLE IF NOT EXISTS users (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   email         VARCHAR(190) NOT NULL UNIQUE,
-  name          VARCHAR(190) NOT NULL,
-  password_hash VARCHAR(255) NOT NULL      -- scrypt "salt:hash", never the password
+  name          VARCHAR(190) NOT NULL      -- no password column: Google signs people in (SRS-26)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS classrooms (

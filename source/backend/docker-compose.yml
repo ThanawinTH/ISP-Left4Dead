@@ -23,6 +23,11 @@ services:
       DB_PASSWORD: password
       DB_NAME: ku_classroom
       SESSION_SECRET: dev-secret
+      # US-16: from source/backend/.env (copy .env.example). Never commit .env.
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-http://localhost:3000/api/auth/google/callback}
+      TEST_LOGIN: ${TEST_LOGIN:-0}
     volumes:
       - ./:/app
       - /app/node_modules
