@@ -15,6 +15,7 @@ const state = {
   search: '',
   atRisk: [],         // US-8: the student's at-risk rows, from ?atRisk=1
   riskOnly: false,    // the "At risk only" toggle
+  view: 'mine',       // a TA starts on their own tasks; 'all' shows the whole class
 };
 
 const $ = (id) => document.getElementById(id);
@@ -125,6 +126,26 @@ function staffColumns(a) {
 
 /** Overdue is worth flagging on the week header, whoever is looking. */
 
+/* ---------- a TA's own work ----------
+   A TA is the one role the lecturer hands work to, with their own check date
+   (never before the students' due date) and a note. That date is the one we
+   count down for them. */
+
+const isTA = () => state.role === 'ta' && !state.isOwner;
+const myTasks = () => state.assignments.filter(a => a.can_grade);
+const taDue = (a) => a.staff_due_at || a.due_at;
+
+function taUrgency(a) {
+  if (a.status === 'done') return { cls: 'done', text: 'Done' };
+  const hours = (parseDue(taDue(a)) - new Date()) / 36e5;
+  const days = Math.round(Math.abs(hours) / 24);
+  if (hours < 0)  return { cls: 'overdue', text: days >= 1 ? `Overdue ${days}d` : 'Overdue' };
+  if (hours < 24) return { cls: 'duesoon', text: `Due in ${Math.max(1, Math.round(hours))}h` };
+  if (hours < 72) return { cls: 'duesoon', text: `Due in ${days}d` };
+  if (days < 14)  return { cls: 'ok', text: `In ${days} days` };
+  return { cls: 'ok', text: days < 60 ? `In ${Math.round(days / 7)} weeks` : 'Later' };
+}
+
 /* ---------- loading ---------- */
 
 async function loadClassroom() {
@@ -156,6 +177,16 @@ async function loadAssignments() {
     $('riskCount').textContent = state.atRisk.length;
     $('riskCount').hidden = state.atRisk.length === 0;
   }
+
+  // A TA gets two tabs: their own tasks first, then the whole class.
+  const tabs = $('taTabs');
+  tabs.hidden = !isTA();
+  if (isTA()) {
+    $('countMine').textContent = myTasks().length;
+    $('countAll').textContent = state.assignments.length;
+    tabs.querySelectorAll('.tab').forEach(t =>
+      t.classList.toggle('is-active', t.dataset.view === state.view));
+  }
 }
 
 /* ---------- filtering ---------- */
@@ -170,6 +201,7 @@ function visible() {
 
 function renderList() {
   renderRiskBox();
+  if (isTA() && state.view === 'mine') return renderMyTasks();
   const rows = visible();
   const host = $('weeks');
   const empty = $('emptyState');
@@ -267,6 +299,76 @@ function setRiskOnly(on) {
   renderList();
 }
 
+/* ---------- a TA's task list ----------
+   One card per assignment the lecturer gave them, soonest check date first,
+   with the lecturer's note right there - no clicking in to find out what to do. */
+
+function renderMyTasks() {
+  const term = state.search.trim().toLowerCase();
+  const tasks = myTasks()
+    .filter(a => !term || a.title.toLowerCase().includes(term))
+    .sort((x, y) => parseDue(taDue(x)) - parseDue(taDue(y)));
+
+  const host = $('weeks');
+  const empty = $('emptyState');
+  empty.hidden = tasks.length > 0;
+
+  if (!tasks.length) {
+    host.innerHTML = '';
+    empty.innerHTML = term
+      ? `<strong>No tasks match</strong>Try clearing the search.`
+      : `<strong>Nothing assigned to you yet</strong>When the lecturer adds you to an assignment, it shows up here.`;
+    return;
+  }
+
+  const open = tasks.filter(a => a.status !== 'done').length;
+  host.innerHTML = `
+    <div class="week__head">
+      <span class="week__title">Your tasks</span>
+      <span class="week__count">${open} to do · sorted by your check date</span>
+    </div>
+    ${tasks.map(taskCard).join('')}`;
+
+  host.querySelectorAll('.assignment').forEach(el =>
+    el.addEventListener('click', () => {
+      state.selected = Number(el.dataset.id);
+      renderList();
+      renderPanel();
+    }));
+}
+
+function taskCard(a) {
+  const u = taUrgency(a);
+  return `
+  <button class="assignment task tone--${u.cls} ${a.id === state.selected ? 'is-selected' : ''}" data-id="${a.id}">
+    <span class="task__top">
+      <span class="assignment__title">${esc(a.title)}</span>
+      <span class="when when--${u.cls}">${u.text}</span>
+    </span>
+    <span class="task__due">
+      <b>Check by</b> ${esc(dueText(taDue(a)))}
+      <span class="task__sep">·</span> Students due ${esc(dueText(a.due_at))}
+    </span>
+    ${a.staff_note
+      ? `<span class="task__note">${esc(a.staff_note)}</span>`
+      : `<span class="task__note task__note--none">No instructions from the lecturer</span>`}
+    <span class="task__foot">
+      <span>From ${esc(a.created_by_name)}</span>
+      <span class="status status--${esc(a.status)}">${esc(STATUS_LABEL[a.status] || a.status)}</span>
+      ${a.visibility === 'class' ? '' : '<span class="status status--notstarted">Not posted to students</span>'}
+    </span>
+  </button>`;
+}
+
+/** The coloured left edge, one rule for every role.
+    Student: due soon or closed (US-8). TA's own work: their check date.
+    Other staff: posted or draft. */
+function rowTone(a) {
+  if (isTA() && a.can_grade) return taUrgency(a).cls;
+  if (state.isStaff) return a.visibility === 'class' ? 'ok' : 'draft';
+  return isAtRisk(a) ? 'duesoon' : isClosed(a) ? 'closed' : 'ok';
+}
+
 function rowHTML(a) {
   const b = badge(a);
 
@@ -289,7 +391,7 @@ function rowHTML(a) {
       : '';
 
   return `
-  <button class="assignment ${a.id === state.selected ? 'is-selected' : ''} ${!state.isStaff && (isAtRisk(a) || isClosed(a)) ? 'assignment--' + a.risk : ''}" data-id="${a.id}">
+  <button class="assignment tone--${rowTone(a)} ${a.id === state.selected ? 'is-selected' : ''}" data-id="${a.id}">
     <span class="assignment__main">
       <span class="assignment__title">${esc(a.title)}</span>
       <span class="assignment__meta">
@@ -301,17 +403,18 @@ function rowHTML(a) {
     <span class="assignment__end">
       ${mark}
       <span class="badge badge--${b.key}">${b.label}</span>
-      <span class="icon-btn">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
     </span>
   </button>`;
 }
 
-/* ---------- the details panel ---------- */
+/* ---------- the details panel ----------
+   One layout for every role, top to bottom:
+     header   - title, who set it, Edit for the lecturer
+     chips    - posted and status (staff only)
+     role box - the one thing this person does here, same frame for everyone
+     facts    - dates, points, TAs
+     description
+   Only the role box changes between lecturer, TA, staff and student. */
 
 function renderPanel() {
   const a = state.assignments.find(x => x.id === state.selected);
@@ -326,139 +429,173 @@ function renderPanel() {
   const b = badge(a);
 
   panel.innerHTML = `
-    <div class="panel__head">
+    <div class="pd__head">
       <div>
-        <div class="panel__title">Assignment Details</div>
-        <div class="panel__sub">Selected assignment</div>
+        <div class="pd__eyebrow">Assignment</div>
+        <div class="pd__title">${esc(a.title)}</div>
+        <div class="pd__by">Set by ${esc(a.created_by_name)}</div>
       </div>
       ${state.isOwner
         ? `<a class="linkbtn" href="create-assignment.html?id=${classroomId}&edit=${a.id}">Edit</a>`
         : ''}
     </div>
 
-    <div class="panel__name">${esc(a.title)}</div>
+    ${state.isStaff ? `
+    <div class="pd__chips">
+      <span class="badge badge--${b.key}">${b.label}</span>
+      ${statusPill(a)}
+    </div>` : ''}
 
-    <div class="panel__tags">
-      <span class="panel__by">Assigned by ${esc(a.created_by_name)}</span>
-    </div>
+    ${roleBox(a)}
 
-    <div class="panel__due"><span class="sq"></span> Due: ${esc(dueText(a.due_at))}</div>
-    <div class="panel__pts">${a.points} pts</div>
-    <div class="panel__badge"><span class="badge badge--${b.key}">${b.label}</span></div>
-    ${a.staff_names ? `<div class="panel__staff">TAs: ${esc(a.staff_names)}</div>` : ''}
-    ${state.isStaff ? `<div class="panel__staff">Status: <span class="status status--${esc(a.status)}">${esc(STATUS_LABEL[a.status] || a.status)}</span></div>` : ''}
-    ${state.isOwner ? myTask(a) : ''}
+    <dl class="facts">
+      <dt>Students due</dt><dd>${esc(dueText(a.due_at))}</dd>
+      <dt>Points</dt><dd>${a.points} pts</dd>
+      ${state.isStaff ? `
+        ${canSetStatus(a) ? '' : `<dt>TA check by</dt><dd>${a.staff_due_at ? esc(dueText(a.staff_due_at)) : '<span class="muted">Not set</span>'}</dd>`}
+        <dt>TAs</dt><dd>${(a.staff || []).length ? esc(a.staff.map(s => s.name).join(', ')) : '<span class="muted">None</span>'}</dd>` : ''}
+    </dl>
 
-    <hr>
-    <div class="panel__label">Description</div>
-    <p class="panel__desc">${esc(a.description || 'No description.')}</p>
-    ${state.isStaff ? staffActions(a) : studentSubmission(a)}`;
+    <div class="pd__label">Description</div>
+    <p class="pd__desc">${esc(a.description || 'No description.')}</p>`;
 
   wireSoonButtons();
+  wireStatus(a);
 }
 
-/**
- * What a TA sees on an assignment the lecturer gave them: their own deadline,
- * which is usually earlier than the students', and the lecturer's note.
- */
-function myTask(a) {
-  if (!a.staff_due_at && !a.staff_note) return '';
+const statusPill = (a) =>
+  `<span class="status status--${esc(a.status)}">${esc(STATUS_LABEL[a.status] || a.status)}</span>`;
 
+/** Who may move the status: the lecturer, or a TA on this assignment. */
+const canSetStatus = (a) => state.isOwner || (state.role === 'ta' && a.can_grade);
+
+/** Three buttons, the current one pressed. Saves on click (wireStatus). */
+function statusControl(a) {
   return `
-    <div class="mytask">
-      <div class="mytask__label">Your task</div>
-      ${a.staff_due_at
-        ? `<div class="mytask__due"><span class="sq"></span> Finish by ${esc(dueText(a.staff_due_at))}</div>`
-        : ''}
-      ${a.staff_note ? `<p class="mytask__note">${esc(a.staff_note)}</p>` : ''}
+    <div class="box__stack">
+      <span class="box__k">Progress</span>
+      <div class="prog" data-status-for="${a.id}">
+        ${['notstarted', 'inprogress', 'done'].map(v => `
+          <button class="prog__btn ${a.status === v ? 'is-on' : ''}" data-status="${v}">${STATUS_LABEL[v]}</button>`).join('')}
+      </div>
     </div>`;
 }
 
-/**
- * The submission box a student sees. Uploading is not built yet - it needs the
- * submissions table and the late check (SRS-21 to SRS-24) - so the button says
- * so when you click it.
- */
-function studentSubmission(a) {
-  // Past the due date the assignment is closed - no more uploads (US-8).
+/** The note the lecturer left for the TAs, or a quiet placeholder. */
+const noteHTML = (a) => a.staff_note
+  ? `<div class="box__note">${esc(a.staff_note)}</div>`
+  : `<div class="box__note box__note--none">No instructions for TAs.</div>`;
+
+const LOCK_ICON = `
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2"/>
+    <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" stroke="currentColor" stroke-width="2"/>
+  </svg>`;
+
+/** The role box - same frame for everyone, different contents. */
+function roleBox(a) {
+  const posted = a.visibility === 'class';
+  const soon = (label, cls = 'btn--ghost') =>
+    `<button class="btn ${cls} btn--block" data-soon="${label}">${label}</button>`;
+
+  // Lecturer: what the TAs were told, progress, and the actions (Delete: US-9).
+  if (state.isOwner) {
+    return `
+      <div class="box">
+        <div class="box__head"><span class="box__label">Lecturer controls</span></div>
+        <div class="box__row"><span class="box__k">TAs check by</span>
+          <b>${a.staff_due_at ? esc(dueText(a.staff_due_at)) : 'Not set'}</b></div>
+        ${noteHTML(a)}
+        ${statusControl(a)}
+        <div class="box__actions">
+          ${posted ? soon('Check The Submitted Status') : soon('Post Assignment', 'btn--primary')}
+          ${posted ? soon('Grade Submissions', 'btn--primary') : ''}
+          <button class="btn--text-danger" id="btnDelete" data-id="${a.id}">Delete assignment</button>
+        </div>
+      </div>`;
+  }
+
+  // TA on this assignment: their check date counting down, the note, progress.
+  if (state.role === 'ta' && a.can_grade) {
+    const u = taUrgency(a);
+    return `
+      <div class="box box--${u.cls}">
+        <div class="box__head">
+          <span class="box__label">Your task</span>
+          <span class="when when--${u.cls}">${u.text}</span>
+        </div>
+        <div class="box__row"><span class="box__k">Check by</span><b>${esc(dueText(taDue(a)))}</b></div>
+        ${noteHTML(a)}
+        ${statusControl(a)}
+        <div class="box__actions">
+          ${posted
+            ? soon('Check The Submitted Status') + soon('Grade Submissions', 'btn--primary')
+            : '<div class="box__hint">Not posted to students yet, so there is nothing to check.</div>'}
+        </div>
+      </div>`;
+  }
+
+  // A TA not on it, or University staff: look only.
+  if (state.isStaff) {
+    return `
+      <div class="box box--muted">
+        <div class="box__head"><span class="box__label">View only</span></div>
+        <div class="box__hint">${state.role === 'ta'
+          ? "The lecturer hasn't assigned this one to you."
+          : 'University staff can see assignments but not change them.'}</div>
+      </div>`;
+  }
+
+  // Student, past the due date: closed, no more uploads (US-8).
   if (isClosed(a)) {
     return `
-    <hr>
-    <div class="panel__label">Submission</div>
-    <div class="closed-note">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="10.5" width="14" height="9.5" rx="2" stroke="currentColor" stroke-width="2"/>
-        <path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" stroke="currentColor" stroke-width="2"/>
-      </svg>
-      <span><b>This assignment is closed</b>The due date was ${esc(dueText(a.due_at))}.</span>
-    </div>`;
+      <div class="box box--muted">
+        <div class="box__head"><span class="box__label">Your submission</span>
+          <span class="badge badge--notstarted">Closed</span></div>
+        <div class="closed-note">${LOCK_ICON}
+          <span><b>This assignment is closed</b>The due date was ${esc(dueText(a.due_at))}.</span>
+        </div>
+      </div>`;
   }
+
+  // Student: upload and submit. Not built yet (SRS-21 to SRS-24).
+  const s = badge(a);
   return `
-    <hr>
-    <div class="panel__label">Submission</div>
-    <div class="upload">
-      <div class="upload__row">
-        <span class="upload__title">Upload file</span>
-        <span class="upload__note">PDF or link</span>
+    <div class="box ${isAtRisk(a) ? 'box--duesoon' : ''}">
+      <div class="box__head">
+        <span class="box__label">Your submission</span>
+        <span class="badge badge--${s.key}">${isAtRisk(a) ? riskWhen(a) : s.label}</span>
       </div>
-      <button class="btn btn--ghost btn--block" data-soon="Choosing a file">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 16V5m0 0L8 9m4-4 4 4M5 19h14" stroke="currentColor"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>Upload File
-      </button>
-      <div class="upload__file">No file chosen yet</div>
-    </div>
-    <button class="btn btn--primary btn--block" data-soon="Submitting your work">
-      Submit Assignment
-    </button>`;
+      <div class="upload">
+        <div class="upload__row">
+          <span class="upload__title">Upload file</span>
+          <span class="upload__note">PDF or link</span>
+        </div>
+        <button class="btn btn--ghost btn--block" data-soon="Choosing a file">Upload File</button>
+        <div class="upload__file">No file chosen yet</div>
+      </div>
+      <div class="box__actions">${soon('Submit Assignment', 'btn--primary')}</div>
+    </div>`;
 }
 
-/**
- * What each role gets under an assignment.
- *   Lecturer         - post, unpost, delete, check submissions, grade
- *   TA               - grade, but only on the assignments they were added to
- *   University staff - nothing, they are here to look
- *   Student          - nothing
- * None of these are wired up yet, so each one says so when you click it.
- */
-function staffActions(a) {
-  const posted = a.visibility === 'class';
-  const grade = a.can_grade
-    ? `<button class="btn btn--primary btn--block" data-soon="Grading">Grade Submissions</button>`
-    : '';
-
-  if (!state.isOwner) {
-    // TAs and University staff cannot change an assignment. A TA added to this
-    // one gets their task box, the submitted list and the grade button, since
-    // they cannot grade what they cannot see. Everyone else gets nothing.
-    if (!a.can_grade) return '';
-
-    return `
-      <hr>
-      ${myTask(a)}
-      ${posted
-        ? `<button class="btn btn--primary btn--block" data-soon="Check the submitted status">
-             Check The Submitted Status
-           </button>`
-        : ''}
-      ${grade}`;
-  }
-
-  // A draft can be posted. Once it is posted it stays posted - there is no
-  // unposting something students have already seen.
-  return `
-    <hr>
-    <div class="panel__actions">
-      ${posted ? '' : '<button class="btn btn--primary" data-soon="Post Assignment">Post Assignment</button>'}
-      <button class="btn btn--danger" id="btnDelete" data-id="${a.id}">Delete</button>
-    </div>
-    ${posted
-      ? `<button class="btn btn--primary btn--block" data-soon="Check the submitted status">
-           Check The Submitted Status
-         </button>`
-      : ''}
-    ${grade}`;
+/** Status buttons save straight away, then redraw both sides. */
+function wireStatus(a) {
+  const prog = document.querySelector(`#panel [data-status-for="${a.id}"]`);
+  if (!prog) return;
+  prog.querySelectorAll('[data-status]').forEach(btn =>
+    btn.addEventListener('click', async () => {
+      const status = btn.dataset.status;
+      if (status === a.status) return;
+      try {
+        await API.patch(`/classrooms/${classroomId}/assignments/${a.id}/status`, { status });
+        a.status = status;
+        renderList();
+        renderPanel();
+        KU.toast('Status: ' + STATUS_LABEL[status]);
+      } catch (err) {
+        KU.toast(err.message);
+      }
+    }));
 }
 
 /** Anything marked data-soon is drawn but not built yet. */
@@ -501,6 +638,14 @@ function wireDelete() {
 $('riskToggle').addEventListener('click', (e) => {
   const btn = e.target.closest('.seg__btn');
   if (btn) setRiskOnly(btn.dataset.risk === 'only');
+});
+
+$('taTabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.tab');
+  if (!tab) return;
+  state.view = tab.dataset.view;
+  $('taTabs').querySelectorAll('.tab').forEach(t => t.classList.toggle('is-active', t === tab));
+  renderList();
 });
 
 $('searchBox').addEventListener('input', (e) => {
