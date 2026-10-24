@@ -977,3 +977,52 @@ a.linkbtn:hover { text-decoration: underline; }
          padding-bottom: 18px; border-bottom: 1px solid var(--slate-200); }
 .facts dt { color: var(--slate-500); }
 .facts dd { margin: 0; font-weight: 600; }
+
+/* ==========================================================================
+   CLASS ANNOUNCEMENTS (US-11)
+   ========================================================================== */
+.anns { max-width: 780px; margin: 0 auto; }
+
+/* US-11: the list, newest first */
+.anns__bar { display: flex; align-items: center; gap: 10px; margin: 4px 0 16px; }
+.anns__heading { font-size: 17px; font-weight: 700; margin: 0; color: var(--slate-900); }
+.anns__count {
+  min-width: 26px; padding: 2px 9px; border-radius: var(--r-full);
+  background: var(--slate-100); color: var(--slate-600);
+  font-size: 13px; font-weight: 700; text-align: center;
+}
+.anns__count:empty { display: none; }
+.anns__empty {
+  background: var(--white); border: 1px dashed var(--slate-300); border-radius: var(--r-lg);
+  padding: 48px 24px; text-align: center; color: var(--slate-600); font-size: 15px;
+}
+.anns__empty strong { display: block; color: var(--slate-900); font-size: 17px; margin-bottom: 6px; }
+
+.ann {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r-lg);
+  padding: 22px 26px 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+}
+.ann.is-latest { border-color: var(--teal-600); box-shadow: 0 0 0 3px var(--teal-50); }
+.ann__head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.ann__avatar { flex: none; width: 40px; height: 40px; font-size: 13px; }
+.ann__avatar--lecturer { background: var(--teal-700); color: var(--white); }
+.ann__avatar--ta       { background: var(--blue-100); color: var(--blue-700); }
+.ann__avatar--staff    { background: var(--amber-100); color: var(--amber-700); }
+.ann__who { min-width: 0; }
+.ann__name { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--slate-900); }
+.ann__role { padding: 2px 10px; border-radius: var(--r-full); font-size: 12px; font-weight: 600; }
+.ann__role--lecturer { background: var(--teal-50); color: var(--teal-700); }
+.ann__role--ta       { background: var(--blue-100); color: var(--blue-700); }
+.ann__role--staff    { background: var(--amber-100); color: var(--amber-700); }
+.ann__time { margin-top: 2px; font-size: 13px; color: var(--slate-500); }
+.ann__latest {
+  margin-left: auto; align-self: flex-start;
+  padding: 3px 10px; border-radius: var(--r-full);
+  background: var(--teal-700); color: var(--white); font-size: 12px; font-weight: 700;
+}
+.ann__title { margin: 0 0 8px; font-size: 19px; font-weight: 700; line-height: 1.35; color: var(--slate-900); }
+.ann__body { margin: 0; font-size: 15.5px; line-height: 1.7; color: #334155; white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -144,6 +144,7 @@ document.getElementById('resetCode').addEventListener('click', () => {
   }
   // the class menu on this page has to point back at the right classroom
   document.getElementById('assignmentLink').href = 'class-schedule.html?id=' + classroomId;
+  document.getElementById('announcementsLink').href = 'announcements.html?id=' + classroomId;
 
   try {
     await loadJoinCode();

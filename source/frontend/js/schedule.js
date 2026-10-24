@@ -666,6 +666,7 @@ $('copyCode').addEventListener('click', async () => {
     return;
   }
   $('membersLink').href = 'members.html?id=' + classroomId;
+  $('announcementsLink').href = 'announcements.html?id=' + classroomId;
 
   try {
     await loadClassroom();

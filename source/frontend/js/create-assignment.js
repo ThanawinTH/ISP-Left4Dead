@@ -209,6 +209,7 @@ document.getElementById('dueDate').addEventListener('change', (e) => {
   document.getElementById('cancelLink').href = backToClass;
   document.getElementById('assignmentLink').href = backToClass;
   document.getElementById('membersLink').href = 'members.html?id=' + classroomId;
+  document.getElementById('announcementsLink').href = 'announcements.html?id=' + classroomId;
 
   try {
     await loadClassroom();
