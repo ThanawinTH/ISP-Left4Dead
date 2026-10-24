@@ -67,7 +67,23 @@ async function setRole(req, res) {
     }
   }
 
-  res.json({ ok: true, user_id: targetId, role, unassigned: removed });
+  // A student cannot post announcements (US-10), so when someone is turned
+  // into a student, the announcements they posted in this classroom go too.
+  // A TA moved to University staff can still post, so theirs stay.
+  let deletedAnnouncements = 0;
+  if (role === 'student') {
+    try {
+      const drop = await q(
+        'DELETE FROM announcements WHERE classroom_id = ? AND author_id = ?',
+        [req.params.id, targetId]);
+      deletedAnnouncements = drop.affectedRows || 0;
+    } catch (err) {
+      // Tidying up must never stop the role change itself.
+      console.error('could not clear announcements:', err.message);
+    }
+  }
+
+  res.json({ ok: true, user_id: targetId, role, unassigned: removed, deletedAnnouncements });
 }
 
 module.exports = { list, setRole };

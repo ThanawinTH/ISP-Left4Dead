@@ -58,8 +58,11 @@ router.patch('/classrooms/:id/assignments/:assignmentId/status',
 router.delete('/classrooms/:id/assignments/:assignmentId',
   mw(auth.loadMembership), auth.requireOwner, go(assignments.remove));
 
-/* Announcements (US-11). Every member of the classroom reads them (SRS-17). */
+/* Announcements (US-10, US-11). Every member reads them (SRS-17); only a
+   lecturer, TA or University staff member posts one (SRS-15). */
 router.get('/classrooms/:id/announcements',
   mw(auth.loadMembership), go(announcements.list));
+router.post('/classrooms/:id/announcements',
+  mw(auth.loadMembership), auth.requireStaff, go(announcements.create));
 
 module.exports = router;
