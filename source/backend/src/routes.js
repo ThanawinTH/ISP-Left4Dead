@@ -3,6 +3,7 @@ const auth = require('./auth');
 const classrooms = require('./classrooms');
 const members = require('./members');
 const assignments = require('./assignments');
+const announcements = require('./announcements');
 
 /** Wraps an async handler so a thrown error reaches the error middleware. */
 const go = (fn) => (req, res, next) => fn(req, res).catch(next);
@@ -56,5 +57,9 @@ router.patch('/classrooms/:id/assignments/:assignmentId/status',
 /* US-9 (SRS-14): only the lecturer deletes. Students, TAs and staff get 403. */
 router.delete('/classrooms/:id/assignments/:assignmentId',
   mw(auth.loadMembership), auth.requireOwner, go(assignments.remove));
+
+/* Announcements (US-11). Every member of the classroom reads them (SRS-17). */
+router.get('/classrooms/:id/announcements',
+  mw(auth.loadMembership), go(announcements.list));
 
 module.exports = router;

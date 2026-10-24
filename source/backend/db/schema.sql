@@ -54,3 +54,17 @@ CREATE TABLE IF NOT EXISTS assignment_staff (
   FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
   FOREIGN KEY (user_id)       REFERENCES users(id)
 ) ENGINE=InnoDB;
+
+-- US-10 / US-11: one row per class announcement. The author and time are
+-- set by the server (SRS-16); every member of the classroom can read them.
+CREATE TABLE IF NOT EXISTS announcements (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  classroom_id INT NOT NULL,
+  title        VARCHAR(190) NOT NULL,
+  body         TEXT NOT NULL,
+  author_id    INT NOT NULL,
+  created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_class_time (classroom_id, created_at),                 -- newest first, per class
+  FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
+  FOREIGN KEY (author_id)    REFERENCES users(id)
+) ENGINE=InnoDB;
