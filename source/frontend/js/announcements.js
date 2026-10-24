@@ -1,6 +1,9 @@
 /* ==========================================================================
-   Class Announcements (US-11)
-   Everyone in the classroom reads the same list, newest first.
+   Class Announcements (US-10, US-11)
+   Everyone in the classroom reads the same list, newest first (US-11).
+   A lecturer, TA or University staff member also gets a "New Announcement"
+   button that opens the post form (US-10). The server decides who can post;
+   the page only follows its answer.
    ========================================================================== */
 
 const classroomId = new URLSearchParams(location.search).get('id');
@@ -12,6 +15,8 @@ const ROLE_LABEL = {
   staff: 'University Staff',
   student: 'Student',
 };
+
+let canPost = false;
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -35,6 +40,7 @@ async function loadClassroom() {
 
 async function loadAnnouncements() {
   const data = await API.get(`/classrooms/${classroomId}/announcements`);
+  canPost = data.canPost;
   render(data.announcements);
 }
 
@@ -45,7 +51,8 @@ function render(list) {
     $('noticeList').innerHTML = `
       <div class="anns__empty">
         <strong>No announcements yet</strong>
-        When your lecturer or TA posts something, it will show up here.
+        ${canPost ? 'Use <b>New Announcement</b> to post the first one.'
+                  : 'When your lecturer or TA posts something, it will show up here.'}
       </div>`;
     return;
   }
@@ -73,6 +80,60 @@ function cardHTML(a, latest) {
     </article>`;
 }
 
+/* ---------- US-10: New Announcement ---------- */
+
+function setError(fieldId, on) {
+  $(fieldId).classList.toggle('is-error', on);
+  $(fieldId).querySelector('.input').classList.toggle('is-error', on);
+}
+
+function openComposer() {
+  $('postForm').hidden = false;
+  $('newBtn').hidden = true;                 // the form takes the button's place
+  $('title').focus();
+}
+
+function closeComposer() {
+  $('postForm').reset();
+  setError('titleField', false);
+  setError('bodyField', false);
+  $('postForm').hidden = true;
+  $('newBtn').hidden = false;
+}
+
+async function post(e) {
+  e.preventDefault();
+  const title = $('title').value.trim();
+  const body = $('body').value.trim();
+
+  setError('titleField', !title);
+  setError('bodyField', !body);
+  if (!title || !body) return;
+
+  $('postBtn').disabled = true;
+  try {
+    await API.post(`/classrooms/${classroomId}/announcements`, { title, body });
+    closeComposer();
+    KU.toast('Announcement posted');
+    await loadAnnouncements();
+  } catch (err) {
+    KU.toast(err.message);
+  } finally {
+    $('postBtn').disabled = false;
+  }
+}
+
+function setUpPosting() {
+  if (!canPost) return;                      // students only read
+  $('newBtn').hidden = false;
+  $('newBtn').addEventListener('click', openComposer);
+  $('closeBtn').addEventListener('click', closeComposer);
+  $('cancelBtn').addEventListener('click', closeComposer);
+  $('postForm').addEventListener('submit', post);
+  ['title', 'body'].forEach(id => $(id).addEventListener('input', () =>
+    setError(id + 'Field', false)));
+}
+
 /* ---------- start ---------- */
 
 (async () => {
@@ -87,6 +148,7 @@ function cardHTML(a, latest) {
   try {
     await loadClassroom();
     await loadAnnouncements();
+    setUpPosting();
   } catch (err) {
     $('noticeList').innerHTML =
       `<div class="anns__empty"><strong>Could not load announcements</strong>${esc(err.message)}</div>`;

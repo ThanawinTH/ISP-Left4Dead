@@ -979,7 +979,7 @@ a.linkbtn:hover { text-decoration: underline; }
 .facts dd { margin: 0; font-weight: 600; }
 
 /* ==========================================================================
-   CLASS ANNOUNCEMENTS (US-11)
+   CLASS ANNOUNCEMENTS (US-10, US-11)
    ========================================================================== */
 .anns { max-width: 780px; margin: 0 auto; }
 
@@ -1026,3 +1026,26 @@ a.linkbtn:hover { text-decoration: underline; }
 }
 .ann__title { margin: 0 0 8px; font-size: 19px; font-weight: 700; line-height: 1.35; color: var(--slate-900); }
 .ann__body { margin: 0; font-size: 15.5px; line-height: 1.7; color: #334155; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* US-10: the post form, opened by New Announcement */
+.composer {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--r-lg);
+  padding: 24px 28px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+  margin-bottom: 28px;
+}
+.composer[hidden], #newBtn[hidden] { display: none; }
+.composer__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.composer__title { margin: 0; font-size: 18px; font-weight: 700; }
+.composer__close {
+  width: 34px; height: 34px; display: grid; place-items: center;
+  border: 0; border-radius: var(--r-md); background: none; color: var(--slate-500); cursor: pointer;
+}
+.composer__close:hover { background: var(--slate-100); color: var(--slate-900); }
+.composer__close svg { width: 18px; height: 18px; }
+.composer .field { margin-bottom: 18px; }
+.composer .input { font-size: 15px; }
+.composer__body { resize: vertical; min-height: 140px; font: inherit; font-size: 15px; line-height: 1.6; }
+.composer__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }

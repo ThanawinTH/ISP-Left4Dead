@@ -50,10 +50,42 @@
         <h1>Class Announcements</h1>
         <div class="header__sub" id="classSub"></div>
       </div>
+      <!-- US-10: lecturers, TAs and University staff get this button. -->
+      <div class="header__actions">
+        <button class="btn btn--primary" id="newBtn" type="button" hidden>
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          New Announcement
+        </button>
+      </div>
     </header>
 
     <main class="content">
       <div class="anns">
+
+        <!-- US-10: the post form, opened by the New Announcement button. -->
+        <form class="composer" id="postForm" hidden novalidate>
+          <div class="composer__head">
+            <h2 class="composer__title">New announcement</h2>
+            <button class="composer__close" type="button" id="closeBtn" aria-label="Close">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="field" id="titleField">
+            <label class="label" for="title">Title <span class="req">*</span></label>
+            <input class="input" id="title" maxlength="190" placeholder="e.g. Lab moved to room 204 this Friday">
+            <div class="hint">Please add a title.</div>
+          </div>
+          <div class="field" id="bodyField">
+            <label class="label" for="body">Message <span class="req">*</span></label>
+            <textarea class="input composer__body" id="body" rows="6" maxlength="5000"
+                      placeholder="Write the announcement for everyone in this class"></textarea>
+            <div class="hint">Please write a message.</div>
+          </div>
+          <div class="composer__actions">
+            <button class="btn btn--ghost" type="button" id="cancelBtn">Cancel</button>
+            <button class="btn btn--primary" type="submit" id="postBtn">Post Announcement</button>
+          </div>
+        </form>
 
         <!-- US-11: every member reads the same list, newest first. -->
         <div class="anns__bar">

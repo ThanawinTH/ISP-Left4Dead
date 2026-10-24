@@ -106,10 +106,14 @@ function startEditing(row, member) {
         { role: select.value });
       member.role = select.value;                       // keep our copy in step
 
-      // Say so if they were taken off assignments on the way out of the TA role.
-      KU.toast(res.unassigned
-        ? `Role updated to ${ROLE_LABEL[select.value]} — removed from ${res.unassigned} assignment${res.unassigned === 1 ? '' : 's'}`
-        : 'Role updated to ' + ROLE_LABEL[select.value]);
+      // Say what was cleared on the way out of the TA role: the assignments
+      // they were on, and (when made a student) the announcements they posted.
+      const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+      const cleared = [];
+      if (res.unassigned) cleared.push('removed from ' + plural(res.unassigned, 'assignment'));
+      if (res.deletedAnnouncements) cleared.push(plural(res.deletedAnnouncements, 'announcement') + ' deleted');
+      KU.toast('Role updated to ' + ROLE_LABEL[select.value]
+        + (cleared.length ? ' — ' + cleared.join(', ') : ''));
     } catch (err) {
       KU.toast(err.message);
     }
