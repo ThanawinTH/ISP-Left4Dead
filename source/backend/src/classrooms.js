@@ -25,9 +25,14 @@ async function freeJoinCode() {
 }
 
 /** GET /api/classrooms — the ones this user is in. */
+/* The join code lets anyone with it into the class, so only the teaching team
+   (lecturer, TA, University staff) is sent it. Students get null and the
+   pages simply leave it out. */
+const JOIN_CODE_FOR_STAFF = "IF(m.role IN ('lecturer','ta','staff'), c.join_code, NULL) AS join_code";
+
 async function list(req, res) {
   const rows = await q(
-    `SELECT c.id, c.name, c.semester, c.subject_code, c.join_code, m.role, u.name AS owner_name,
+    `SELECT c.id, c.name, c.semester, c.subject_code, ${JOIN_CODE_FOR_STAFF}, m.role, u.name AS owner_name,
             (SELECT COUNT(*) FROM memberships x
               WHERE x.classroom_id = c.id AND x.role IN ('ta','staff')) AS staff_count
        FROM memberships m
@@ -47,8 +52,12 @@ async function previewCode(req, res) {
 async function create(req, res) {
   const name = String(req.body.name || '').trim();
   const semester = String(req.body.semester || '').trim();
-  if (!name || !semester) {
-    return res.status(400).json({ error: 'Classroom name and semester are required' });
+  const subject = String(req.body.subject_code || '').trim();
+  if (!name || !semester || !subject) {
+    return res.status(400).json({ error: 'Classroom name, semester and subject code are required' });
+  }
+  if (subject.length > 32) {
+    return res.status(400).json({ error: 'Keep the subject code under 32 characters' });
   }
 
   // Keep the previewed code if it still looks like one of ours and is free.
@@ -63,7 +72,7 @@ async function create(req, res) {
 
   const r = await q(
     'INSERT INTO classrooms (name, semester, subject_code, join_code, owner_id) VALUES (?, ?, ?, ?, ?)',
-    [name, semester, req.body.subject_code || null, code, req.session.user.id]);
+    [name, semester, subject, code, req.session.user.id]);
 
   await q("INSERT INTO memberships (classroom_id, user_id, role) VALUES (?, ?, 'lecturer')",
     [r.insertId, req.session.user.id]);
@@ -92,7 +101,7 @@ async function join(req, res) {
 /** GET /api/classrooms/:id — members only. */
 async function detail(req, res) {
   const row = await one(
-    `SELECT c.id, c.name, c.semester, c.subject_code, c.join_code, m.role
+    `SELECT c.id, c.name, c.semester, c.subject_code, ${JOIN_CODE_FOR_STAFF}, m.role
        FROM memberships m
        JOIN classrooms c ON c.id = m.classroom_id
       WHERE c.id = ? AND m.user_id = ?`, [req.params.id, req.session.user.id]);
@@ -101,4 +110,16 @@ async function detail(req, res) {
   res.json({ classroom: row, role: row.role });
 }
 
-module.exports = { list, previewCode, create, join, detail };
+/**
+ * POST /api/classrooms/:id/join-code   (lecturer only - requireOwner has run)
+ * Issues a fresh join code (SRS-2). The old code stops working at once, so
+ * a removed member, or anyone the old code leaked to, cannot join with it.
+ * Nobody already in the class is affected.
+ */
+async function resetCode(req, res) {
+  const code = await freeJoinCode();
+  await q('UPDATE classrooms SET join_code = ? WHERE id = ?', [code, req.params.id]);
+  res.json({ join_code: code });
+}
+
+module.exports = { list, previewCode, create, join, detail, resetCode };

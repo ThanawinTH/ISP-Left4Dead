@@ -31,6 +31,8 @@ router.get('/classrooms/preview-code', go(classrooms.previewCode));
 router.post('/classrooms', go(classrooms.create));
 router.post('/classrooms/join', go(classrooms.join));
 router.get('/classrooms/:id', go(classrooms.detail));
+router.post('/classrooms/:id/join-code',
+  mw(auth.loadMembership), auth.requireOwner, go(classrooms.resetCode));
 
 /* Members and roles (US-4). loadMembership runs first so each handler knows
    what the caller is inside this classroom before it does anything. */
@@ -38,6 +40,8 @@ router.get('/classrooms/:id/members',
   mw(auth.loadMembership), go(members.list));
 router.patch('/classrooms/:id/members/:userId',
   mw(auth.loadMembership), auth.requireOwner, go(members.setRole));
+router.delete('/classrooms/:id/members/:userId',
+  mw(auth.loadMembership), auth.requireOwner, go(members.remove));
 
 /* Assignments (US-5). Reading is open to every member - the handler hides
    staff-only rows from students. Only the lecturer creates one: TAs work on

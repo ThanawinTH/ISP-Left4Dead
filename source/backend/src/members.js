@@ -86,4 +86,43 @@ async function setRole(req, res) {
   res.json({ ok: true, user_id: targetId, role, unassigned: removed, deletedAnnouncements });
 }
 
-module.exports = { list, setRole };
+/**
+ * DELETE /api/classrooms/:id/members/:userId   (lecturer only - requireOwner has run)
+ * Removes someone from the classroom. The lecturer cannot remove themselves,
+ * so the class always keeps its owner. What they did as staff goes with them:
+ * they come off any assignment they were checking, and their announcements
+ * (with the files on them) are deleted. Student work is kept, so it comes
+ * back if the same person is let in again. They can rejoin with the join
+ * code, so reset the code if that should not happen.
+ */
+async function remove(req, res) {
+  const targetId = Number(req.params.userId);
+  if (targetId === req.session.user.id) {
+    return res.status(400).json({ error: 'You cannot remove yourself from your own classroom' });
+  }
+
+  const member = await one(
+    'SELECT role FROM memberships WHERE classroom_id = ? AND user_id = ?', [req.params.id, targetId]);
+  if (!member) return res.status(404).json({ error: 'That person is not in this classroom' });
+  if (member.role === 'lecturer') {
+    return res.status(400).json({ error: 'The lecturer cannot be removed' });
+  }
+
+  await q('DELETE FROM memberships WHERE classroom_id = ? AND user_id = ?', [req.params.id, targetId]);
+
+  const unassigned = await q(
+    `DELETE FROM assignment_staff
+      WHERE user_id = ? AND assignment_id IN (SELECT id FROM assignments WHERE classroom_id = ?)`,
+    [targetId, req.params.id]);
+  const announcements = await q(
+    'DELETE FROM announcements WHERE classroom_id = ? AND author_id = ?', [req.params.id, targetId]);
+
+  res.json({
+    ok: true,
+    user_id: targetId,
+    unassigned: unassigned.affectedRows || 0,
+    deletedAnnouncements: announcements.affectedRows || 0,
+  });
+}
+
+module.exports = { list, setRole, remove };
