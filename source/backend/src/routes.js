@@ -4,6 +4,8 @@ const classrooms = require('./classrooms');
 const members = require('./members');
 const assignments = require('./assignments');
 const announcements = require('./announcements');
+const files = require('./files');
+const attachments = require('./attachments');
 
 /** Wraps an async handler so a thrown error reaches the error middleware. */
 const go = (fn) => (req, res, next) => fn(req, res).catch(next);
@@ -68,5 +70,18 @@ router.get('/classrooms/:id/announcements',
   mw(auth.loadMembership), go(announcements.list));
 router.post('/classrooms/:id/announcements',
   mw(auth.loadMembership), auth.requireStaff, go(announcements.create));
+
+/* Files the teaching team attaches: the lecturer on an assignment, the poster
+   (or the lecturer) on an announcement. Any member who can see it can open it. */
+const att = '/attachments/:attachmentId';
+router.post('/classrooms/:id/assignments/:assignmentId/attachments',
+  mw(auth.loadMembership), auth.requireOwner, files.readUpload, go(attachments.addToAssignment));
+router.delete('/classrooms/:id/assignments/:assignmentId' + att,
+  mw(auth.loadMembership), auth.requireOwner, go(attachments.removeFromAssignment));
+router.post('/classrooms/:id/announcements/:announcementId/attachments',
+  mw(auth.loadMembership), auth.requireStaff, files.readUpload, go(attachments.addToAnnouncement));
+router.delete('/classrooms/:id/announcements/:announcementId' + att,
+  mw(auth.loadMembership), auth.requireStaff, go(attachments.removeFromAnnouncement));
+router.get('/classrooms/:id' + att, mw(auth.loadMembership), go(attachments.open));
 
 module.exports = router;

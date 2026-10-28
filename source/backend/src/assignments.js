@@ -1,4 +1,6 @@
 const { q, one } = require('./db');
+const attachments = require('./attachments');
+const { cleanTopic } = require('./topics');
 
 /* The values the database will accept. We check them here too so a bad request
    comes back as a clear 400 instead of a MySQL error. */
@@ -53,7 +55,7 @@ async function list(req, res) {
   // can_grade is true when this person is one of the TAs the lecturer added to
   // that assignment. The lecturer gets it on everything.
   const assignments = await q(
-    `SELECT a.id, a.title, a.description, a.points, a.due_at, a.visibility,
+    `SELECT a.id, a.title, a.topic, a.description, a.points, a.due_at, a.visibility,
             a.staff_due_at, a.staff_note, a.status, c.name AS created_by_name,
             IF(COUNT(u.id) = 0, JSON_ARRAY(),
                JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'name', u.name))) AS staff,
@@ -67,6 +69,8 @@ async function list(req, res) {
       ORDER BY a.due_at ASC, a.id ASC`,
     [req.session.user.id, req.params.id]);
 
+  const files = await attachments.byParent('assignment', req.params.id);
+
   // US-7 (SRS-13): the assigned TAs come back as a real list so the dashboard
   // can show them as a column. staff_names stays for the pages that read it.
   assignments.forEach(a => {
@@ -75,6 +79,7 @@ async function list(req, res) {
       .sort((x, y) => x.name.localeCompare(y.name));
     a.staff_names = a.staff.map(s => s.name).join(', ') || null;
     a.can_grade = req.isOwner || (req.role === 'ta' && Number(a.assigned_to_me) === 1);
+    a.attachments = files.get(a.id) || [];
     delete a.assigned_to_me;
   });
 
@@ -96,6 +101,8 @@ async function create(req, res) {
   const dueAt = req.body.due_at;
 
   if (!title) return res.status(400).json({ error: 'A title is required' });
+  const topic = cleanTopic(req.body.topic);
+  if (topic && topic.error) return res.status(400).json({ error: topic.error });
   if (!dueAt || isNaN(Date.parse(dueAt))) {
     return res.status(400).json({ error: 'A valid due date is required' });
   }
@@ -136,10 +143,10 @@ async function create(req, res) {
 
   const result = await q(
     `INSERT INTO assignments
-       (classroom_id, title, description, points, due_at, visibility,
+       (classroom_id, title, topic, description, points, due_at, visibility,
         staff_due_at, staff_note, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [req.params.id, title, req.body.description || null, points, toSqlDate(dueAt),
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [req.params.id, title, topic, req.body.description || null, points, toSqlDate(dueAt),
      visibility, staffDue, staffNote, status, req.session.user.id]);
 
   for (const userId of staffIds) {
@@ -202,6 +209,12 @@ async function update(req, res) {
     set('staff_due_at', req.body.staff_due_at && !isNaN(Date.parse(req.body.staff_due_at))
       ? toSqlDate(req.body.staff_due_at)
       : null);
+  }
+
+  if (req.body.topic !== undefined) {
+    const topic = cleanTopic(req.body.topic);
+    if (topic && topic.error) return res.status(400).json({ error: topic.error });
+    set('topic', topic);
   }
 
   if (VISIBILITIES.includes(req.body.visibility)) set('visibility', req.body.visibility);
