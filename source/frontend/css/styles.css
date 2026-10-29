@@ -417,12 +417,6 @@ a { color: inherit; text-decoration: none; }
 }
 .select:focus { outline: none; border-color: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
 
-.week { margin-bottom: 26px; }
-.week__head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
-.week__title { font-size: 18px; font-weight: 700; letter-spacing: -.01em; }
-.week__count { color: var(--slate-500); font-size: 13px; }
-.week__flag { margin-left: auto; font-size: 12.5px; color: var(--slate-500); }
-.week__flag b { color: var(--red-600); }
 
 .assignment {
   width: 100%; text-align: left;
@@ -780,15 +774,6 @@ input[data-soon] { background: var(--slate-50); color: var(--slate-500); }
 .datetime .input--time { flex: none; width: 110px; text-align: center; letter-spacing: .04em; }
 
 /* group heading: title (and any overdue flag) on one line, the count under it */
-.week__head {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  row-gap: 2px;
-  align-items: baseline;
-}
-.week__title { grid-column: 1; grid-row: 1; }
-.week__flag  { grid-column: 2; grid-row: 1; justify-self: end; }
-.week__count { grid-column: 1; grid-row: 2; }
 
 /* details panel rhythm */
 .panel hr { margin: 20px 0; border: none; border-top: 1px solid var(--slate-200); }
@@ -877,7 +862,6 @@ a.linkbtn:hover { text-decoration: underline; }
 .assignment--duesoon { border-left: 4px solid var(--amber-700); }
 .assignment--closed  { background: var(--slate-100); }
 .assignment--closed .assignment__title { color: var(--slate-500); }
-.week__flag--soon b { color: var(--amber-700); }
 
 .closed-note { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
                background: var(--slate-100); border: 1px solid var(--slate-200);
@@ -898,7 +882,6 @@ a.linkbtn:hover { text-decoration: underline; }
 .assignment.tone--draft   { border-left-color: var(--slate-300); border-left-style: dashed; }
 .assignment.tone--closed  { border-left-color: var(--slate-300); background: var(--slate-100); }
 .assignment.tone--closed .assignment__title { color: var(--slate-500); }
-.assignment.task.tone--done { opacity: .75; }
 .muted { color: var(--slate-400); }
 
 /* pills: status (where staff work is) and when (how soon) share one shape */
@@ -910,25 +893,7 @@ a.linkbtn:hover { text-decoration: underline; }
 .when--done    { background: var(--green-100); color: var(--green-700); }
 
 /* ---------- TA tabs and task cards ---------- */
-.tabs { display: flex; gap: 6px; margin: 0 0 18px; padding: 4px; background: var(--slate-100);
-        border-radius: var(--r-md); width: fit-content; }
-.tab { border: 0; background: transparent; padding: 8px 14px; border-radius: var(--r-sm); font: inherit;
-       font-size: 13.5px; font-weight: 600; color: var(--slate-600); cursor: pointer;
-       display: inline-flex; align-items: center; gap: 7px; }
-.tab.is-active { background: var(--white); color: var(--teal-700); box-shadow: 0 1px 3px rgba(15,23,42,.1); }
-.tab__n { font-size: 11.5px; padding: 1px 7px; border-radius: var(--r-full); background: var(--slate-200); color: var(--slate-600); }
-.tab.is-active .tab__n { background: var(--teal-700); color: var(--white); }
 
-.assignment.task { display: block; margin-bottom: 12px; }
-.task__top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.task__due { display: block; margin-top: 6px; font-size: 13px; color: var(--slate-500); }
-.task__due b { color: var(--slate-900); font-weight: 700; margin-right: 4px; }
-.task__sep { margin: 0 6px; }
-.task__note { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-              margin-top: 10px; padding: 9px 12px; border-radius: 8px; background: var(--slate-100);
-              font-size: 13px; color: var(--slate-600); line-height: 1.5; }
-.task__note--none { font-style: italic; color: var(--slate-400); }
-.task__foot { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: 12.5px; color: var(--slate-500); }
 
 /* ---------- details panel ---------- */
 .pd__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
@@ -1049,3 +1014,121 @@ a.linkbtn:hover { text-decoration: underline; }
 .composer .input { font-size: 15px; }
 .composer__body { resize: vertical; min-height: 140px; font: inherit; font-size: 15px; line-height: 1.6; }
 .composer__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+
+/* New Announcement and Create Assignment: the form's own title, under the
+   class name in the page header */
+.form-card__title { margin: 0 0 24px; font-size: 20px; font-weight: 700; color: var(--slate-900); }
+.input--area { resize: vertical; min-height: 160px; font: inherit; font-size: 15px; line-height: 1.6; }
+
+/* ==========================================================================
+   FILES FROM THE TEACHING TEAM (assignments and announcements)
+   ========================================================================== */
+/* a file or link as a row: PDFs, text and pictures open in a new tab */
+.upload__hint { margin-top: 8px; font-size: 12.5px; color: var(--slate-500); }
+.subfiles { display: grid; gap: 6px; }
+.subfile { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--slate-200);
+  border-radius: var(--r-md); background: var(--white); color: var(--slate-900); text-decoration: none; }
+.subfile:hover { border-color: var(--teal-600); }
+.subfile svg { width: 22px; height: 22px; flex: none; color: var(--teal-700); }
+.subfile__text { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; min-width: 0; flex: 1; }
+.subfile__name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.subfile__meta { font-size: 12px; color: var(--slate-500); flex: none; }
+.linkform { display: flex; gap: 8px; }
+.linkform .input { flex: 1; min-width: 0; padding: 9px 12px; font-size: 13px; }
+/* a long file name or link must shorten with "…", never widen the panel */
+.box { grid-template-columns: minmax(0, 1fr); }
+.subfiles, .subfile { min-width: 0; }
+.panel .subfiles { margin-bottom: 20px; }
+.pd__label--gap { margin-top: 20px; }
+.attach { display: grid; gap: 8px; }
+.attach__list { display: grid; gap: 6px; }
+.attach__row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--slate-200);
+  border-radius: var(--r-md); background: var(--white); font-size: 13px; }
+.attach__row svg { width: 18px; height: 18px; flex: none; color: var(--teal-700); }
+.attach__row--new { border-style: dashed; border-color: var(--teal-600); }
+.attach__name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach__size { font-size: 12px; color: var(--slate-500); }
+.attach__x { border: 0; background: none; color: var(--slate-400); font-size: 18px; line-height: 1; cursor: pointer; padding: 0 4px; }
+.attach__x:hover { color: var(--red-600); }
+.attach .btn { justify-self: start; }
+.attach .btn svg { width: 16px; height: 16px; }
+.ann__files { display: grid; gap: 6px; margin-top: 14px; }
+
+/* ==========================================================================
+   TOPICS - the Assignment page, one layout for every role
+   ========================================================================== */
+.topic { margin-bottom: 30px; }
+.topic__head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px; margin-bottom: 12px;
+  border-bottom: 1px solid var(--slate-300); }
+.topic__title { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -.01em; color: var(--slate-900); }
+.topic__count { font-size: 13px; color: var(--slate-500); }
+/* Create Assignment: the topic picker, same box as the TA list */
+.picker__item--new { flex-wrap: wrap; }
+.picker__item .picker__input { flex: 1; width: auto; height: 38px; min-width: 180px; padding: 8px 12px; font-size: 13.5px; }
+.topic__flag { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--amber-700); }
+
+/* one row per assignment: icon, title and due line, points and badge */
+.topic .assignment { display: flex; align-items: center; gap: 14px; width: 100%; margin-bottom: 8px;
+  padding: 12px 16px; border: 1px solid var(--slate-200); border-left: 1px solid var(--slate-200);
+  border-radius: var(--r-lg); background: var(--white); text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.topic .assignment:hover { border-color: var(--teal-600); }
+.topic .assignment.is-selected { border-color: var(--teal-600); background: var(--teal-50); box-shadow: 0 0 0 2px var(--teal-50); }
+.assignment__icon { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 50%;
+  background: var(--teal-50); color: var(--teal-700); }
+.assignment__icon svg { width: 20px; height: 20px; }
+.tone--duesoon .assignment__icon { background: var(--amber-100); color: var(--amber-700); }
+.tone--overdue .assignment__icon { background: var(--red-100);   color: var(--red-600); }
+.tone--done    .assignment__icon { background: var(--green-100); color: var(--green-700); }
+.tone--draft   .assignment__icon { background: var(--slate-100); color: var(--slate-500); }
+.tone--closed  .assignment__icon { background: var(--slate-100); color: var(--slate-400); }
+.topic .assignment.tone--closed { background: var(--white); }
+.topic .assignment__title { display: block; font-size: 15px; font-weight: 600; }
+.topic .assignment__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 0; margin-top: 3px;
+  font-size: 12.5px; color: var(--slate-500); }
+.meta__dot { margin: 0 7px; color: var(--slate-300); }
+.topic .assignment.is-selected .assignment__icon { background: var(--white); }
+.topic .assignment__end { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; margin-left: auto; }
+.topic .assignment__pts { font-size: 14px; font-weight: 700; color: var(--slate-900); }
+.assignment__tags { display: flex; align-items: center; gap: 6px; }
+
+/* ==========================================================================
+   ASSIGNMENT PANEL - side panel, or full screen, same parts for every role
+   ========================================================================== */
+.pd__tools { display: flex; align-items: center; gap: 10px; flex: none; }
+.iconbtn { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--slate-200);
+  border-radius: var(--r-md); background: var(--white); color: var(--slate-600); cursor: pointer; }
+.iconbtn:hover { border-color: var(--teal-600); color: var(--teal-700); }
+.iconbtn svg { width: 16px; height: 16px; }
+.pd__back { display: none; }
+/* side panel: the thing to do first, then the facts, then the description */
+.pd__body { display: grid; grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "action" "subs" "facts" "about"; }
+.pd__action { grid-area: action; min-width: 0; }
+.pd__subs   { grid-area: subs; }
+.pd__facts  { grid-area: facts; }
+.pd__about  { grid-area: about; min-width: 0; }
+
+/* full screen: the assignment on the left, what you do with it on the right */
+.schedule.is-full { grid-template-columns: minmax(0, 1fr); }
+.schedule.is-full > section { display: none; }
+.schedule.is-full .panel { position: static; width: 100%; max-width: 1120px; margin: 0 auto; padding: 32px 40px; }
+.is-full .pd__back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 0;
+  border: 0; background: none; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--teal-700); cursor: pointer; }
+.is-full .pd__back:hover { text-decoration: underline; }
+.is-full .pd__title { font-size: 28px; }
+.is-full .pd__head { padding-bottom: 20px; border-bottom: 1px solid var(--slate-200); }
+.is-full .pd__chips { margin-top: 16px; }
+.is-full .pd__body { margin-top: 24px; column-gap: 40px; align-items: start;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-areas: "about action" "facts action" "subs action"; }
+.is-full .pd__action { grid-row: 1 / span 3; position: sticky; top: 24px; }
+.is-full .pd__action .box { margin-top: 0; }
+.is-full .pd__about { padding-bottom: 22px; margin-bottom: 22px; border-bottom: 1px solid var(--slate-200); }
+.pd__desc { white-space: pre-wrap; overflow-wrap: anywhere; }   /* keeps the lecturer's line breaks */
+.is-full .pd__desc { font-size: 15px; line-height: 1.7; }
+.is-full .pd__facts { margin-bottom: 22px; }
+@media (max-width: 1000px) {
+  .schedule.is-full .panel { padding: 24px; }
+  .is-full .pd__body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "action" "about" "facts" "subs"; }
+  .is-full .pd__action { grid-row: auto; position: static; }
+}

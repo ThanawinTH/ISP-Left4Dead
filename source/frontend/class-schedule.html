@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Class Assignment · KU Classroom</title>
+<title>Assignment · KU Classroom</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=37">
+<link rel="stylesheet" href="css/styles.css?v=42">
 </head>
 <body>
 
@@ -30,9 +30,9 @@
     <!-- Inside a classroom the menu switches to the class menu. -->
     <nav class="nav">
       <a class="nav__item" href="my-classrooms.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1v-8.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Return to Classes</a>
-      <a class="nav__item is-active" href="#"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3h6v3H9zM9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Class Assignment</a>
+      <a class="nav__item" href="#" id="announcementsLink"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Announcements</a>
+      <a class="nav__item is-active" href="#"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3h6v3H9zM9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Assignment</a>
       <a class="nav__item" href="#" id="membersLink"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 6.5a3 3 0 0 1 0 5.8M17 14.4a5 5 0 0 1 3.5 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Members</a>
-      <a class="nav__item" href="#" id="announcementsLink"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Class Announcements</a>
     </nav>
 
     <div class="sidebar__user">
@@ -47,21 +47,8 @@
   <div class="main">
     <header class="header">
       <div class="header__titles">
-        <h1 id="className">Loading…</h1>
-        <div class="header__sub" id="classSem"></div>
-      </div>
-
-      <div class="header__actions">
-        <!-- SRS-2: the classroom join code, copyable by staff -->
-        <div class="codegroup">
-          <span class="codegroup__code" id="joinCode">—</span>
-          <button id="copyCode">
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
-              <path d="M5 15V6a2 2 0 0 1 2-2h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>Copy
-          </button>
-        </div>
+        <h1 id="classTitle">Loading…</h1>
+        <div class="header__sub" id="classSub"></div>
       </div>
     </header>
 
@@ -74,12 +61,17 @@
             <a class="btn btn--primary" id="newAssignment" href="#" hidden>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-              </svg>Class Assignment
+              </svg>New Assignment
             </a>
             <!-- US-8: students switch between everything and only what's at risk -->
             <div class="seg" id="riskToggle" hidden>
               <button class="seg__btn is-on" data-risk="all">All</button>
               <button class="seg__btn" data-risk="only">Due soon <span class="seg__n" id="riskCount" hidden>0</span></button>
+            </div>
+            <!-- A TA switches between the work the lecturer gave them and the whole class -->
+            <div class="seg" id="taTabs" hidden>
+              <button class="seg__btn is-on" data-view="mine">Mine <span class="seg__n" id="countMine">0</span></button>
+              <button class="seg__btn" data-view="all">All <span class="seg__n" id="countAll">0</span></button>
             </div>
             <div class="search">
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -90,16 +82,10 @@
             </div>
           </div>
 
-          <!-- A TA's own tasks, or the whole class -->
-          <div class="tabs" id="taTabs" hidden>
-            <button class="tab is-active" data-view="mine">My tasks <span class="tab__n" id="countMine">0</span></button>
-            <button class="tab" data-view="all">All assignments <span class="tab__n" id="countAll">0</span></button>
-          </div>
-
           <!-- US-8: at-risk assignments for a student, above the schedule -->
           <div class="risk" id="riskBox" hidden></div>
 
-          <div id="weeks"></div>
+          <div id="topics"></div>
           <div class="empty" id="emptyState" hidden>
             <strong>No assignments yet</strong>
             Nothing has been added to this classroom.
@@ -114,9 +100,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=37"></script>
-<script src="js/api.js?v=37"></script>
-<script src="js/schedule.js?v=37"></script>
+<script src="js/app.js?v=42"></script>
+<script src="js/api.js?v=42"></script>
+<script src="js/schedule.js?v=42"></script>
 <script>
   // Menu items that are designed but not built yet.
   document.querySelectorAll('[data-soon]').forEach(el =>
