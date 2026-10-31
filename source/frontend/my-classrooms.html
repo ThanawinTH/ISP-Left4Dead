@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=35">
+<link rel="stylesheet" href="css/styles.css?v=42">
 </head>
 <body>
 
@@ -77,8 +77,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=35"></script>
-<script src="js/api.js?v=35"></script>
+<script src="js/app.js?v=42"></script>
+<script src="js/api.js?v=42"></script>
 <script>
   const ROLE_LABEL = { lecturer: 'Lecturer', ta: 'TA', staff: 'Staff', student: 'Student' };
 
@@ -87,7 +87,7 @@
     const code = c.join_code
       ? `<span class="chip chip--muted">Code: <b>${c.join_code}</b></span>` : '';
     return `
-      <a class="class-card" href="class-schedule.html?id=${c.id}">
+      <a class="class-card" href="announcements.html?id=${c.id}">
         <div class="class-card__top">
           <div>
             <div class="class-card__code">${c.subject_code || ''}</div>

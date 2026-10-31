@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Class Announcements · KU Classroom</title>
+<title>Announcements · KU Classroom</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=37">
+<link rel="stylesheet" href="css/styles.css?v=42">
 </head>
 <body>
 
@@ -30,9 +30,9 @@
     <!-- Inside a classroom the menu switches to the class menu. -->
     <nav class="nav">
       <a class="nav__item" href="my-classrooms.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1v-8.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg> Return to Classes</a>
-      <a class="nav__item" href="#" id="assignmentLink"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3h6v3H9zM9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Class Assignment</a>
+      <a class="nav__item is-active" href="#"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Announcements</a>
+      <a class="nav__item" href="#" id="assignmentLink"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="4" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 3h6v3H9zM9 12h6M9 16h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Assignment</a>
       <a class="nav__item" href="#" id="membersLink"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="9" cy="9" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 6.5a3 3 0 0 1 0 5.8M17 14.4a5 5 0 0 1 3.5 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Members</a>
-      <a class="nav__item is-active" href="#"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Class Announcements</a>
     </nav>
 
     <div class="sidebar__user">
@@ -47,45 +47,30 @@
   <div class="main">
     <header class="header">
       <div class="header__titles">
-        <h1>Class Announcements</h1>
+        <h1 id="classTitle">Loading…</h1>
         <div class="header__sub" id="classSub"></div>
-      </div>
-      <!-- US-10: lecturers, TAs and University staff get this button. -->
-      <div class="header__actions">
-        <button class="btn btn--primary" id="newBtn" type="button" hidden>
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-          New Announcement
-        </button>
       </div>
     </header>
 
     <main class="content">
       <div class="anns">
 
-        <!-- US-10: the post form, opened by the New Announcement button. -->
-        <form class="composer" id="postForm" hidden novalidate>
-          <div class="composer__head">
-            <h2 class="composer__title">New announcement</h2>
-            <button class="composer__close" type="button" id="closeBtn" aria-label="Close">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-            </button>
+        <!-- Laid out like the bar on the Class Assignment page: the New
+             Announcement button (lecturers, TAs and University staff only)
+             and a search everyone can use. -->
+        <div class="filters" id="annBar">
+          <a class="btn btn--primary" id="newBtn" href="#" hidden>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            New Announcement
+          </a>
+          <div class="search">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/>
+              <path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input id="searchBox" placeholder="Search" autocomplete="off" aria-label="Search announcements">
           </div>
-          <div class="field" id="titleField">
-            <label class="label" for="title">Title <span class="req">*</span></label>
-            <input class="input" id="title" maxlength="190" placeholder="e.g. Lab moved to room 204 this Friday">
-            <div class="hint">Please add a title.</div>
-          </div>
-          <div class="field" id="bodyField">
-            <label class="label" for="body">Message <span class="req">*</span></label>
-            <textarea class="input composer__body" id="body" rows="6" maxlength="5000"
-                      placeholder="Write the announcement for everyone in this class"></textarea>
-            <div class="hint">Please write a message.</div>
-          </div>
-          <div class="composer__actions">
-            <button class="btn btn--ghost" type="button" id="cancelBtn">Cancel</button>
-            <button class="btn btn--primary" type="submit" id="postBtn">Post Announcement</button>
-          </div>
-        </form>
+        </div>
 
         <!-- US-11: every member reads the same list, newest first. -->
         <div class="anns__bar">
@@ -100,8 +85,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=37"></script>
-<script src="js/api.js?v=37"></script>
-<script src="js/announcements.js?v=37"></script>
+<script src="js/app.js?v=42"></script>
+<script src="js/api.js?v=42"></script>
+<script src="js/announcements.js?v=42"></script>
 </body>
 </html>

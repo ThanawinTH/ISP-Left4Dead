@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=35">
+<link rel="stylesheet" href="css/styles.css?v=39">
 </head>
 <body>
 
@@ -67,9 +67,10 @@
           <div class="hint hint--plain">Format: yyyy/s &nbsp;·&nbsp; e.g. 2026/1 or 2026/2</div>
         </div>
 
-        <div class="field">
-          <label class="label" for="subject">Subject Code</label>
-          <input class="input" id="subject" placeholder="e.g. 01204491" autocomplete="off">
+        <div class="field" id="f-subj">
+          <label class="label" for="subject">Subject Code <span class="req">*</span></label>
+          <input class="input" id="subject" placeholder="e.g. 01204491" maxlength="32" autocomplete="off">
+          <div class="hint">A subject code is required.</div>
         </div>
 
         <!-- SRS-2: the system generates a code unique among active classrooms.
@@ -101,8 +102,8 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=35"></script>
-<script src="js/api.js?v=35"></script>
+<script src="js/app.js?v=39"></script>
+<script src="js/api.js?v=39"></script>
 <script>
   // SRS-2: the code is issued by the server on save, so this is only a placeholder.
   document.getElementById('previewCode').textContent = '—';
@@ -134,7 +135,8 @@
     const submitBtn = e.target.querySelector('button[type="submit"]');
     let ok = true;
 
-    [['f-name', name], ['f-sem', sem]].forEach(([id, el]) => {
+    const subj = document.getElementById('subject');
+    [['f-name', name], ['f-sem', sem], ['f-subj', subj]].forEach(([id, el]) => {
       const bad = !el.value.trim();
       document.getElementById(id).classList.toggle('is-error', bad);
       el.classList.toggle('is-error', bad);
@@ -151,7 +153,7 @@
       const data = await API.post('/classrooms', {
         name: name.value.trim(),
         semester: sem.value.trim(),
-        subject_code: document.getElementById('subject').value.trim() || null,
+        subject_code: subj.value.trim(),
         // only send a previewed code - the placeholder dash is not one
         join_code: (() => {
           const shown = document.getElementById('previewCode').textContent.trim();
@@ -190,7 +192,7 @@
                    : year;
   });
 
-  ['className', 'semester'].forEach(id => {
+  ['className', 'semester', 'subject'].forEach(id => {
     document.getElementById(id).addEventListener('input', (e) => {
       e.target.classList.remove('is-error');
       e.target.closest('.field').classList.remove('is-error');
