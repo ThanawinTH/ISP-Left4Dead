@@ -93,4 +93,12 @@ router.put(sub, mw(auth.loadMembership), files.readUpload, go(submissions.upload
 router.get(sub, mw(auth.loadMembership), go(submissions.mine));
 router.get(sub + '/files/:fileId', mw(auth.loadMembership), go(submissions.myFile));
 
+/* US-15: lecturers, TAs and University staff see who has submitted and open any
+   file in their classroom (SRS-25). Students get 403. */
+const subs = '/classrooms/:id/assignments/:assignmentId/submissions';
+router.get(subs, mw(auth.loadMembership), auth.requireStaff, go(submissions.listForStaff));
+router.get(subs + '/files/:fileId', mw(auth.loadMembership), auth.requireStaff, go(submissions.staffFile));
+router.put('/classrooms/:id/assignments/:assignmentId/grades/:studentId',
+  mw(auth.loadMembership), auth.requireStaff, go(submissions.setGrade));
+
 module.exports = router;

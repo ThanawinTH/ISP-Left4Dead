@@ -108,3 +108,19 @@ CREATE TABLE IF NOT EXISTS submissions (
   FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
   FOREIGN KEY (student_id)    REFERENCES users(id)
 ) ENGINE=InnoDB;
+
+-- US-15: one grade per student per assignment, from the lecturer or a TA on
+-- that assignment. Kept apart from the submissions, so handing in again does
+-- not wipe a grade, and a student who handed in nothing can still be given 0.
+CREATE TABLE IF NOT EXISTS grades (
+  assignment_id INT NOT NULL,
+  student_id    INT NOT NULL,
+  score         INT NOT NULL,                -- 0 up to the assignment's points
+  feedback      TEXT NULL,                   -- a comment only that student sees
+  graded_by     INT NOT NULL,
+  graded_at     DATETIME NOT NULL,           -- UTC, set by the server
+  PRIMARY KEY (assignment_id, student_id),
+  FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id)    REFERENCES users(id),
+  FOREIGN KEY (graded_by)     REFERENCES users(id)
+) ENGINE=InnoDB;

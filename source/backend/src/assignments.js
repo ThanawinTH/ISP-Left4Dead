@@ -54,6 +54,12 @@ async function list(req, res) {
   // US-14: the student's own submission, joined in only for students.
   const mySubmission = forStudent
     ? 'LEFT JOIN submissions sub ON sub.assignment_id = a.id AND sub.student_id = ?' : '';
+  // US-15 (SRS-25): staff see how many students have handed in, against the
+  // number of students in the class.
+  const counts = forStudent ? '' : `,
+            (SELECT COUNT(DISTINCT x.student_id) FROM submissions x WHERE x.assignment_id = a.id) AS submitted_count,
+            (SELECT COUNT(*) FROM memberships m WHERE m.classroom_id = a.classroom_id
+                                                AND m.role = 'student') AS student_count`;
   const atRiskOnly = forStudent && req.query.atRisk === '1'
     ? " HAVING risk IN ('duesoon', 'overdue')"
     : '';
@@ -65,7 +71,7 @@ async function list(req, res) {
             a.staff_due_at, a.staff_note, a.status, a.allow_late, c.name AS created_by_name,
             IF(COUNT(u.id) = 0, JSON_ARRAY(),
                JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'name', u.name))) AS staff,
-            MAX(s.user_id = ?) AS assigned_to_me${riskColumn}
+            MAX(s.user_id = ?) AS assigned_to_me${riskColumn}${counts}
        FROM assignments a
        JOIN users c ON c.id = a.created_by
        LEFT JOIN assignment_staff s ON s.assignment_id = a.id
@@ -80,6 +86,13 @@ async function list(req, res) {
 
   const files = await attachments.byParent('assignment', req.params.id);
 
+  // US-15: a student sees their own grade on each row, like "30/100".
+  const myScores = forStudent ? new Map((await q(
+    `SELECT g.assignment_id, g.score FROM grades g
+       JOIN assignments x ON x.id = g.assignment_id
+      WHERE g.student_id = ? AND x.classroom_id = ?`,
+    [req.session.user.id, req.params.id])).map(g => [g.assignment_id, g.score])) : null;
+
   // US-7 (SRS-13): the assigned TAs come back as a real list so the dashboard
   // can show them as a column. staff_names stays for the pages that read it.
   assignments.forEach(a => {
@@ -90,6 +103,7 @@ async function list(req, res) {
     a.can_grade = req.isOwner || (req.role === 'ta' && Number(a.assigned_to_me) === 1);
     a.allow_late = Number(a.allow_late) === 1;
     a.attachments = files.get(a.id) || [];
+    if (forStudent) a.my_score = myScores.has(a.id) ? myScores.get(a.id) : null;
     delete a.assigned_to_me;
   });
 
