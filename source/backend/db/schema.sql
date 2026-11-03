@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS assignments (
   staff_due_at DATETIME NULL,      -- the TAs' own deadline, earlier than the students'
   staff_note   TEXT NULL,          -- what the lecturer wants the TAs to do
   status       ENUM('notstarted','inprogress','done') NOT NULL DEFAULT 'notstarted',
+  allow_late   TINYINT(1) NOT NULL DEFAULT 0,   -- US-14: take work after due_at, marked late
   created_by   INT NOT NULL,
   created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY idx_class_due (classroom_id, due_at),                      -- we always sort by due date
@@ -86,4 +87,24 @@ CREATE TABLE IF NOT EXISTS attachments (
   FOREIGN KEY (assignment_id)   REFERENCES assignments(id)   ON DELETE CASCADE,
   FOREIGN KEY (announcement_id) REFERENCES announcements(id) ON DELETE CASCADE,
   FOREIGN KEY (uploaded_by)     REFERENCES users(id)
+) ENGINE=InnoDB;
+
+-- US-14 / US-15: what a student hands in - files, links, or both. One submit
+-- shares a batch id, and submitting again replaces the whole earlier batch
+-- (SRS-23). Files are stored in the row, so they are deleted with the
+-- assignment and need no separate folder. Late = uploaded after due_at (SRS-24).
+CREATE TABLE IF NOT EXISTS submissions (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  assignment_id INT NOT NULL,
+  student_id    INT NOT NULL,
+  batch         CHAR(16) NOT NULL,           -- the submit this item belongs to
+  kind          ENUM('file','link') NOT NULL DEFAULT 'file',
+  file_name     VARCHAR(255) NOT NULL,       -- original file name, or the link's site
+  url           VARCHAR(2048) NULL,          -- links only
+  file_size     INT NOT NULL DEFAULT 0,
+  content       LONGBLOB NULL,               -- files only
+  uploaded_at   DATETIME NOT NULL,           -- UTC, set by the server
+  KEY idx_student_work (assignment_id, student_id),
+  FOREIGN KEY (assignment_id) REFERENCES assignments(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id)    REFERENCES users(id)
 ) ENGINE=InnoDB;

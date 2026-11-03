@@ -4,6 +4,7 @@ const classrooms = require('./classrooms');
 const members = require('./members');
 const assignments = require('./assignments');
 const announcements = require('./announcements');
+const submissions = require('./submissions');
 const files = require('./files');
 const attachments = require('./attachments');
 
@@ -83,5 +84,13 @@ router.post('/classrooms/:id/announcements/:announcementId/attachments',
 router.delete('/classrooms/:id/announcements/:announcementId' + att,
   mw(auth.loadMembership), auth.requireStaff, go(attachments.removeFromAnnouncement));
 router.get('/classrooms/:id' + att, mw(auth.loadMembership), go(attachments.open));
+
+/* US-14: a student's own submission - files, links or both (SRS-21 to SRS-24).
+   The upload route reads the files itself, after the membership check.
+   Add ?view=1 to a file address to open it in the browser instead. */
+const sub = '/classrooms/:id/assignments/:assignmentId/submission';
+router.put(sub, mw(auth.loadMembership), files.readUpload, go(submissions.upload));
+router.get(sub, mw(auth.loadMembership), go(submissions.mine));
+router.get(sub + '/files/:fileId', mw(auth.loadMembership), go(submissions.myFile));
 
 module.exports = router;

@@ -9,15 +9,18 @@ const STATUSES = ['notstarted', 'inprogress', 'done'];
 
 /*
  * US-8 (SRS-12): at-risk for a student, worked out in SQL so every page agrees.
- *   closed  - the due date has passed; the assignment no longer takes work
+ *   overdue - the due date has passed, but the lecturer allows late work
+ *   closed  - the due date has passed and late work is not allowed
  *   duesoon - due within the next 3 days; this is what "at risk" means
  *   ok      - everything else
  * Dates are stored in UTC, so they are compared with UTC_TIMESTAMP().
- * "Not submitted" joins in here once submissions exist (US-14).
+ *   submitted - US-14: the student has handed in a file, so it is not at risk
  */
 const DUE_SOON_DAYS = 3;
 const STUDENT_RISK = `
   CASE
+    WHEN MAX(sub.id) IS NOT NULL                                     THEN 'submitted'
+    WHEN a.due_at <  UTC_TIMESTAMP() AND a.allow_late = 1           THEN 'overdue'
     WHEN a.due_at <  UTC_TIMESTAMP()                                 THEN 'closed'
     WHEN a.due_at <  UTC_TIMESTAMP() + INTERVAL ${DUE_SOON_DAYS} DAY THEN 'duesoon'
     ELSE 'ok'
@@ -48,15 +51,18 @@ async function list(req, res) {
   // narrow the list to the at-risk rows (SRS-13).
   const forStudent = !req.isStaff;
   const riskColumn = forStudent ? `, ${STUDENT_RISK} AS risk` : '';
+  // US-14: the student's own submission, joined in only for students.
+  const mySubmission = forStudent
+    ? 'LEFT JOIN submissions sub ON sub.assignment_id = a.id AND sub.student_id = ?' : '';
   const atRiskOnly = forStudent && req.query.atRisk === '1'
-    ? " HAVING risk = 'duesoon'"
+    ? " HAVING risk IN ('duesoon', 'overdue')"
     : '';
 
   // can_grade is true when this person is one of the TAs the lecturer added to
   // that assignment. The lecturer gets it on everything.
   const assignments = await q(
     `SELECT a.id, a.title, a.topic, a.description, a.points, a.due_at, a.visibility,
-            a.staff_due_at, a.staff_note, a.status, c.name AS created_by_name,
+            a.staff_due_at, a.staff_note, a.status, a.allow_late, c.name AS created_by_name,
             IF(COUNT(u.id) = 0, JSON_ARRAY(),
                JSON_ARRAYAGG(JSON_OBJECT('id', u.id, 'name', u.name))) AS staff,
             MAX(s.user_id = ?) AS assigned_to_me${riskColumn}
@@ -64,10 +70,13 @@ async function list(req, res) {
        JOIN users c ON c.id = a.created_by
        LEFT JOIN assignment_staff s ON s.assignment_id = a.id
        LEFT JOIN users u            ON u.id = s.user_id
+       ${mySubmission}
       WHERE a.classroom_id = ?${onlyClassVisible}
       GROUP BY a.id${atRiskOnly}
       ORDER BY a.due_at ASC, a.id ASC`,
-    [req.session.user.id, req.params.id]);
+    forStudent
+      ? [req.session.user.id, req.session.user.id, req.params.id]
+      : [req.session.user.id, req.params.id]);
 
   const files = await attachments.byParent('assignment', req.params.id);
 
@@ -79,6 +88,7 @@ async function list(req, res) {
       .sort((x, y) => x.name.localeCompare(y.name));
     a.staff_names = a.staff.map(s => s.name).join(', ') || null;
     a.can_grade = req.isOwner || (req.role === 'ta' && Number(a.assigned_to_me) === 1);
+    a.allow_late = Number(a.allow_late) === 1;
     a.attachments = files.get(a.id) || [];
     delete a.assigned_to_me;
   });
@@ -144,10 +154,10 @@ async function create(req, res) {
   const result = await q(
     `INSERT INTO assignments
        (classroom_id, title, topic, description, points, due_at, visibility,
-        staff_due_at, staff_note, status, created_by)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        staff_due_at, staff_note, status, allow_late, created_by)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [req.params.id, title, topic, req.body.description || null, points, toSqlDate(dueAt),
-     visibility, staffDue, staffNote, status, req.session.user.id]);
+     visibility, staffDue, staffNote, status, req.body.allow_late ? 1 : 0, req.session.user.id]);
 
   for (const userId of staffIds) {
     await q('INSERT INTO assignment_staff (assignment_id, user_id) VALUES (?, ?)',
@@ -218,6 +228,7 @@ async function update(req, res) {
   }
 
   if (VISIBILITIES.includes(req.body.visibility)) set('visibility', req.body.visibility);
+  if (req.body.allow_late !== undefined) set('allow_late', req.body.allow_late ? 1 : 0);
 
   if (fields.length) {
     values.push(assignmentId);
