@@ -2,7 +2,7 @@
    Class Announcements (US-10, US-11)
    Everyone in the classroom reads the same list, newest first (US-11).
    A lecturer, TA or University staff member also gets a "New Announcement"
-   button that opens the post form (US-10). The server decides who can post;
+   button that opens the post form on its own page (US-10). The server decides who can post;
    the page only follows its answer.
    ========================================================================== */
 
@@ -17,6 +17,8 @@ const ROLE_LABEL = {
 };
 
 let canPost = false;
+let all = [];          // every announcement, newest first, as the server sent them
+let search = '';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -34,19 +36,32 @@ function when(value) {
 
 async function loadClassroom() {
   const { classroom } = await API.get('/classrooms/' + classroomId);
-  $('classSub').textContent =
-    (classroom.subject_code ? classroom.subject_code + ' ' : '') + classroom.name;
+  showClassHeader(classroom);
 }
 
 async function loadAnnouncements() {
   const data = await API.get(`/classrooms/${classroomId}/announcements`);
   canPost = data.canPost;
-  render(data.announcements);
+  all = data.announcements;
+  render();
 }
 
-function render(list) {
-  $('noticeCount').textContent = list.length;
+/** Words typed in the search: title, message or author must contain them. */
+function matches(a, term) {
+  return !term || [a.title, a.body, a.author_name].some(s => String(s || '').toLowerCase().includes(term));
+}
 
+function render() {
+  const term = search.trim().toLowerCase();
+  const list = all.filter(a => matches(a, term));
+  $('noticeCount').textContent = term ? `${list.length} of ${all.length}` : all.length;
+
+  if (term && !list.length) {
+    $('noticeList').innerHTML = `
+      <div class="anns__empty"><strong>No announcements match "${esc(search.trim())}"</strong>
+        Try another word, or clear the search.</div>`;
+    return;
+  }
   if (!list.length) {
     $('noticeList').innerHTML = `
       <div class="anns__empty">
@@ -56,8 +71,9 @@ function render(list) {
       </div>`;
     return;
   }
-  // The server already sends them newest first; there is no search or filter.
-  $('noticeList').innerHTML = list.map((a, i) => cardHTML(a, i === 0)).join('');
+  // The server sends them newest first; searching only hides the others, so
+  // the order never changes. "Latest" stays on the newest of all.
+  $('noticeList').innerHTML = list.map(a => cardHTML(a, a === all[0])).join('');
 }
 
 function cardHTML(a, latest) {
@@ -77,62 +93,54 @@ function cardHTML(a, latest) {
       </header>
       <h3 class="ann__title">${esc(a.title)}</h3>
       <p class="ann__body">${esc(a.body)}</p>
+      ${filesHTML(a)}
     </article>`;
 }
 
-/* ---------- US-10: New Announcement ---------- */
-
-function setError(fieldId, on) {
-  $(fieldId).classList.toggle('is-error', on);
-  $(fieldId).querySelector('.input').classList.toggle('is-error', on);
+/* Files attached to an announcement. PDFs and pictures open in a new tab,
+   other files download. Whoever posted it (or the lecturer) can remove one. */
+function filesHTML(a) {
+  if (!(a.attachments || []).length) return '';
+  return `
+    <div class="ann__files">
+      ${a.attachments.map(f => `
+        <div class="attach__row">${f.kind === 'link' ? Files.ICON.link : Files.ICON.file}
+          ${f.kind === 'link'
+            ? `<a class="attach__name" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.url)}</a>
+               <span class="attach__size">${esc(f.file_name)}</span>`
+            : `<a class="attach__name" ${Files.link(`/classrooms/${classroomId}/attachments/${f.id}`, f.file_name)}>${esc(f.file_name)}</a>
+               <span class="attach__size">${Files.size(f.file_size)}</span>`}
+          ${a.can_manage ? `<button class="attach__x" type="button" data-ann="${a.id}" data-file="${f.id}"
+             aria-label="Remove ${esc(f.file_name)}">×</button>` : ''}
+        </div>`).join('')}
+    </div>`;
 }
 
-function openComposer() {
-  $('postForm').hidden = false;
-  $('newBtn').hidden = true;                 // the form takes the button's place
-  $('title').focus();
-}
-
-function closeComposer() {
-  $('postForm').reset();
-  setError('titleField', false);
-  setError('bodyField', false);
-  $('postForm').hidden = true;
-  $('newBtn').hidden = false;
-}
-
-async function post(e) {
-  e.preventDefault();
-  const title = $('title').value.trim();
-  const body = $('body').value.trim();
-
-  setError('titleField', !title);
-  setError('bodyField', !body);
-  if (!title || !body) return;
-
-  $('postBtn').disabled = true;
+$('noticeList').addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-file]');
+  if (!btn || !confirm('Remove this file from the announcement?')) return;
   try {
-    await API.post(`/classrooms/${classroomId}/announcements`, { title, body });
-    closeComposer();
-    KU.toast('Announcement posted');
+    await API.del(`/classrooms/${classroomId}/announcements/${btn.dataset.ann}/attachments/${btn.dataset.file}`);
+    KU.toast('File removed');
     await loadAnnouncements();
   } catch (err) {
     KU.toast(err.message);
-  } finally {
-    $('postBtn').disabled = false;
   }
-}
+});
 
+/* ---------- US-10: New Announcement ---------- */
+
+/* The button opens the post form on its own page, like New Assignment. */
 function setUpPosting() {
   if (!canPost) return;                      // students only read
+  $('newBtn').href = 'create-announcement.html?id=' + classroomId;
   $('newBtn').hidden = false;
-  $('newBtn').addEventListener('click', openComposer);
-  $('closeBtn').addEventListener('click', closeComposer);
-  $('cancelBtn').addEventListener('click', closeComposer);
-  $('postForm').addEventListener('submit', post);
-  ['title', 'body'].forEach(id => $(id).addEventListener('input', () =>
-    setError(id + 'Field', false)));
 }
+
+$('searchBox').addEventListener('input', (e) => {
+  search = e.target.value;
+  render();
+});
 
 /* ---------- start ---------- */
 
