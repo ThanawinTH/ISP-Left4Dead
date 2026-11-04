@@ -40,6 +40,7 @@ async function loadForEditing() {
   document.getElementById('staffNote').value = a.staff_note || '';
   fillDateTime('dueDate', 'dueTime', a.due_at);
   fillDateTime('staffDue', 'staffTime', a.staff_due_at);
+  document.getElementById('allowLate').checked = !!a.allow_late;
   attach.kept = a.attachments || [];
   renderAttachments();
   document.getElementById('staffDue').min = document.getElementById('dueDate').value;
@@ -212,6 +213,7 @@ async function save(visibility, button) {
     staff_ids: pickedStaff(),
     staff_due_at: staffDueISO(),
     staff_note: document.getElementById('staffNote').value.trim() || null,
+    allow_late: document.getElementById('allowLate').checked,
     visibility,
   };
 

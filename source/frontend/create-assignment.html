@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=42">
+<link rel="stylesheet" href="css/styles.css?v=43">
 </head>
 <body>
 
@@ -120,6 +120,16 @@
           <input class="input" id="staffNote" placeholder="Write Note to staff" autocomplete="off">
         </div>
 
+        <!-- Late work: off by default. On = students can still hand in after the
+             due date, and their work is marked Late (SRS-24). -->
+        <div class="field">
+          <label class="toggle" for="allowLate">
+            <input type="checkbox" id="allowLate">
+            <span><b>Allow late submissions</b>
+              <span>Students can still hand in after the due date. Their work is marked Late.</span></span>
+          </label>
+        </div>
+
         <!-- Files for the students: instructions, starter code, data ... -->
         <div class="field">
           <label class="label">Attach Files and Links</label>
@@ -153,9 +163,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=42"></script>
-<script src="js/api.js?v=42"></script>
-<script src="js/create-assignment.js?v=42"></script>
+<script src="js/app.js?v=43"></script>
+<script src="js/api.js?v=43"></script>
+<script src="js/create-assignment.js?v=43"></script>
 <script>
   // Anything marked data-soon is in the design but not built yet.
   document.querySelectorAll('[data-soon]').forEach(el => {

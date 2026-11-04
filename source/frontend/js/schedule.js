@@ -54,16 +54,19 @@ function badge(a) {
 }
 
 const RISK_BADGE = {
+  submitted: { key: 'submitted', label: 'Submitted' },   // US-14
+  overdue: { key: 'overdue',    label: 'Overdue' },      // past due, late work allowed
   duesoon: { key: 'duesoon',    label: 'Due Soon' },
   closed:  { key: 'notstarted', label: 'Closed' },
   ok:      { key: 'inprogress', label: 'Assigned' },
 };
 
-const isAtRisk = (a) => a.risk === 'duesoon';
+const isAtRisk = (a) => a.risk === 'duesoon' || a.risk === 'overdue';
 const isClosed = (a) => a.risk === 'closed';
 
 /** "Due in 5h", "Due in 2d" - how close, for the at-risk box. */
 function riskWhen(a) {
+  if (a.risk === 'overdue') return 'Overdue';
   const hours = Math.max(0, (parseDue(a.due_at) - new Date()) / 36e5);
   return hours >= 24 ? `Due in ${Math.round(hours / 24)}d` : `Due in ${Math.max(1, Math.round(hours))}h`;
 }
@@ -253,6 +256,8 @@ function setRiskOnly(on) {
 function rowTone(a) {
   if (isTA() && a.can_grade) return taUrgency(a).cls;
   if (state.isStaff) return a.visibility === 'class' ? 'ok' : 'draft';
+  if (a.risk === 'submitted') return 'done';                   // US-14
+  if (a.risk === 'overdue') return 'overdue';
   return isAtRisk(a) ? 'duesoon' : isClosed(a) ? 'closed' : 'ok';
 }
 
@@ -284,9 +289,12 @@ function rowHTML(a) {
       ? `<span class="mine mine--count" title="TAs: ${esc(a.staff_names)}">${a.staff_names.split(', ').length} TA${a.staff_names.split(', ').length === 1 ? '' : 's'}</span>`
       : '';
 
-  const due = isMine(a)
+  // Whether work is still taken after the due date (US-14), for every role.
+  const late = `<span class="meta__dot">·</span><span class="${a.allow_late ? 'meta__late' : ''}">${
+    a.allow_late ? 'Late work accepted' : 'No late work'}</span>`;
+  const due = (isMine(a)
     ? `<span>Check by ${esc(dueText(taDue(a)))}</span><span class="meta__dot">·</span><span>Students due ${esc(dueText(a.due_at))}</span>`
-    : `<span>Due ${esc(dueText(a.due_at))}</span>`;
+    : `<span>Due ${esc(dueText(a.due_at))}</span>`) + late;
 
   return `
   <button class="assignment tone--${rowTone(a)} ${a.id === state.selected ? 'is-selected' : ''}" data-id="${a.id}">
@@ -355,6 +363,7 @@ function renderPanel() {
       ${a.topic ? `<dt>Topic</dt><dd>${esc(a.topic)}</dd>` : ''}
       <dt>Students due</dt><dd>${esc(dueText(a.due_at))}</dd>
       <dt>Points</dt><dd>${a.points} pts</dd>
+      <dt>Late work</dt><dd>${a.allow_late ? 'Accepted, marked late' : 'Not accepted'}</dd>
       ${state.isStaff ? `
         ${canSetStatus(a) ? '' : `<dt>TA check by</dt><dd>${a.staff_due_at ? esc(dueText(a.staff_due_at)) : '<span class="muted">Not set</span>'}</dd>`}
         <dt>TAs</dt><dd>${(a.staff || []).length ? esc(a.staff.map(s => s.name).join(', ')) : '<span class="muted">None</span>'}</dd>` : ''}
@@ -372,6 +381,7 @@ function renderPanel() {
 
   wireSoonButtons();
   wireStatus(a);
+  if (!state.isStaff) loadMySubmission(a);                          // US-14
 }
 
 /* Open the assignment full screen, and back again. */
@@ -478,7 +488,7 @@ function roleBox(a) {
       </div>`;
   }
 
-  // Student, past the due date: closed, no more uploads (US-8).
+  // Student, past the due date with nothing handed in: closed (US-8).
   if (isClosed(a)) {
     return `
       <div class="box box--muted">
@@ -490,24 +500,166 @@ function roleBox(a) {
       </div>`;
   }
 
-  // Student: upload and submit. Not built yet (SRS-21 to SRS-24).
+  // Student: upload a file (US-14). The contents arrive from the server in
+  // loadMySubmission, so the box starts with a short loading line.
   const s = badge(a);
   return `
-    <div class="box ${isAtRisk(a) ? 'box--duesoon' : ''}">
+    <div class="box ${a.risk === 'overdue' ? 'box--overdue' : isAtRisk(a) ? 'box--duesoon' : a.risk === 'submitted' ? 'box--done' : ''}">
       <div class="box__head">
         <span class="box__label">Your submission</span>
         <span class="badge badge--${s.key}">${isAtRisk(a) ? riskWhen(a) : s.label}</span>
       </div>
-      <div class="upload">
-        <div class="upload__row">
-          <span class="upload__title">Upload file</span>
-          <span class="upload__note">PDF or link</span>
-        </div>
-        <button class="btn btn--ghost btn--block" data-soon="Choosing a file">Upload File</button>
-        <div class="upload__file">No file chosen yet</div>
-      </div>
-      <div class="box__actions">${soon('Submit Assignment', 'btn--primary')}</div>
+      <div class="upload" id="mySub"><div class="upload__file">Loading…</div></div>
     </div>`;
+}
+
+/* ---------- US-14: the student's own submission ----------
+   A student adds files, links (Google Drive, GitHub ...) or both, checks the
+   list, then submits them together. Submitting again replaces the whole
+   earlier set (SRS-23). After the due date the box stays open only when the
+   lecturer allows late work, and the server marks it late (SRS-24). The
+   server checks everything again (SRS-21, SRS-22). */
+
+const pastDue = (a) => parseDue(a.due_at) < new Date();
+const canStillSubmit = (a) => !pastDue(a) || a.allow_late;
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+const subUrl = (a) => `/classrooms/${classroomId}/assignments/${a.id}/submission`;
+
+/* Files and links picked but not submitted yet, for the open assignment. */
+const pending = { id: null, files: [], links: [], data: null };
+
+/* Picked files live only in this page until Submit sends them, so warn
+   before the student leaves (or refreshes) with work not handed in. */
+window.addEventListener('beforeunload', (e) => {
+  if (pending.files.length || pending.links.length) e.preventDefault();
+});
+
+async function loadMySubmission(a) {
+  if (!$('mySub')) return;
+  if (pending.id !== a.id) { pending.id = a.id; pending.files = []; pending.links = []; }
+  try {
+    pending.data = await API.get(subUrl(a));
+    if (state.selected === a.id) renderMySubmission(a);
+  } catch (err) {
+    $('mySub').innerHTML = `<div class="upload__file">${esc(err.message)}</div>`;
+  }
+}
+
+function renderMySubmission(a) {
+  const box = $('mySub');
+  if (!box || !pending.data) return;
+  const { submission, limits } = pending.data;
+  const open = canStillSubmit(a);
+  const types = limits.types.map(x => '.' + x).join(',');
+  const items = submission ? [...submission.files, ...submission.links] : [];
+
+  const done = submission ? `
+    <div class="subfiles">${items.map(f => Files.row(f, `${subUrl(a)}/files/${f.id}`)).join('')}</div>
+    <div class="upload__meta">Submitted ${esc(dueText(submission.submitted_at))} · ${plural(items.length, 'item')}
+      ${Number(submission.late) ? '<span class="tag tag--late">Late</span>' : ''}</div>`
+    : '<div class="upload__file">Nothing submitted yet</div>';
+
+  const count = pending.files.length + pending.links.length;
+  const chosen = count ? `
+    <div class="pending">
+      <div class="pending__head">Not handed in yet · ${plural(count, 'item')} - press Submit to save</div>
+      ${pending.files.map((f, i) => `
+        <div class="pending__row">
+          <span class="pending__icon">${Files.ICON.file}</span>
+          <span class="pending__name">${esc(f.name)}</span>
+          <span class="pending__size">${Files.size(f.size)}</span>
+          <button class="pending__x" data-remove-file="${i}" type="button" aria-label="Remove ${esc(f.name)}">×</button>
+        </div>`).join('')}
+      ${pending.links.map((l, i) => `
+        <div class="pending__row">
+          <span class="pending__icon">${Files.ICON.link}</span>
+          <span class="pending__name">${esc(l)}</span>
+          <button class="pending__x" data-remove-link="${i}" type="button" aria-label="Remove link">×</button>
+        </div>`).join('')}
+    </div>` : '';
+
+  box.innerHTML = `
+    <div class="upload__row">
+      <span class="upload__title">${submission ? 'Your work' : 'Hand in your work'}</span>
+      <span class="upload__note">Files or links</span>
+    </div>
+    ${done}
+    ${open ? `
+      ${pastDue(a) ? '<div class="late-note">The due date has passed. Late work is still accepted and will be marked <b>Late</b>.</div>' : ''}
+      ${chosen}
+      <input type="file" id="fileInput" accept="${types}" multiple hidden>
+      <div class="addrow">
+        <button class="btn btn--ghost" id="pickFile" type="button">${Files.ICON.file} Add Files</button>
+        <form class="linkform" id="linkForm" novalidate>
+          <input class="input" id="linkInput" type="url" placeholder="Paste a link">
+          <button class="btn btn--ghost" type="submit">Add</button>
+        </form>
+      </div>
+      <button class="btn btn--primary btn--block" id="submitWork" type="button" ${count ? '' : 'disabled'}>
+        ${submission ? 'Replace Submission' : 'Submit'}${count ? ` (${plural(count, 'item')})` : ''}</button>
+      ${count ? '' : `<div class="upload__hint upload__hint--center">${submission
+        ? 'To change your work, add the new files or links above, then Replace Submission.'
+        : 'Add files or a link above, then press Submit.'}</div>`}
+      <div class="upload__hint">${submission ? 'Submitting again replaces everything you handed in. ' : ''}${Files.limitsText(limits)}</div>`
+    : `<div class="upload__hint">The due date has passed, so your work can no longer be changed.</div>`}`;
+
+  if (!open) return;
+  $('pickFile').addEventListener('click', () => $('fileInput').click());
+  $('fileInput').addEventListener('change', (e) => {
+    pending.files.push(...Files.accept([...e.target.files], pending.files, limits));
+    renderMySubmission(a);
+  });
+  $('linkForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    addLink(a, $('linkInput').value.trim(), limits);
+  });
+  box.querySelectorAll('[data-remove-file]').forEach(b => b.addEventListener('click', () => {
+    pending.files.splice(Number(b.dataset.removeFile), 1);
+    renderMySubmission(a);
+  }));
+  box.querySelectorAll('[data-remove-link]').forEach(b => b.addEventListener('click', () => {
+    pending.links.splice(Number(b.dataset.removeLink), 1);
+    renderMySubmission(a);
+  }));
+  $('submitWork')?.addEventListener('click', () => sendWork(a, limits));
+}
+
+/** Only http and https links; the server checks this again. */
+function addLink(a, text, limits) {
+  if (!text) return;
+  const url = Files.toUrl(text);
+  if (!url) return KU.toast('That does not look like a link');
+  if (pending.links.length >= limits.maxLinks) return KU.toast(`Up to ${limits.maxLinks} links`);
+  if (!pending.links.includes(url)) pending.links.push(url);
+  renderMySubmission(a);
+  $('linkInput')?.focus();
+}
+
+async function sendWork(a, limits) {
+  const total = pending.files.reduce((n, f) => n + f.size, 0);
+  if (total > limits.maxTotalMb * 1024 * 1024) {
+    return KU.toast(`The files add up to more than ${limits.maxTotalMb} MB`);
+  }
+  const btn = $('submitWork');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  try {
+    await API.sendFiles('PUT', subUrl(a), pending.files, { links: pending.links });
+    pending.files = [];
+    pending.links = [];
+    a.risk = 'submitted';                                    // no longer at risk
+    state.atRisk = state.atRisk.filter(x => x.id !== a.id);
+    $('riskCount').textContent = state.atRisk.length;
+    $('riskCount').hidden = state.atRisk.length === 0;
+    renderList();
+    renderPanel();                                           // reloads the list of work
+    KU.toast('Submitted');
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = label;
+    KU.toast(err.message);
+  }
 }
 
 /* ---------- files the lecturer attached ----------
