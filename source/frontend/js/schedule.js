@@ -19,6 +19,9 @@ const state = {
   riskOnly: false,    // the "At risk only" toggle
   view: 'mine',       // a TA starts on their own tasks; 'all' shows the whole class
   full: false,        // the open assignment fills the page
+  grading: false,     // US-15: the grading screen for the open assignment
+  gradeStudent: null, // the student whose work is open there
+  previewFile: null,  // the file shown in the preview
 };
 
 const $ = (id) => document.getElementById(id);
@@ -49,6 +52,7 @@ function badge(a) {
       : { key: 'notstarted', label: 'Not Posted' };
   }
 
+  if (a.my_score != null) return { key: 'done', label: 'Graded' };   // US-15
   // US-8: the server decides the risk (SRS-12), so every page agrees on it.
   return RISK_BADGE[a.risk] || RISK_BADGE.ok;
 }
@@ -86,6 +90,7 @@ function staffColumns(a) {
   const parts = [
     isMine(a) ? '' : `<span title="${esc(tas.join(', '))}">${tas.length ? 'TAs: ' + esc(tas.join(', ')) : 'No TAs'}</span>`,
     `<span class="status status--${esc(a.status)}">${esc(checkingText(a))}</span>`,
+    a.visibility === 'class' ? `<span>${a.submitted_count}/${a.student_count} submitted</span>` : '',
   ].filter(Boolean);
   return parts.map(x => '<span class="meta__dot">·</span>' + x).join('');
 }
@@ -304,7 +309,7 @@ function rowHTML(a) {
       <span class="assignment__meta">${due}${state.isStaff ? staffColumns(a) : ''}</span>
     </span>
     <span class="assignment__end">
-      <span class="assignment__pts">${a.points} pts</span>
+      <span class="assignment__pts">${a.my_score != null ? `${a.my_score}/${a.points}` : `${a.points} pts`}</span>
       <span class="assignment__tags">${mark}<span class="badge badge--${b.key}">${b.label}</span></span>
     </span>
   </button>`;
@@ -329,6 +334,8 @@ function renderPanel() {
       Choose an assignment from the list.</div>`;
     return;
   }
+
+  if (state.grading && state.full) return renderGradingShell(a);
 
   const b = badge(a);
 
@@ -358,6 +365,7 @@ function renderPanel() {
 
     <div class="pd__body">
     <div class="pd__action">${roleBox(a)}</div>
+    ${state.isStaff && a.visibility === 'class' ? '<div class="subs pd__subs" id="subsBox"></div>' : ''}
 
     <dl class="facts pd__facts">
       ${a.topic ? `<dt>Topic</dt><dd>${esc(a.topic)}</dd>` : ''}
@@ -377,11 +385,13 @@ function renderPanel() {
     </div>`;
 
   $('fullBtn').addEventListener('click', () => setFull(!state.full));
+  $('gradeBtn')?.addEventListener('click', openGrading);
   $('backBtn').addEventListener('click', () => setFull(false));
 
   wireSoonButtons();
   wireStatus(a);
   if (!state.isStaff) loadMySubmission(a);                          // US-14
+  if (state.isStaff && a.visibility === 'class') loadSubmissions(a);  // US-15
 }
 
 /* Open the assignment full screen, and back again. */
@@ -392,18 +402,42 @@ const ICON_SHRINK = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.o
     address keeps ?open= so a refresh, or a shared link, opens the same one. */
 function setFull(on) {
   state.full = on && state.selected != null;
+  if (!state.full) state.grading = false;
   document.querySelector('.schedule').classList.toggle('is-full', state.full);
   const url = new URL(location.href);
   if (state.full) url.searchParams.set('open', state.selected);
   else url.searchParams.delete('open');
+  if (state.grading) url.searchParams.set('grade', '1');
+  else url.searchParams.delete('grade');
   history.replaceState(null, '', url);
   renderPanel();
   window.scrollTo({ top: 0 });
 }
 
+/* US-15: Grade Submissions (View Submissions for staff who only look) opens
+   the grading screen; Back or Esc returns to the assignment. */
+function openGrading() {
+  state.grading = true;
+  state.gradeStudent = null;
+  state.previewFile = null;
+  setFull(true);
+}
+
+function closeGrading() {
+  state.grading = false;
+  setFull(true);
+}
+
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && state.full) setFull(false);
+  if (e.key !== 'Escape' || !state.full) return;
+  if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+  if (state.grading) closeGrading(); else setFull(false);
 });
+
+/* US-15: the way into the grading screen. Staff who cannot grade get the
+   same screen to look at, read-only. */
+const GRADE_BTN = '<button class="btn btn--primary btn--block" id="gradeBtn" type="button">Grade Submissions</button>';
+const VIEW_BTN = '<button class="btn btn--ghost btn--block" id="gradeBtn" type="button">View Submissions</button>';
 
 const statusPill = (a) =>
   `<span class="status status--${esc(a.status)}" title="Has a TA started checking the work?">${esc(checkingText(a))}</span>`;
@@ -450,8 +484,7 @@ function roleBox(a) {
         ${noteHTML(a)}
         ${statusControl(a)}
         <div class="box__actions">
-          ${posted ? soon('Check The Submitted Status') : soon('Post Assignment', 'btn--primary')}
-          ${posted ? soon('Grade Submissions', 'btn--primary') : ''}
+          ${posted ? GRADE_BTN : soon('Post Assignment', 'btn--primary')}
           <button class="btn--text-danger" id="btnDelete" data-id="${a.id}">Delete assignment</button>
         </div>
       </div>`;
@@ -471,7 +504,7 @@ function roleBox(a) {
         ${statusControl(a)}
         <div class="box__actions">
           ${posted
-            ? soon('Check The Submitted Status') + soon('Grade Submissions', 'btn--primary')
+            ? GRADE_BTN
             : '<div class="box__hint">Not posted to students yet, so there is nothing to check.</div>'}
         </div>
       </div>`;
@@ -485,6 +518,7 @@ function roleBox(a) {
         <div class="box__hint">${state.role === 'ta'
           ? "The lecturer hasn't assigned this one to you."
           : 'University staff can see assignments but not change them.'}</div>
+        ${posted ? VIEW_BTN : ''}
       </div>`;
   }
 
@@ -548,10 +582,18 @@ async function loadMySubmission(a) {
 function renderMySubmission(a) {
   const box = $('mySub');
   if (!box || !pending.data) return;
-  const { submission, limits } = pending.data;
+  const { submission, limits, grade, points } = pending.data;
   const open = canStillSubmit(a);
   const types = limits.types.map(x => '.' + x).join(',');
   const items = submission ? [...submission.files, ...submission.links] : [];
+
+  // US-15: the grade and comment from the lecturer or TA, once given.
+  const graded = grade ? `
+    <div class="mygrade">
+      <span class="mygrade__k">Your grade</span>
+      <span class="mygrade__v"><b>${grade.score}</b> / ${points}</span>
+      ${grade.feedback ? `<p class="mygrade__note">${esc(grade.feedback)}</p>` : ''}
+    </div>` : '';
 
   const done = submission ? `
     <div class="subfiles">${items.map(f => Files.row(f, `${subUrl(a)}/files/${f.id}`)).join('')}</div>
@@ -578,7 +620,7 @@ function renderMySubmission(a) {
         </div>`).join('')}
     </div>` : '';
 
-  box.innerHTML = `
+  box.innerHTML = `${graded}
     <div class="upload__row">
       <span class="upload__title">${submission ? 'Your work' : 'Hand in your work'}</span>
       <span class="upload__note">Files or links</span>
@@ -659,6 +701,200 @@ async function sendWork(a, limits) {
     btn.disabled = false;
     btn.textContent = label;
     KU.toast(err.message);
+  }
+}
+
+/* ---------- US-15: who has submitted (staff) ----------
+   Every student in the class, submitted first, each with their files and
+   links. Staff can open any file in their classroom (SRS-25). */
+
+async function loadSubmissions(a) {
+  const box = state.grading ? $('grBody') : $('subsBox');
+  if (!box) return;
+  try {
+    const data = await API.get(`/classrooms/${classroomId}/assignments/${a.id}/submissions`);
+    if (state.selected !== a.id) return;
+    if (state.grading) renderGrading(a, data); else renderSubsSummary(data);
+  } catch (err) {
+    box.innerHTML = `<div class="box__hint">${esc(err.message)}</div>`;
+  }
+}
+
+/** The panel and full screen only show how far along it is. */
+function renderSubsSummary({ submitted, graded, total }) {
+  const pct = total ? Math.round(submitted / total * 100) : 0;
+  $('subsBox').innerHTML = `
+    <div class="subs__head">
+      <span class="box__label">Submissions</span>
+      <span class="subs__count"><b>${submitted}</b> / ${total} submitted · ${graded} graded</span>
+    </div>
+    <div class="subs__bar"><span style="width:${pct}%"></span></div>
+    ${total ? '' : '<div class="box__hint">No students have joined this class yet.</div>'}`;
+}
+
+/* ---------- US-15: the grading screen ----------
+   Students on the left; on the right the one you picked: their files, a
+   preview of the file, and the grade and comment. Previous / Next walk
+   through the class. The lecturer and a TA on it can grade; other staff
+   see the same screen without the inputs. */
+
+const PREVIEW = ['pdf', 'txt', 'png', 'jpg', 'jpeg'];
+
+function renderGradingShell(a) {
+  $('panel').innerHTML = `
+    <button class="pd__back is-shown" id="gradeBack" type="button">&larr; Back to the assignment</button>
+    <div class="gr__head">
+      <div>
+        <div class="pd__eyebrow">${a.can_grade ? 'Grading' : 'Submissions'}</div>
+        <div class="pd__title">${esc(a.title)}</div>
+        <div class="pd__by">${a.points} points · Due ${esc(dueText(a.due_at))}</div>
+      </div>
+      <div class="gr__count" id="grCount"></div>
+    </div>
+    <div class="gr" id="grBody"><div class="box__hint">Loading submissions…</div></div>`;
+  $('gradeBack').addEventListener('click', closeGrading);
+  loadSubmissions(a);
+}
+
+function previewHTML(url, f) {
+  const ext = Files.ext(f.file_name);
+  if (['png', 'jpg', 'jpeg'].includes(ext)) {
+    return `<img class="gr__img" src="/api${url}?view=1" alt="${esc(f.file_name)}">`;
+  }
+  if (PREVIEW.includes(ext)) {
+    return `<iframe class="gr__frame" src="/api${url}?view=1" title="${esc(f.file_name)}"></iframe>`;
+  }
+  return `<div class="gr__noprev">${Files.ICON.file}
+    <span><b>${esc(f.file_name)}</b>This kind of file can't be shown here.</span>
+    <a class="btn btn--ghost btn--sm" ${Files.link(url, f.file_name)}>Download</a></div>`;
+}
+
+function renderGrading(a, data) {
+  const { submitted, graded, total, students, points, canGrade } = data;
+  $('grCount').innerHTML = `<b>${submitted}</b> / ${total} submitted · ${graded} graded`;
+  if (!total) {
+    $('grBody').innerHTML = '<div class="box__hint">No students have joined this class yet.</div>';
+    return;
+  }
+
+  const s = students.find(x => x.id === state.gradeStudent) || students[0];
+  state.gradeStudent = s.id;
+  const at = students.indexOf(s);
+  const sub = s.submission;
+  const g = s.grade;
+  const fileUrl = (f) => `/classrooms/${classroomId}/assignments/${a.id}/submissions/files/${f.id}`;
+
+  const files = sub ? sub.files : [];
+  const links = sub ? sub.links : [];
+  // Show the picked file, else the first PDF, else anything that can be shown.
+  const shown = files.find(f => f.id === state.previewFile)
+             || files.find(f => Files.ext(f.file_name) === 'pdf')
+             || files.find(f => PREVIEW.includes(Files.ext(f.file_name))) || files[0];
+  state.previewFile = shown ? shown.id : null;
+
+  const list = students.map(x => `
+    <button class="gr__student ${x.id === s.id ? 'is-on' : ''}" data-student="${x.id}" type="button">
+      <span class="avatar avatar--sm">${esc(x.name.slice(0, 2).toUpperCase())}</span>
+      <span class="gr__who"><b>${esc(x.name)}</b>
+        <span class="${x.submission ? '' : 'gr__none'}">${x.submission
+          ? (Number(x.submission.late) ? 'Submitted late' : 'Submitted') : 'Not submitted'}</span></span>
+      <span class="gr__score">${x.grade ? `<b>${x.grade.score}</b>/${points}` : '<span class="gr__none">–</span>'}</span>
+    </button>`).join('');
+
+  const work = sub ? `
+      <div class="gr__files">
+        ${files.map(f => `
+          <span class="gr__file ${f.id === state.previewFile ? 'is-on' : ''}">
+            <button type="button" data-file="${f.id}">${Files.ICON.file}<span>${esc(f.file_name)}</span>
+              <small>${Files.size(f.file_size)}</small></button>
+            <a ${Files.link(fileUrl(f), f.file_name)} title="Open in a new tab">Open</a>
+          </span>`).join('')}
+        ${links.map(l => `
+          <a class="gr__file gr__link" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" title="${esc(l.url)}">
+            ${Files.ICON.link}<span>${esc(l.url)}</span><small>${esc(l.file_name)}</small></a>`).join('')}
+      </div>
+      ${shown ? `<div class="gr__preview">${previewHTML(fileUrl(shown), shown)}</div>`
+              : '<div class="gr__empty">Only links were handed in - open them above.</div>'}`
+    : '<div class="gr__empty">Nothing handed in. You can still give a grade, for example 0.</div>';
+
+  // The grade sits above the work, so it is in view while you read the file.
+  const form = canGrade ? `
+      <div class="gr__form">
+        <div class="gr__field">
+          <label class="gr__label" for="grScore">Grade</label>
+          <span class="gr__scorebox">
+            <input class="input" id="grScore" type="number" min="0" ${points > 0 ? `max="${points}"` : ''} step="1"
+                   value="${g ? g.score : ''}" placeholder="-">
+            <span>/ ${points}</span>
+          </span>
+        </div>
+        <div class="gr__field">
+          <label class="gr__label" for="grNote">Comment <span class="gr__opt">(optional)</span></label>
+          <textarea class="input gr__note" id="grNote" rows="2" maxlength="2000"
+                    placeholder="Only ${esc(s.name)} sees this, e.g. Good work, check question 3">${esc(g?.feedback || '')}</textarea>
+        </div>
+        <div class="gr__actions">
+          <button class="btn btn--primary" id="grSave" type="button">${g ? 'Update grade' : 'Save grade'}</button>
+          <span class="gr__by">${g ? `Graded by ${esc(g.graded_by_name)}` : 'Not graded yet'}</span>
+        </div>
+      </div>` : `
+      <div class="gr__form gr__form--read">
+        <div class="gr__field">
+          <span class="gr__label">Grade</span>
+          <div class="gr__read">${g ? `<b>${g.score}</b> / ${points}` : 'Not graded yet'}</div>
+        </div>
+        <div class="gr__field">
+          ${g?.feedback ? `<span class="gr__label">Comment</span><p class="gr__said">${esc(g.feedback)}</p>` : ''}
+        </div>
+        ${g ? `<span class="gr__by">Graded by ${esc(g.graded_by_name)}</span>` : '<span></span>'}
+      </div>`;
+
+  $('grBody').innerHTML = `
+    <div class="gr__list">${list}</div>
+    <div class="gr__work">
+      <div class="gr__workhead">
+        <div>
+          <div class="gr__name">${esc(s.name)}</div>
+          <div class="gr__meta">${sub ? `Handed in ${esc(dueText(sub.submitted_at))}` : 'Nothing handed in'}
+            ${sub && Number(sub.late) ? '<span class="tag tag--late">Late</span>' : ''}
+            ${g?.resubmitted ? '<span class="tag tag--late" title="Handed in again after it was graded">Resubmitted</span>' : ''}</div>
+        </div>
+        <div class="gr__nav">
+          <button class="btn btn--ghost btn--sm" id="grPrev" type="button" ${at === 0 ? 'disabled' : ''}>&larr; Previous</button>
+          <span>${at + 1} of ${students.length}</span>
+          <button class="btn btn--ghost btn--sm" id="grNext" type="button" ${at === students.length - 1 ? 'disabled' : ''}>Next &rarr;</button>
+        </div>
+      </div>
+      ${form}
+      ${work}
+    </div>`;
+
+  const pick = (id) => { state.gradeStudent = id; state.previewFile = null; renderGrading(a, data); };
+  $('grBody').querySelectorAll('.gr__student').forEach(b =>
+    b.addEventListener('click', () => pick(Number(b.dataset.student))));
+  $('grBody').querySelectorAll('[data-file]').forEach(b =>
+    b.addEventListener('click', () => { state.previewFile = Number(b.dataset.file); renderGrading(a, data); }));
+  $('grPrev').addEventListener('click', () => pick(students[at - 1].id));
+  $('grNext').addEventListener('click', () => pick(students[at + 1].id));
+  if (canGrade) {
+    $('grSave').addEventListener('click', () => saveGrade(a, data, s));
+    $('grScore').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); saveGrade(a, data, s); }
+    });
+  }
+}
+
+async function saveGrade(a, data, s) {
+  const btn = $('grSave');
+  btn.disabled = true;
+  try {
+    const res = await API.put(`/classrooms/${classroomId}/assignments/${a.id}/grades/${s.id}`,
+      { score: $('grScore').value, feedback: $('grNote').value });
+    KU.toast(res.grade ? `Saved: ${s.name} ${res.grade.score}/${a.points}` : `Grade taken back for ${s.name}`);
+    await loadSubmissions(a);              // fresh counts, who graded it, still on this student
+  } catch (err) {
+    KU.toast(err.message);
+    btn.disabled = false;
   }
 }
 
@@ -768,6 +1004,7 @@ $('searchBox').addEventListener('input', (e) => {
     if (open && state.assignments.some(a => a.id === open)) {
       state.selected = open;
       state.full = true;
+      state.grading = state.isStaff && new URLSearchParams(location.search).get('grade') === '1';
       document.querySelector('.schedule').classList.add('is-full');
     }
     renderList();

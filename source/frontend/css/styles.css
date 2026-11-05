@@ -1039,7 +1039,7 @@ a.linkbtn:hover { text-decoration: underline; }
 .filters__note { font-size: 13px; color: var(--slate-500); }
 
 /* ==========================================================================
-   SUBMISSIONS (US-14)
+   SUBMISSIONS (US-14, US-15)
    ========================================================================== */
 /* US-14: the student's work - files and links */
 /* US-14: the student's work - files and links */
@@ -1072,6 +1072,14 @@ a.linkbtn:hover { text-decoration: underline; }
 .toggle input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--teal-700); flex: none; }
 .toggle b { display: block; font-size: 13.5px; }
 .toggle span span { font-size: 12.5px; color: var(--slate-500); }
+
+/* US-15: who has submitted */
+.subs { margin: 0 0 20px; padding: 16px; border: 1px solid var(--slate-200); border-radius: var(--r-lg); background: var(--white); }
+.subs__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.subs__count { font-size: 13px; color: var(--slate-600); }
+.subs__count b { font-size: 18px; color: var(--slate-900); }
+.subs__bar { height: 6px; border-radius: var(--r-full); background: var(--slate-100); overflow: hidden; margin-bottom: 12px; }
+.subs__bar span { display: block; height: 100%; background: var(--teal-600); border-radius: var(--r-full); }
 
 /* Members: the owner's role dropdown (coloured like the role badges), the
    remove button, and Reset Code only for the lecturer */
@@ -1164,4 +1172,77 @@ a.linkbtn:hover { text-decoration: underline; }
   .schedule.is-full .panel { padding: 24px; }
   .is-full .pd__body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "action" "about" "facts" "subs"; }
   .is-full .pd__action { grid-row: auto; position: static; }
+}
+
+/* the student's own grade */
+.mygrade { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 4px 12px;
+  margin-bottom: 12px; padding: 12px 14px; border-radius: var(--r-md); background: var(--green-100); }
+.mygrade__k { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--green-700); }
+.mygrade__v { font-size: 14px; color: var(--slate-600); }
+.mygrade__v b { font-size: 22px; color: var(--slate-900); }
+.mygrade__note { grid-column: 1 / -1; margin: 4px 0 0; font-size: 13px; color: var(--slate-700, #334155); white-space: pre-wrap; }
+
+/* US-15: the grading screen - students on the left, the work on the right */
+.pd__back.is-shown { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 0; border: 0;
+  background: none; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--teal-700); cursor: pointer; }
+.gr__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px;
+  padding-bottom: 18px; border-bottom: 1px solid var(--slate-200); }
+.gr__count { font-size: 13.5px; color: var(--slate-600); white-space: nowrap; }
+.gr__count b { font-size: 20px; color: var(--slate-900); }
+.gr { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 24px; margin-top: 20px; align-items: start; }
+.gr__list { display: grid; gap: 4px; max-height: 72vh; overflow-y: auto; padding-right: 4px; }
+.gr__student { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid transparent;
+  border-radius: var(--r-md); background: none; font: inherit; text-align: left; cursor: pointer; }
+.gr__student:hover { background: var(--slate-50); }
+.gr__student.is-on { background: var(--teal-50); border-color: var(--teal-600); }
+.gr__who { display: grid; flex: 1; min-width: 0; font-size: 13px; }
+.gr__who b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gr__who span { font-size: 12px; color: var(--teal-700); }
+.gr__none { color: var(--slate-400) !important; }
+.gr__score { font-size: 12.5px; color: var(--slate-500); flex: none; }
+.gr__score b { font-size: 14px; color: var(--slate-900); }
+.gr__work { min-width: 0; border: 1px solid var(--slate-200); border-radius: var(--r-lg); padding: 20px; }
+.gr__workhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.gr__name { font-size: 18px; font-weight: 700; }
+.gr__meta { margin-top: 3px; font-size: 12.5px; color: var(--slate-500); }
+.gr__meta .tag { margin-left: 6px; padding: 1px 7px; font-size: 10.5px; }
+.gr__nav { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--slate-500); flex: none; }
+.gr__nav .btn:disabled { opacity: .4; cursor: default; }
+.gr__files { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.gr__file { display: inline-flex; align-items: center; gap: 2px; max-width: 100%; border: 1px solid var(--slate-200);
+  border-radius: var(--r-md); background: var(--white); font-size: 13px; }
+.gr__file.is-on { border-color: var(--teal-600); background: var(--teal-50); }
+.gr__file button, .gr__link { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 7px 10px;
+  border: 0; background: none; font: inherit; color: var(--slate-900); cursor: pointer; text-decoration: none; }
+.gr__file span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 260px; font-weight: 600; }
+.gr__file small { color: var(--slate-500); font-size: 11.5px; }
+.gr__file svg { width: 16px; height: 16px; flex: none; color: var(--teal-700); }
+.gr__file > a { padding: 7px 10px 7px 4px; font-size: 12px; font-weight: 600; color: var(--teal-700); text-decoration: none; }
+.gr__preview { border: 1px solid var(--slate-200); border-radius: var(--r-md); background: var(--slate-100); overflow: hidden; }
+.gr__frame { display: block; width: 100%; height: 62vh; border: 0; background: var(--white); }
+.gr__img { display: block; max-width: 100%; max-height: 62vh; margin: 0 auto; }
+.gr__noprev { display: flex; align-items: center; gap: 12px; padding: 18px; font-size: 13px; color: var(--slate-500); }
+.gr__noprev svg { width: 28px; height: 28px; color: var(--teal-700); flex: none; }
+.gr__noprev span { display: grid; flex: 1; }
+.gr__noprev b { color: var(--slate-900); }
+.gr__empty { padding: 28px; border: 1px dashed var(--slate-300); border-radius: var(--r-md); text-align: center;
+  font-size: 13.5px; color: var(--slate-500); }
+.gr__form { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px 18px; align-items: end;
+  margin-bottom: 16px; padding: 16px; border-radius: var(--r-md); background: var(--slate-50); border: 1px solid var(--slate-200); }
+.gr__field { display: grid; gap: 6px; min-width: 0; }
+.gr__label { font-size: 13px; font-weight: 700; }
+.gr__opt { font-weight: 400; color: var(--slate-400); }
+.gr__scorebox { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--slate-500); }
+.gr__scorebox .input { width: 92px; font-size: 18px; font-weight: 700; text-align: right; background: var(--white); }
+.gr__note { min-height: 46px; resize: vertical; font: inherit; font-size: 13.5px; background: var(--white); }
+.gr__actions { display: grid; justify-items: end; gap: 6px; }
+.gr__by { font-size: 12px; color: var(--slate-500); white-space: nowrap; }
+.gr__read { font-size: 14px; color: var(--slate-500); }
+.gr__read b { font-size: 22px; color: var(--slate-900); }
+.gr__said { margin: 0; font-size: 13.5px; color: var(--slate-600); white-space: pre-wrap; }
+@media (max-width: 1000px) {
+  .gr__form { grid-template-columns: minmax(0, 1fr); }
+  .gr__actions { justify-items: start; }
+  .gr { grid-template-columns: minmax(0, 1fr); }
+  .gr__list { max-height: 240px; }
 }
