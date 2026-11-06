@@ -17,7 +17,11 @@ const API = (() => {
     }
 
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || 'Request failed');
+    if (!res.ok) {
+      const err = new Error(data.error || 'Request failed');
+      err.status = res.status;                  // e.g. 403 when you no longer have access
+      throw err;
+    }
     return data;
   }
 
@@ -59,6 +63,15 @@ function showClassHeader(classroom) {
   document.getElementById('classSub').textContent =
     [classroom.subject_code, 'Semester ' + classroom.semester].filter(Boolean).join(' · ');
   document.title = classroom.name + ' · KU Classroom';
+
+  // Chat is for everyone in the class; the Admin panel only for the teaching team.
+  const chat = document.getElementById('chatLink');
+  if (chat) chat.href = 'chat.html?id=' + classroom.id;
+  const admin = document.getElementById('adminLink');
+  if (admin) {
+    admin.hidden = !['lecturer', 'ta', 'staff'].includes(classroom.role);
+    admin.href = 'admin.html?id=' + classroom.id;
+  }
 }
 
 /* ---------- files, shared by every page that shows or picks them ----------
