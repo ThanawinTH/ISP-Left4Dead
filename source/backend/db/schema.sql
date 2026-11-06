@@ -124,3 +124,20 @@ CREATE TABLE IF NOT EXISTS grades (
   FOREIGN KEY (student_id)    REFERENCES users(id),
   FOREIGN KEY (graded_by)     REFERENCES users(id)
 ) ENGINE=InnoDB;
+
+-- US-12, US-13: chat. Two channels per classroom: 'class' (every member) and
+-- 'staff' (lecturer, TAs and University staff only, SRS-18). Each message keeps
+-- its author and time of sending (SRS-19). A deleted message keeps its row,
+-- without its text, so everyone who has the chat open sees it go.
+CREATE TABLE IF NOT EXISTS chat_messages (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  classroom_id INT NOT NULL,
+  channel      ENUM('class','staff') NOT NULL,
+  author_id    INT NOT NULL,
+  body         TEXT NULL,                    -- NULL once deleted
+  created_at   DATETIME NOT NULL,            -- UTC, set by the server
+  deleted_at   DATETIME NULL,
+  KEY idx_channel (classroom_id, channel, id),
+  FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
+  FOREIGN KEY (author_id)    REFERENCES users(id)
+) ENGINE=InnoDB;

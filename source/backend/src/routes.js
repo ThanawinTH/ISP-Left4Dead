@@ -4,6 +4,7 @@ const classrooms = require('./classrooms');
 const members = require('./members');
 const assignments = require('./assignments');
 const announcements = require('./announcements');
+const { classChat, staffChat } = require('./chat');
 const submissions = require('./submissions');
 const files = require('./files');
 const attachments = require('./attachments');
@@ -71,6 +72,18 @@ router.get('/classrooms/:id/announcements',
   mw(auth.loadMembership), go(announcements.list));
 router.post('/classrooms/:id/announcements',
   mw(auth.loadMembership), auth.requireStaff, go(announcements.create));
+
+/* Chat (US-12, US-13). The class chat is open to every member of the class;
+   the staff chat (Admin panel) is for the lecturer, TAs and University staff
+   only - students are refused (SRS-18). */
+const cc = '/classrooms/:id/chat';
+router.get(cc, mw(auth.loadMembership), go(classChat.list));
+router.post(cc, mw(auth.loadMembership), go(classChat.send));
+router.delete(cc + '/:messageId', mw(auth.loadMembership), go(classChat.remove));
+const sc = '/classrooms/:id/staff-chat';
+router.get(sc, mw(auth.loadMembership), auth.requireStaff, go(staffChat.list));
+router.post(sc, mw(auth.loadMembership), auth.requireStaff, go(staffChat.send));
+router.delete(sc + '/:messageId', mw(auth.loadMembership), auth.requireStaff, go(staffChat.remove));
 
 /* Files the teaching team attaches: the lecturer on an assignment, the poster
    (or the lecturer) on an announcement. Any member who can see it can open it. */
