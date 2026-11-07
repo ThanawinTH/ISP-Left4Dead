@@ -88,8 +88,11 @@ async function setRole(req, res) {
     try {
       await q('UPDATE staff_tasks SET assignee_id = NULL WHERE classroom_id = ? AND assignee_id = ?',
         [req.params.id, targetId]);
+      // US-17: and they no longer host anything on the timeline.
+      await q('UPDATE timeline_events SET host_id = NULL WHERE classroom_id = ? AND host_id = ?',
+        [req.params.id, targetId]);
     } catch (err) {
-      console.error('could not unassign tasks:', err.message);
+      console.error('could not unassign tasks or timeline items:', err.message);
     }
   }
 
@@ -128,6 +131,9 @@ async function remove(req, res) {
     'DELETE FROM announcements WHERE classroom_id = ? AND author_id = ?', [req.params.id, targetId]);
   // US-18: their tasks go back to Unassigned rather than pointing at someone gone.
   await q('UPDATE staff_tasks SET assignee_id = NULL WHERE classroom_id = ? AND assignee_id = ?',
+    [req.params.id, targetId]);
+  // US-17: nor host anything on the timeline.
+  await q('UPDATE timeline_events SET host_id = NULL WHERE classroom_id = ? AND host_id = ?',
     [req.params.id, targetId]);
 
   res.json({

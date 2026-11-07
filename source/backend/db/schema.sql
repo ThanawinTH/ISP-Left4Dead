@@ -160,3 +160,27 @@ CREATE TABLE IF NOT EXISTS staff_tasks (
   FOREIGN KEY (assignee_id)  REFERENCES users(id),
   FOREIGN KEY (created_by)   REFERENCES users(id)
 ) ENGINE=InnoDB;
+
+-- US-17: the class timeline - lab sessions, consultations and milestones on one
+-- list. The lecturer, TAs and University staff add and edit; everyone in the
+-- class sees it. Date and times are class time as the staff typed them (Thai
+-- time), not UTC: a 13:00 lab stays 13:00. No times = all day.
+CREATE TABLE IF NOT EXISTS timeline_events (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  classroom_id INT NOT NULL,
+  kind         ENUM('lab','consultation','milestone') NOT NULL,
+  title        VARCHAR(190) NOT NULL,
+  notes        TEXT NULL,
+  place        VARCHAR(190) NULL,             -- a room, or a meeting link
+  host_id      INT NULL,                      -- who runs it: staff of this class, or nobody
+  event_date   DATE NOT NULL,
+  start_time   TIME NULL,                     -- NULL = all day
+  end_time     TIME NULL,
+  created_by   INT NOT NULL,
+  created_at   DATETIME NOT NULL,             -- UTC, set by the server
+  updated_at   DATETIME NULL,
+  KEY idx_when (classroom_id, event_date, start_time),
+  FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
+  FOREIGN KEY (host_id)      REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (created_by)   REFERENCES users(id)
+) ENGINE=InnoDB;

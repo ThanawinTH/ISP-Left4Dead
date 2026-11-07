@@ -6,6 +6,7 @@ const assignments = require('./assignments');
 const announcements = require('./announcements');
 const { classChat, staffChat } = require('./chat');
 const tasks = require('./tasks');
+const timeline = require('./timeline');
 const submissions = require('./submissions');
 const files = require('./files');
 const attachments = require('./attachments');
@@ -92,6 +93,15 @@ router.get(tk, mw(auth.loadMembership), auth.requireStaff, go(tasks.list));
 router.post(tk, mw(auth.loadMembership), auth.requireStaff, go(tasks.create));
 router.patch(tk + '/:taskId', mw(auth.loadMembership), auth.requireStaff, go(tasks.update));
 router.delete(tk + '/:taskId', mw(auth.loadMembership), auth.requireStaff, go(tasks.remove));
+
+/* Class timeline (US-17): everyone in the class reads it; the lecturer, TAs
+   and University staff add. The lecturer edits or deletes any item, the
+   others only their own (checked in timeline.js). */
+const tl = '/classrooms/:id/timeline';
+router.get(tl, mw(auth.loadMembership), go(timeline.list));
+router.post(tl, mw(auth.loadMembership), auth.requireStaff, go(timeline.create));
+router.put(tl + '/:eventId', mw(auth.loadMembership), auth.requireStaff, go(timeline.update));
+router.delete(tl + '/:eventId', mw(auth.loadMembership), auth.requireStaff, go(timeline.remove));
 
 /* Files the teaching team attaches: the lecturer on an assignment, the poster
    (or the lecturer) on an announcement. Any member who can see it can open it. */
