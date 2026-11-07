@@ -83,6 +83,16 @@ async function setRole(req, res) {
     }
   }
 
+  // US-18: staff tasks are for staff, so a new student's tasks go back to Unassigned.
+  if (role === 'student') {
+    try {
+      await q('UPDATE staff_tasks SET assignee_id = NULL WHERE classroom_id = ? AND assignee_id = ?',
+        [req.params.id, targetId]);
+    } catch (err) {
+      console.error('could not unassign tasks:', err.message);
+    }
+  }
+
   res.json({ ok: true, user_id: targetId, role, unassigned: removed, deletedAnnouncements });
 }
 
@@ -116,6 +126,9 @@ async function remove(req, res) {
     [targetId, req.params.id]);
   const announcements = await q(
     'DELETE FROM announcements WHERE classroom_id = ? AND author_id = ?', [req.params.id, targetId]);
+  // US-18: their tasks go back to Unassigned rather than pointing at someone gone.
+  await q('UPDATE staff_tasks SET assignee_id = NULL WHERE classroom_id = ? AND assignee_id = ?',
+    [req.params.id, targetId]);
 
   res.json({
     ok: true,

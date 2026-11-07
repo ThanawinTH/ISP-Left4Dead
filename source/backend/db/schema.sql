@@ -141,3 +141,22 @@ CREATE TABLE IF NOT EXISTS chat_messages (
   FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
   FOREIGN KEY (author_id)    REFERENCES users(id)
 ) ENGINE=InnoDB;
+
+-- US-18: internal staff tasks - create, assign, status, close. Students never
+-- see them. Closing a task is moving it to 'done'; closed_at keeps when.
+CREATE TABLE IF NOT EXISTS staff_tasks (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  classroom_id INT NOT NULL,
+  title        VARCHAR(190) NOT NULL,
+  notes        TEXT NULL,
+  assignee_id  INT NULL,                     -- NULL = unassigned
+  status       ENUM('open','inprogress','done') NOT NULL DEFAULT 'open',
+  due_date     DATE NULL,
+  created_by   INT NOT NULL,
+  created_at   DATETIME NOT NULL,
+  closed_at    DATETIME NULL,
+  KEY idx_board (classroom_id, status),
+  FOREIGN KEY (classroom_id) REFERENCES classrooms(id) ON DELETE CASCADE,
+  FOREIGN KEY (assignee_id)  REFERENCES users(id),
+  FOREIGN KEY (created_by)   REFERENCES users(id)
+) ENGINE=InnoDB;

@@ -5,6 +5,7 @@ const members = require('./members');
 const assignments = require('./assignments');
 const announcements = require('./announcements');
 const { classChat, staffChat } = require('./chat');
+const tasks = require('./tasks');
 const submissions = require('./submissions');
 const files = require('./files');
 const attachments = require('./attachments');
@@ -84,6 +85,13 @@ const sc = '/classrooms/:id/staff-chat';
 router.get(sc, mw(auth.loadMembership), auth.requireStaff, go(staffChat.list));
 router.post(sc, mw(auth.loadMembership), auth.requireStaff, go(staffChat.send));
 router.delete(sc + '/:messageId', mw(auth.loadMembership), auth.requireStaff, go(staffChat.remove));
+
+/* Internal staff tasks (US-18): staff only, read and write. */
+const tk = '/classrooms/:id/tasks';
+router.get(tk, mw(auth.loadMembership), auth.requireStaff, go(tasks.list));
+router.post(tk, mw(auth.loadMembership), auth.requireStaff, go(tasks.create));
+router.patch(tk + '/:taskId', mw(auth.loadMembership), auth.requireStaff, go(tasks.update));
+router.delete(tk + '/:taskId', mw(auth.loadMembership), auth.requireStaff, go(tasks.remove));
 
 /* Files the teaching team attaches: the lecturer on an assignment, the poster
    (or the lecturer) on an announcement. Any member who can see it can open it. */
