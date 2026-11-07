@@ -60,11 +60,12 @@
 
     <main class="content">
       <!-- Admin panel: the lecturer, TAs and University staff only. Two parts:
-           the staff chat (US-12, US-13). Tasks (US-18) come next. -->
+           the staff chat (US-12, US-13) and internal tasks (US-18). -->
       <div class="admin" id="admin">
         <div class="admin__head">
           <div class="seg admin__tabs" id="adminTabs" role="tablist">
             <button class="seg__btn is-on" type="button" data-tab="chat" role="tab">Staff chat</button>
+            <button class="seg__btn" type="button" data-tab="tasks" role="tab">Tasks <span class="seg__n" id="taskCount">0</span></button>
           </div>
           <span class="admin__lock">Staff only - students never see this</span>
         </div>
@@ -90,6 +91,22 @@
       </section>
         </div>
 
+        <div id="tab-tasks" hidden>
+          <div class="filters">
+            <a class="btn btn--primary" id="newTask" href="#">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>New task
+            </a>
+            <div class="seg" id="taskView">
+              <button class="seg__btn is-on" type="button" data-view="all">All tasks</button>
+              <button class="seg__btn" type="button" data-view="mine">Assigned to me <span class="seg__n" id="mineCount">0</span></button>
+            </div>
+            <div class="search">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              <input id="taskSearch" placeholder="Search" autocomplete="off" aria-label="Search tasks">
+            </div>
+          </div>
+          <div class="board" id="board"><div class="empty">Loading tasks…</div></div>
+        </div>
       </div>
     </main>
   </div>
@@ -99,5 +116,6 @@
 <script src="js/app.js?v=47"></script>
 <script src="js/api.js?v=47"></script>
 <script src="js/chat.js?v=47"></script>
+<script src="js/admin.js?v=47"></script>
 </body>
 </html>
