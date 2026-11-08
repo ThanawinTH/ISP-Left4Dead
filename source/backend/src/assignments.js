@@ -316,4 +316,4 @@ async function setStatus(req, res) {
   res.json({ ok: true, id: assignmentId, status });
 }
 
-module.exports = { list, create, update, remove, setStatus };
+module.exports = { list, create, update, remove, setStatus, STUDENT_RISK, DUE_SOON_DAYS };

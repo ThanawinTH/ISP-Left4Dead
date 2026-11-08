@@ -7,6 +7,7 @@ const announcements = require('./announcements');
 const { classChat, staffChat } = require('./chat');
 const tasks = require('./tasks');
 const timeline = require('./timeline');
+const todo = require('./todo');
 const submissions = require('./submissions');
 const files = require('./files');
 const attachments = require('./attachments');
@@ -33,6 +34,9 @@ router.post('/auth/logout', auth.logout);
 router.use(auth.requireAuth);
 
 router.get('/classrooms', go(classrooms.list));
+
+/* To-do (US-19): what is due and at risk across all my classes. */
+router.get('/todo', go(todo.list));
 router.get('/classrooms/preview-code', go(classrooms.previewCode));
 router.post('/classrooms', go(classrooms.create));
 router.post('/classrooms/join', go(classrooms.join));
