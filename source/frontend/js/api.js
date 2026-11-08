@@ -67,6 +67,8 @@ function showClassHeader(classroom) {
   // Chat is for everyone in the class; the Admin panel only for the teaching team.
   const chat = document.getElementById('chatLink');
   if (chat) chat.href = 'chat.html?id=' + classroom.id;
+  const timeline = document.getElementById('timelineLink');            // US-17, everyone
+  if (timeline) timeline.href = 'timeline.html?id=' + classroom.id;
   const admin = document.getElementById('adminLink');
   if (admin) {
     admin.hidden = !['lecturer', 'ta', 'staff'].includes(classroom.role);

@@ -1343,3 +1343,103 @@ a.linkbtn:hover { text-decoration: underline; }
 .seg--sm .seg__btn { flex: 1; justify-content: center; padding: 5px 8px; font-size: 12px; }
 .picker__role { margin-left: auto; }
 @media (max-width: 1000px) { .board { grid-template-columns: minmax(0, 1fr); } }
+
+/* ==========================================================================
+   SCHEDULE (US-17) - labs, consultations, milestones and due dates, as a list or a month
+   ========================================================================== */
+.timeline { max-width: 1080px; margin: 0 auto; --c-lab: #2563eb; --c-lab-bg: #dbeafe; --c-con: #7c3aed; --c-con-bg: #ede9fe;
+  --c-mil: #c2410c; --c-mil-bg: #ffedd5; --c-due: #0f766e; --c-due-bg: #ccfbf1; }
+.timeline__bar { flex-wrap: wrap; }
+.timeline__right { display: flex; align-items: center; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+.timeline__right [hidden] { display: none; }
+#viewPick svg { width: 15px; height: 15px; }
+.tl-week { margin-bottom: 30px; }
+.tl-week__head { display: flex; align-items: baseline; gap: 10px; margin: 0 0 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--slate-200); font-size: 20px; font-weight: 700; color: var(--slate-900); }
+.tl-week__head span { font-size: 13.5px; font-weight: 500; color: var(--slate-500); }
+.tl-day { display: grid; grid-template-columns: 76px 1fr; gap: 14px; margin-bottom: 12px; }
+.tl-day__date { display: flex; flex-direction: column; align-items: center; padding-top: 10px; text-align: center; }
+.tl-day__num { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  font-size: 22px; font-weight: 700; color: var(--slate-900); }
+.tl-day__name { margin-top: 2px; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; color: var(--slate-500); }
+.tl-day.is-today .tl-day__num { background: var(--teal-700); color: var(--white); font-size: 18px; }
+.tl-day.is-today .tl-day__name { color: var(--teal-700); }
+.tl-day__items { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.tl-item { display: grid; grid-template-columns: 112px 1fr auto; align-items: center; gap: 16px;
+  padding: 14px 18px; background: var(--white); border: 1px solid var(--slate-200); border-left: 4px solid var(--slate-300);
+  border-radius: var(--r-lg); }
+.tl-item--lab { border-left-color: var(--c-lab); }
+.tl-item--consultation { border-left-color: var(--c-con); }
+.tl-item--milestone { border-left-color: var(--c-mil); }
+.tl-item--due { border-left-color: var(--c-due); }
+.tl-item.is-now { background: var(--teal-50); border-color: var(--teal-600); border-left-color: var(--teal-700); }
+.tl-item__time { font-size: 14px; font-weight: 600; color: var(--slate-700); font-variant-numeric: tabular-nums; }
+.tl-item__body { min-width: 0; }
+.tl-item__title { font-size: 15.5px; font-weight: 600; color: var(--slate-900); overflow-wrap: anywhere; }
+.tl-item__sub { margin-top: 3px; font-size: 13.5px; color: var(--slate-500); }
+.tl-item__sub a { color: var(--teal-700); font-weight: 600; }
+.tl-item__notes { margin-top: 6px; font-size: 13px; color: var(--slate-600); white-space: pre-line; }
+.tl-item__side { display: flex; align-items: center; gap: 12px; }
+.tl-item__edit { font-size: 13.5px; font-weight: 600; color: var(--teal-700); }
+.tl-tag { padding: 3px 10px; border-radius: var(--r-full); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.tl-tag--lab { background: var(--c-lab-bg); color: var(--c-lab); }
+.tl-tag--consultation { background: var(--c-con-bg); color: var(--c-con); }
+.tl-tag--milestone { background: var(--c-mil-bg); color: var(--c-mil); }
+.tl-tag--due { background: var(--c-due-bg); color: var(--c-due); }
+.tl-tag--now { background: var(--teal-700); color: var(--white); }
+#eventForm .input:disabled { background: var(--slate-50); color: var(--slate-400); }
+@media (max-width: 760px) {
+  .timeline__right { margin-left: 0; }
+  .timeline__bar .seg { flex-wrap: wrap; }
+  .tl-day { grid-template-columns: 48px 1fr; gap: 8px; }
+  .tl-item { grid-template-columns: 1fr; gap: 6px; }
+  .tl-item__side { justify-content: flex-start; }
+}
+
+/* Month view: the calendar, and the picked day in full beside it */
+.cal-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 18px; align-items: start; }
+.cal-wrap[hidden] { display: none; }
+.cal { background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--r-lg); overflow: hidden; }
+.cal__head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--slate-200); }
+.cal__title { margin: 0; font-size: 18px; font-weight: 700; color: var(--slate-900); }
+.cal__nav { display: flex; align-items: center; gap: 8px; }
+.cal__days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border-bottom: 1px solid var(--slate-200); background: var(--slate-50); }
+.cal__days span { padding: 8px 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--slate-500); }
+.cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-day { display: flex; flex-direction: column; gap: 3px; min-width: 0; min-height: 108px; padding: 6px 6px 8px;
+  border: 0; border-right: 1px solid var(--slate-100); border-bottom: 1px solid var(--slate-100);
+  background: var(--white); text-align: left; font: inherit; cursor: pointer; }
+.cal-day:nth-child(7n) { border-right: 0; }
+.cal-day:hover { background: var(--slate-50); }
+.cal-day.is-out { background: var(--slate-50); }
+.cal-day.is-out .cal-day__num { color: var(--slate-400); }
+.cal-day.is-selected { box-shadow: inset 0 0 0 2px var(--teal-600); }
+.cal-day__num { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; font-weight: 600; color: var(--slate-700); }
+.cal-day.is-today .cal-day__num { background: var(--teal-700); color: var(--white); }
+.cal-chip { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 2px 6px; border-radius: 5px;
+  font-size: 11.5px; line-height: 1.45; border-left: 3px solid; }
+.cal-chip b { margin-right: 4px; font-weight: 700; }
+.cal-chip--lab { background: var(--c-lab-bg); border-color: var(--c-lab); color: #1e3a8a; }
+.cal-chip--consultation { background: var(--c-con-bg); border-color: var(--c-con); color: #4c1d95; }
+.cal-chip--milestone { background: var(--c-mil-bg); border-color: var(--c-mil); color: #7c2d12; }
+.cal-chip--due { background: var(--c-due-bg); border-color: var(--c-due); color: #134e4a; }
+.cal-more { padding: 0 6px; font-size: 11.5px; font-weight: 600; color: var(--slate-500); }
+.cal-panel { position: sticky; top: 16px; background: var(--white); border: 1px solid var(--slate-200); border-radius: var(--r-lg); padding: 16px; }
+.cal-panel__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.cal-panel__title { margin: 0; font-size: 15.5px; font-weight: 700; color: var(--slate-900); }
+.cal-panel__add { font-size: 13px; font-weight: 600; color: var(--teal-700); white-space: nowrap; }
+.cal-panel__add[hidden] { display: none; }
+.cal-panel__items { display: flex; flex-direction: column; gap: 10px; }
+.cal-panel__empty { padding: 24px 8px; text-align: center; font-size: 13.5px; color: var(--slate-500); }
+/* In the narrow panel a card stacks: time, title, then tag and Edit. */
+.cal-panel .tl-item { grid-template-columns: 1fr; gap: 6px; padding: 12px 14px; }
+.cal-panel .tl-item__side { justify-content: flex-start; }
+@media (max-width: 1180px) {
+  .cal-wrap { grid-template-columns: minmax(0, 1fr); }
+  .cal-panel { position: static; }
+}
+@media (max-width: 760px) {
+  .cal-day { min-height: 64px; padding: 4px; }
+  .cal-chip { font-size: 0; padding: 0; height: 6px; border-left: 0; }   /* just a coloured bar */
+  .cal-more { font-size: 10px; padding: 0; }
+}
