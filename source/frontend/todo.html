@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>To-do · KU Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=49">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ---------- Sidebar ---------- -->
+  <aside class="sidebar">
+    <div class="sidebar__brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v9a2.5 2.5 0 0 1-2.5 2.5H13l-4.2 3.5a.6.6 0 0 1-1-.46V17H6.5A2.5 2.5 0 0 1 4 14.5v-9Z" fill="#fff"/>
+          <circle cx="12" cy="10" r="2.6" fill="#0f766e"/>
+        </svg>
+      </span>
+      <span>
+        <div class="sidebar__title">KU Classroom</div>
+        <div class="sidebar__subtitle">Course Support Portal</div>
+      </span>
+    </div>
+
+    <nav class="nav">
+      <a class="nav__item" href="my-classrooms.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Classes</a>
+      <a class="nav__item is-active" href="todo.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="m8 9.5 1.6 1.6L12.5 8M8 15.5l1.6 1.6 2.9-3.1M14.5 9.5H16M14.5 15.5H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> To-do</a>
+    </nav>
+
+    <div class="sidebar__user">
+      <span class="avatar">··</span>
+      <span>
+        <div class="sidebar__user-name">…</div>
+        <div class="sidebar__user-mail"></div>
+      </span>
+    </div>
+  </aside>
+
+  <!-- ---------- Main ---------- -->
+  <div class="main">
+    <header class="header">
+      <div class="header__titles">
+        <h1>To-do</h1>
+        <div class="header__sub">What's due and at risk across all your classes</div>
+      </div>
+    </header>
+
+    <main class="content content--todo">
+      <!-- US-19: what is due and at risk across all my classes, with search.
+           Laid out like the Google Classroom To-do page: tabs, a class filter,
+           and sections by week that open and close. -->
+      <div class="gtodo" id="todo">
+        <div class="gtabs" id="tabs" role="tablist"></div>
+
+        <div class="gtodo__body">
+          <div class="gtodo__controls">
+            <select class="gselect" id="classPick" aria-label="Class"></select>
+            <div class="search gtodo__search">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/>
+                <path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <input id="search" type="search" placeholder="Search" aria-label="Search your to-do" autocomplete="off">
+            </div>
+            <!-- Only when I am a student in one class and staff in another -->
+            <div class="seg" id="roleTabs" hidden>
+              <button class="seg__btn is-on" type="button" data-role="student">Student</button>
+              <button class="seg__btn" type="button" data-role="staff">Staff</button>
+            </div>
+          </div>
+          <div id="list"><div class="empty">Loading…</div></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="js/app.js?v=49"></script>
+<script src="js/api.js?v=49"></script>
+<script src="js/todo.js?v=49"></script>
+</body>
+</html>

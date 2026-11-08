@@ -30,7 +30,7 @@
 
     <nav class="nav">
       <a class="nav__item is-active" href="my-classrooms.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Classes</a>
-      <a class="nav__item" href="#" data-soon="Assignments"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3 .7 4.4 1.5 5.4.4.5 0 1.3-.7 1.3H5.7c-.7 0-1.1-.8-.7-1.3.8-1 1.5-2.4 1.5-5.4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Assignments</a>
+      <a class="nav__item" href="todo.html"><svg class="nav__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="m8 9.5 1.6 1.6L12.5 8M8 15.5l1.6 1.6 2.9-3.1M14.5 9.5H16M14.5 15.5H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> To-do</a>
     </nav>
 
     <div class="sidebar__user">
@@ -127,14 +127,7 @@
       field.classList.remove('is-error');
       field.value = '';
       KU.toast('Joined ' + data.classroom.name + ' as Student');
-      // Thai academic year: Buddhist year, rolling over in June.
-  (() => {
-    const now = new Date();
-    const year = now.getFullYear() + 543 + (now.getMonth() >= 5 ? 0 : -1);
-    document.getElementById('academicYear').textContent = 'academic year ' + year;
-  })();
-
-  loadClasses();
+      loadClasses();
     } catch (err) {
       field.classList.add('is-error');
       KU.toast(err.message);
@@ -143,6 +136,13 @@
 
   document.getElementById('joinCode').addEventListener('input', (e) =>
     e.target.classList.remove('is-error'));
+
+  // Thai academic year: Buddhist year, rolling over in June.
+  (() => {
+    const now = new Date();
+    const year = now.getFullYear() + 543 + (now.getMonth() >= 5 ? 0 : -1);
+    document.getElementById('academicYear').textContent = 'academic year ' + year;
+  })();
 
   loadClasses();
 

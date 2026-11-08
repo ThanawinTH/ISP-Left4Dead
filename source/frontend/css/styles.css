@@ -1443,3 +1443,67 @@ a.linkbtn:hover { text-decoration: underline; }
   .cal-chip { font-size: 0; padding: 0; height: 6px; border-left: 0; }   /* just a coloured bar */
   .cal-more { font-size: 10px; padding: 0; }
 }
+
+/* ==========================================================================
+   TO-DO (US-19) - like the Google Classroom To-do page: underline tabs, a
+   class filter, and week sections that open and close.
+   ========================================================================== */
+.content--todo { padding-top: 0; }
+.gtodo { max-width: 1040px; margin: 0 auto; }
+.gtabs { display: flex; gap: 8px; margin: 0 -8px 22px; border-bottom: 1px solid var(--slate-200); overflow-x: auto; }
+.gtab { position: relative; padding: 16px 22px 14px; border: 0; background: none; font: inherit; font-size: 15px;
+  font-weight: 600; color: var(--slate-600); cursor: pointer; white-space: nowrap; }
+.gtab:hover { color: var(--slate-900); background: var(--slate-50); }
+.gtab.is-on { color: var(--teal-700); }
+.gtab.is-on::after { content: ''; position: absolute; left: 8px; right: 8px; bottom: -1px; height: 3px;
+  border-radius: 3px 3px 0 0; background: var(--teal-700); }
+.gtodo__body { padding: 0 8px; }
+.gtodo__controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.gtodo__controls .seg[hidden] { display: none; }
+.gselect { min-width: 260px; padding: 12px 40px 12px 14px; border: 1px solid var(--slate-300); border-radius: 8px;
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z' fill='%23475569'/%3E%3C/svg%3E") no-repeat right 12px center / 22px;
+  font: inherit; font-size: 15px; color: var(--slate-900); appearance: none; cursor: pointer; }
+.gselect:focus { outline: none; border-color: var(--teal-600); box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+.gtodo__search { max-width: 320px; }
+.gsec { border-bottom: 1px solid var(--slate-200); }
+.gsec__head { display: flex; align-items: center; gap: 14px; width: 100%; padding: 20px 4px; border: 0; background: none;
+  font: inherit; text-align: left; cursor: pointer; }
+.gsec__label { flex: 1; font-size: 22px; font-weight: 600; color: var(--slate-900); }
+.gsec__n { font-size: 15px; font-weight: 600; color: var(--teal-700); }
+.gsec__chev { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--slate-600); transition: transform .15s; }
+.gsec__head:hover .gsec__chev { background: var(--slate-100); }
+.gsec.is-open .gsec__chev { transform: rotate(180deg); }
+.gsec__chev svg { width: 22px; height: 22px; }
+.gsec__body { display: none; padding-bottom: 8px; }
+.gsec.is-open .gsec__body { display: block; }
+.gitem { display: flex; align-items: center; gap: 18px; padding: 14px 16px; border-top: 1px solid var(--slate-100);
+  color: inherit; text-decoration: none; border-radius: 8px; }
+.gitem:first-child { border-top: 0; }
+.gitem:hover { background: var(--slate-50); }
+.gitem__icon { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 50%;
+  background: var(--teal-50); color: var(--teal-700); }
+.gitem__icon svg { width: 24px; height: 24px; }
+.gitem__icon--late { background: var(--red-100); color: var(--red-600); }
+.gitem__icon--done { background: var(--green-100); color: var(--green-700); }
+.gitem__icon--muted { background: var(--slate-100); color: var(--slate-400); }
+.gitem__icon--task { background: #ede9fe; color: #6d28d9; }
+.gitem__main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.gitem__title { font-size: 16px; font-weight: 500; color: var(--slate-900); overflow-wrap: anywhere; }
+.gitem__sub { font-size: 13.5px; color: var(--slate-500); }
+.gitem__warn { color: var(--amber-700); font-weight: 600; }
+.gitem__you { color: var(--teal-700); font-weight: 600; }
+.gitem__date { display: flex; flex-direction: column; align-items: flex-end; flex: none; font-size: 14.5px; font-weight: 600;
+  color: var(--green-700); text-align: right; }
+.gitem__date small { font-size: 12.5px; font-weight: 500; color: var(--slate-500); }
+.gitem__date--soon { color: var(--amber-700); }
+.gitem__date--late { color: var(--red-600); }
+.gitem__date--done { color: var(--slate-700); }
+.gempty { padding: 48px 16px; text-align: center; font-size: 15px; color: var(--slate-500); }
+.gtodo__sched { padding-top: 8px; }
+a.gtodo__ev { color: inherit; text-decoration: none; }
+a.gtodo__ev:hover { border-color: var(--teal-600); }
+@media (max-width: 760px) {
+  .gselect { min-width: 0; width: 100%; }
+  .gitem { gap: 12px; padding: 12px 6px; }
+  .gitem__icon { width: 40px; height: 40px; }
+}
