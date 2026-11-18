@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=48">
+<link rel="stylesheet" href="css/styles.css?v=49">
 </head>
 <body>
 
@@ -69,6 +69,7 @@
           <label class="label" for="title">Title <span class="req">*</span></label>
           <input class="input" id="title" maxlength="190" autocomplete="off"
                  placeholder="e.g. Lab moved to room 204 this Friday">
+          <div class="charcount" data-for="title" aria-live="polite"></div>
           <div class="hint">Please add a title.</div>
         </div>
 
@@ -76,6 +77,7 @@
           <label class="label" for="body">Message <span class="req">*</span></label>
           <textarea class="input input--area" id="body" rows="8" maxlength="5000"
                     placeholder="Write the announcement for everyone in this class"></textarea>
+          <div class="charcount" data-for="body" aria-live="polite"></div>
           <div class="hint">Please write a message.</div>
         </div>
 
@@ -111,8 +113,9 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=48"></script>
-<script src="js/api.js?v=48"></script>
-<script src="js/create-announcement.js?v=48"></script>
+<script src="js/app.js?v=49"></script>
+<script src="js/api.js?v=49"></script>
+<script src="js/charcount.js?v=49"></script>
+<script src="js/create-announcement.js?v=49"></script>
 </body>
 </html>
