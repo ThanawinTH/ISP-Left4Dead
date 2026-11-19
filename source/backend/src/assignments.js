@@ -5,6 +5,8 @@ const { cleanTopic } = require('./topics');
 /* The values the database will accept. We check them here too so a bad request
    comes back as a clear 400 instead of a MySQL error. */
 const VISIBILITIES = ['class', 'staff'];
+const TITLE_MAX = 190;          // matches the column; announcements, tasks and the schedule use the same
+const TITLE_TOO_LONG = `Keep the title under ${TITLE_MAX} characters`;
 const STATUSES = ['notstarted', 'inprogress', 'done'];
 
 /*
@@ -125,6 +127,8 @@ async function create(req, res) {
   const dueAt = req.body.due_at;
 
   if (!title) return res.status(400).json({ error: 'A title is required' });
+  // D-02: a longer title used to reach MySQL and come back as a 500.
+  if (title.length > TITLE_MAX) return res.status(400).json({ error: TITLE_TOO_LONG });
   const topic = cleanTopic(req.body.topic);
   if (topic && topic.error) return res.status(400).json({ error: topic.error });
   if (!dueAt || isNaN(Date.parse(dueAt))) {
@@ -211,6 +215,7 @@ async function update(req, res) {
   if (req.body.title !== undefined) {
     const title = String(req.body.title).trim();
     if (!title) return res.status(400).json({ error: 'A title is required' });
+    if (title.length > TITLE_MAX) return res.status(400).json({ error: TITLE_TOO_LONG });
     set('title', title);
   }
 
