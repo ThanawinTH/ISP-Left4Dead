@@ -126,6 +126,8 @@ router.get('/classrooms/:id' + att, mw(auth.loadMembership), go(attachments.open
 const sub = '/classrooms/:id/assignments/:assignmentId/submission';
 router.put(sub, mw(auth.loadMembership), files.readUpload, go(submissions.upload));
 router.get(sub, mw(auth.loadMembership), go(submissions.mine));
+/* Unsubmit, as in Google Classroom: take the work back, change it, submit again. */
+router.delete(sub, mw(auth.loadMembership), go(submissions.unsubmit));
 router.get(sub + '/files/:fileId', mw(auth.loadMembership), go(submissions.myFile));
 
 /* US-15: lecturers, TAs and University staff see who has submitted and open any
@@ -135,5 +137,8 @@ router.get(subs, mw(auth.loadMembership), auth.requireStaff, go(submissions.list
 router.get(subs + '/files/:fileId', mw(auth.loadMembership), auth.requireStaff, go(submissions.staffFile));
 router.put('/classrooms/:id/assignments/:assignmentId/grades/:studentId',
   mw(auth.loadMembership), auth.requireStaff, go(submissions.setGrade));
+/* Ungrade: take a grade back off, then grade again. */
+router.delete('/classrooms/:id/assignments/:assignmentId/grades/:studentId',
+  mw(auth.loadMembership), auth.requireStaff, go(submissions.removeGrade));
 
 module.exports = router;
