@@ -89,7 +89,10 @@ function cardHTML(a, latest) {
           </div>
           <div class="ann__time">${esc(when(a.created_at))}</div>
         </div>
-        ${latest ? '<span class="ann__latest">Latest</span>' : ''}
+        <div class="ann__tools">
+          ${latest ? '<span class="ann__latest">Latest</span>' : ''}
+          ${a.can_delete ? `<button class="btn--text-danger ann__del" type="button" data-del-ann="${a.id}">Delete</button>` : ''}
+        </div>
       </header>
       <h3 class="ann__title">${esc(a.title)}</h3>
       <p class="ann__body">${esc(a.body)}</p>
@@ -116,7 +119,25 @@ function filesHTML(a) {
     </div>`;
 }
 
+/* Only the lecturer gets the Delete button (the server refuses everyone else).
+   Asks first: the announcement and its files cannot be brought back. */
+async function deleteAnnouncement(btn) {
+  const a = all.find(x => x.id === Number(btn.dataset.delAnn));
+  if (!a || !confirm(`Delete the announcement "${a.title}"? Its files are deleted too. This can't be undone.`)) return;
+  btn.disabled = true;
+  try {
+    await API.del(`/classrooms/${classroomId}/announcements/${a.id}`);
+    KU.toast('Announcement deleted');
+    await loadAnnouncements();
+  } catch (err) {
+    btn.disabled = false;
+    KU.toast(err.message);
+  }
+}
+
 $('noticeList').addEventListener('click', async (e) => {
+  const del = e.target.closest('[data-del-ann]');
+  if (del) return deleteAnnouncement(del);
   const btn = e.target.closest('[data-file]');
   if (!btn || !confirm('Remove this file from the announcement?')) return;
   try {

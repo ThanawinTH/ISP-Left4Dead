@@ -985,7 +985,7 @@ a.linkbtn:hover { text-decoration: underline; }
 .ann__role--staff    { background: var(--amber-100); color: var(--amber-700); }
 .ann__time { margin-top: 2px; font-size: 13px; color: var(--slate-500); }
 .ann__latest {
-  margin-left: auto; align-self: flex-start;
+  align-self: flex-start;
   padding: 3px 10px; border-radius: var(--r-full);
   background: var(--teal-700); color: var(--white); font-size: 12px; font-weight: 700;
 }
@@ -1514,5 +1514,16 @@ a.gtodo__ev:hover { border-color: var(--teal-600); }
 .charcount.is-near { color: var(--amber-700); }
 .charcount.is-full { color: var(--red-600); font-weight: 600; }
 
+/* Delete on an announcement (lecturer only), next to the Latest badge */
+.ann__tools { margin-left: auto; align-self: flex-start; display: flex; align-items: center; gap: 10px; }
+.ann__del { padding: 3px 4px; }
+
 /* Grader: the note when work was handed in again after the grade */
 .gr__again { color: var(--amber-700); font-weight: 600; }
+
+/* Members page: lecturer-only Delete Classroom */
+.danger { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 28px;
+          padding: 18px 20px; border: 1px solid var(--red-100); border-radius: 12px; background: #fffafa; }
+.danger__title { font-weight: 700; color: var(--red-600); }
+.danger__note { margin-top: 4px; font-size: 13px; color: var(--slate-500); max-width: 560px; }
+.danger .btn--danger { flex: none; background: #dc2626; border-color: #dc2626; color: #fff; }

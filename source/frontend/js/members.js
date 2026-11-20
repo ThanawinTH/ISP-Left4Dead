@@ -24,6 +24,7 @@ const ROLE_LABEL = {
 
 let members = [];
 let isOwner = false;
+let className = '';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -37,6 +38,7 @@ const initials = (name) => name.slice(0, 2).toUpperCase();
 async function loadJoinCode() {
   const { classroom } = await API.get('/classrooms/' + classroomId);
   showClassHeader(classroom);
+  className = classroom.name;
   // Only the teaching team is sent the code; for a student the banner goes.
   document.querySelector('.joincode').hidden = !classroom.join_code;
   document.getElementById('joinCode').textContent = classroom.join_code || '—';
@@ -47,6 +49,7 @@ async function loadMembers() {
   members = data.members;
   isOwner = data.isOwner;
   document.getElementById('resetCode').hidden = !isOwner;   // TAs and staff see the code, only the lecturer resets it
+  document.getElementById('dangerZone').hidden = !isOwner;  // only the lecturer deletes the classroom
   render();
 }
 
@@ -170,6 +173,25 @@ document.getElementById('resetCode').addEventListener('click', async (e) => {
     KU.toast(err.message);
   } finally {
     btn.disabled = false;
+  }
+});
+
+/* ---------- delete the classroom ---------- */
+
+/* Lecturer only (the server refuses everyone else). Everything in the class
+   goes with it, so the lecturer types the classroom name to confirm. */
+document.getElementById('deleteClass').addEventListener('click', async (e) => {
+  const typed = prompt(`This deletes "${className}" and everything in it for everyone. It can't be undone.\n\nType the classroom name to confirm:`);
+  if (typed === null) return;
+  if (typed.trim() !== className) return KU.toast('The name did not match - nothing was deleted');
+  const btn = e.currentTarget;
+  btn.disabled = true;
+  try {
+    await API.del('/classrooms/' + classroomId);
+    location.href = 'my-classrooms.html';
+  } catch (err) {
+    btn.disabled = false;
+    KU.toast(err.message);
   }
 });
 
