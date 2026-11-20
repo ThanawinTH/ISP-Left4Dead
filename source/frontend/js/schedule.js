@@ -548,11 +548,13 @@ function roleBox(a) {
 }
 
 /* ---------- US-14: the student's own submission ----------
-   A student adds files, links (Google Drive, GitHub ...) or both, checks the
-   list, then submits them together. Submitting again replaces the whole
-   earlier set (SRS-23). After the due date the box stays open only when the
-   lecturer allows late work, and the server marks it late (SRS-24). The
-   server checks everything again (SRS-21, SRS-22). */
+   Works like Google Classroom. A student adds files, links (Google Drive,
+   GitHub ...) or both, checks the list, then presses Submit. Once submitted,
+   the work is locked; to change it the student presses Unsubmit, which hands
+   the same files and links back to them, edits the list and submits again.
+   After the due date the box stays open only when the lecturer allows late
+   work, and the server marks it late (SRS-24). The server checks everything
+   again (SRS-21, SRS-22). */
 
 const pastDue = (a) => parseDue(a.due_at) < new Date();
 const canStillSubmit = (a) => !pastDue(a) || a.allow_late;
@@ -620,13 +622,9 @@ function renderMySubmission(a) {
         </div>`).join('')}
     </div>` : '';
 
-  box.innerHTML = `${graded}
-    <div class="upload__row">
-      <span class="upload__title">${submission ? 'Your work' : 'Hand in your work'}</span>
-      <span class="upload__note">Files or links</span>
-    </div>
-    ${done}
-    ${open ? `
+  // Submitted: the work is locked, and Unsubmit is the only way to change it.
+  // Not submitted: pick files and links, then Submit.
+  const editor = `
       ${pastDue(a) ? '<div class="late-note">The due date has passed. Late work is still accepted and will be marked <b>Late</b>.</div>' : ''}
       ${chosen}
       <input type="file" id="fileInput" accept="${types}" multiple hidden>
@@ -638,14 +636,28 @@ function renderMySubmission(a) {
         </form>
       </div>
       <button class="btn btn--primary btn--block" id="submitWork" type="button" ${count ? '' : 'disabled'}>
-        ${submission ? 'Replace Submission' : 'Submit'}${count ? ` (${plural(count, 'item')})` : ''}</button>
-      ${count ? '' : `<div class="upload__hint upload__hint--center">${submission
-        ? 'To change your work, add the new files or links above, then Replace Submission.'
-        : 'Add files or a link above, then press Submit.'}</div>`}
-      <div class="upload__hint">${submission ? 'Submitting again replaces everything you handed in. ' : ''}${Files.limitsText(limits)}</div>`
-    : `<div class="upload__hint">The due date has passed, so your work can no longer be changed.</div>`}`;
+        Submit${count ? ` (${plural(count, 'item')})` : ''}</button>
+      ${count ? '' : '<div class="upload__hint upload__hint--center">Add files or a link above, then press Submit.</div>'}
+      <div class="upload__hint">${Files.limitsText(limits)}</div>`;
+
+  const locked = `
+      <button class="btn btn--ghost btn--block" id="unsubmitWork" type="button">Unsubmit</button>
+      <div class="upload__hint upload__hint--center">To change your work, unsubmit it, make your changes, then submit again${pastDue(a) ? ' (it will be marked Late)' : ''}.</div>`;
+
+  box.innerHTML = `${graded}
+    <div class="upload__row">
+      <span class="upload__title">Your work</span>
+      <span class="upload__note">Files or links</span>
+    </div>
+    ${submission || !open ? done : ''}
+    ${!open ? '<div class="upload__hint">The due date has passed, so your work can no longer be changed.</div>'
+      : submission ? locked : editor}`;
 
   if (!open) return;
+  if (submission) {
+    $('unsubmitWork').addEventListener('click', () => unsubmitWork(a, submission, grade));
+    return;
+  }
   $('pickFile').addEventListener('click', () => $('fileInput').click());
   $('fileInput').addEventListener('change', (e) => {
     pending.files.push(...Files.accept([...e.target.files], pending.files, limits));
@@ -663,7 +675,7 @@ function renderMySubmission(a) {
     pending.links.splice(Number(b.dataset.removeLink), 1);
     renderMySubmission(a);
   }));
-  $('submitWork')?.addEventListener('click', () => sendWork(a, limits));
+  $('submitWork').addEventListener('click', () => sendWork(a, limits));
 }
 
 /** Only http and https links; the server checks this again. */
@@ -700,6 +712,41 @@ async function sendWork(a, limits) {
   } catch (err) {
     btn.disabled = false;
     btn.textContent = label;
+    KU.toast(err.message);
+  }
+}
+
+/**
+ * Unsubmit, as in Google Classroom. The files and links come back into the
+ * "not handed in yet" list first, so the student only changes what they
+ * need to; then the server takes the submission back. If reading a file
+ * back fails, nothing is unsubmitted.
+ */
+async function unsubmitWork(a, submission, grade) {
+  const note = grade ? ' Your grade stays until your teacher grades it again.' : '';
+  if (!confirm(`Unsubmit "${a.title}"? Your work comes back to you to change, and you need to submit it again.${note}`)) return;
+
+  const btn = $('unsubmitWork');
+  btn.disabled = true;
+  btn.textContent = 'Unsubmitting…';
+  try {
+    const back = await Promise.all(submission.files.map(async (f) => {
+      const res = await fetch(`/api${subUrl(a)}/files/${f.id}`, { credentials: 'same-origin' });
+      if (!res.ok) throw new Error(`Could not read ${f.file_name} back - nothing was unsubmitted`);
+      const blob = await res.blob();
+      return new File([blob], f.file_name, { type: blob.type });
+    }));
+    await API.del(subUrl(a));
+    pending.id = a.id;
+    pending.files = back;
+    pending.links = submission.links.map(l => l.url);
+    await loadAssignments();                                 // the server works out the new risk
+    renderList();
+    renderPanel();                                           // the box opens again with the work in it
+    KU.toast('Unsubmitted - submit again when you are ready');
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Unsubmit';
     KU.toast(err.message);
   }
 }
@@ -818,34 +865,48 @@ function renderGrading(a, data) {
     : '<div class="gr__empty">Nothing handed in. You can still give a grade, for example 0.</div>';
 
   // The grade sits above the work, so it is in view while you read the file.
-  const form = canGrade ? `
+  // Like Submit and Unsubmit for a student: Grade saves it and locks it;
+  // Ungrade takes it back off, and then it can be graded again.
+  const shownGrade = g ? `
+        <div class="gr__field">
+          <span class="gr__label">Grade</span>
+          <div class="gr__read"><b>${g.score}</b> / ${points}</div>
+        </div>
+        <div class="gr__field">
+          ${g.feedback ? `<span class="gr__label">Comment</span><p class="gr__said">${esc(g.feedback)}</p>` : ''}
+        </div>` : '';
+
+  const form = canGrade && g ? `
+      <div class="gr__form gr__form--read">
+        ${shownGrade}
+        <div class="gr__actions">
+          <button class="btn btn--ghost" id="grUngrade" type="button">Ungrade</button>
+          <span class="gr__by">Graded by ${esc(g.graded_by_name)}${g.resubmitted
+            ? ' · <b class="gr__again">handed in again since - ungrade to grade the new work</b>' : ''}</span>
+        </div>
+      </div>` : canGrade ? `
       <div class="gr__form">
         <div class="gr__field">
           <label class="gr__label" for="grScore">Grade</label>
           <span class="gr__scorebox">
             <input class="input" id="grScore" type="number" min="0" ${points > 0 ? `max="${points}"` : ''} step="1"
-                   value="${g ? g.score : ''}" placeholder="-">
+                   value="" placeholder="-">
             <span>/ ${points}</span>
           </span>
         </div>
         <div class="gr__field">
           <label class="gr__label" for="grNote">Comment <span class="gr__opt">(optional)</span></label>
           <textarea class="input gr__note" id="grNote" rows="2" maxlength="2000"
-                    placeholder="Only ${esc(s.name)} sees this, e.g. Good work, check question 3">${esc(g?.feedback || '')}</textarea>
+                    placeholder="Only ${esc(s.name)} sees this, e.g. Good work, check question 3"></textarea>
         </div>
         <div class="gr__actions">
-          <button class="btn btn--primary" id="grSave" type="button">${g ? 'Update grade' : 'Save grade'}</button>
-          <span class="gr__by">${g ? `Graded by ${esc(g.graded_by_name)}` : 'Not graded yet'}</span>
+          <button class="btn btn--primary" id="grSave" type="button">Grade</button>
+          <span class="gr__by">Not graded yet</span>
         </div>
       </div>` : `
       <div class="gr__form gr__form--read">
-        <div class="gr__field">
-          <span class="gr__label">Grade</span>
-          <div class="gr__read">${g ? `<b>${g.score}</b> / ${points}` : 'Not graded yet'}</div>
-        </div>
-        <div class="gr__field">
-          ${g?.feedback ? `<span class="gr__label">Comment</span><p class="gr__said">${esc(g.feedback)}</p>` : ''}
-        </div>
+        ${g ? shownGrade : `<div class="gr__field"><span class="gr__label">Grade</span>
+          <div class="gr__read">Not graded yet</div></div><div class="gr__field"></div>`}
         ${g ? `<span class="gr__by">Graded by ${esc(g.graded_by_name)}</span>` : '<span></span>'}
       </div>`;
 
@@ -876,7 +937,9 @@ function renderGrading(a, data) {
     b.addEventListener('click', () => { state.previewFile = Number(b.dataset.file); renderGrading(a, data); }));
   $('grPrev').addEventListener('click', () => pick(students[at - 1].id));
   $('grNext').addEventListener('click', () => pick(students[at + 1].id));
-  if (canGrade) {
+  if (canGrade && g) {
+    $('grUngrade').addEventListener('click', () => ungrade(a, s));
+  } else if (canGrade) {
     $('grSave').addEventListener('click', () => saveGrade(a, data, s));
     $('grScore').addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); saveGrade(a, data, s); }
@@ -885,13 +948,32 @@ function renderGrading(a, data) {
 }
 
 async function saveGrade(a, data, s) {
+  if (!$('grScore').value.trim()) {
+    KU.toast('Enter a grade first');
+    return $('grScore').focus();
+  }
   const btn = $('grSave');
   btn.disabled = true;
   try {
     const res = await API.put(`/classrooms/${classroomId}/assignments/${a.id}/grades/${s.id}`,
       { score: $('grScore').value, feedback: $('grNote').value });
-    KU.toast(res.grade ? `Saved: ${s.name} ${res.grade.score}/${a.points}` : `Grade taken back for ${s.name}`);
+    KU.toast(`Graded: ${s.name} ${res.grade.score}/${a.points}`);
     await loadSubmissions(a);              // fresh counts, who graded it, still on this student
+  } catch (err) {
+    KU.toast(err.message);
+    btn.disabled = false;
+  }
+}
+
+/** Ungrade: the grade comes off, and the Grade box opens again for this student. */
+async function ungrade(a, s) {
+  if (!confirm(`Ungrade ${s.name}? The grade and comment are taken off, and you can grade again.`)) return;
+  const btn = $('grUngrade');
+  btn.disabled = true;
+  try {
+    await API.del(`/classrooms/${classroomId}/assignments/${a.id}/grades/${s.id}`);
+    KU.toast(`Ungraded: ${s.name}`);
+    await loadSubmissions(a);
   } catch (err) {
     KU.toast(err.message);
     btn.disabled = false;
