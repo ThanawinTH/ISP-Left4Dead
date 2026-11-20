@@ -46,6 +46,8 @@ function summary(items) {
  * the class, and after the due date only if late work is allowed.
  * SRS-22: every file and link checked before anything is saved.
  * SRS-23: the new set replaces the student's earlier set for this assignment.
+ * The page itself no longer offers "Replace": a student unsubmits first
+ * (DELETE below), then submits again, as in Google Classroom.
  */
 async function upload(req, res) {
   if (req.role !== 'student') {
@@ -126,6 +128,32 @@ async function myFile(req, res) {
     [req.params.fileId, req.params.assignmentId, req.params.id, req.session.user.id]);
   if (!row) return res.status(404).json({ error: 'File not found' });
   files.sendFile(req, res, row);
+}
+
+/**
+ * DELETE /api/classrooms/:id/assignments/:assignmentId/submission
+ * Unsubmit, as in Google Classroom: the student takes their work back to
+ * change it, then submits again. Allowed only while the assignment still
+ * takes work - after it closes, unsubmitting would leave nothing handed in
+ * and no way to hand it in again.
+ * A grade already given stays. If the student submits again, the grader sees
+ * "Resubmitted", because the new submit is later than the grade.
+ */
+async function unsubmit(req, res) {
+  if (req.role !== 'student') {
+    return res.status(403).json({ error: 'Only students unsubmit work' });
+  }
+
+  const a = await findAssignment(req);
+  if (!a || a.visibility !== 'class') return res.status(404).json({ error: 'Assignment not found' });
+  if (Number(a.past_due) === 1 && !Number(a.allow_late)) {
+    return res.status(403).json({ error: 'This assignment is closed, so your work can no longer be unsubmitted' });
+  }
+
+  const r = await q('DELETE FROM submissions WHERE assignment_id = ? AND student_id = ?',
+    [a.id, req.session.user.id]);
+  if (!r.affectedRows) return res.status(404).json({ error: 'Nothing has been submitted yet' });
+  res.json({ ok: true, submission: null });
 }
 
 /* ---------- US-15: staff see who has submitted ---------- */
@@ -268,4 +296,23 @@ async function setGrade(req, res) {
   res.json({ ok: true, grade: { score, feedback } });
 }
 
-module.exports = { upload, mine, myFile, listForStaff, staffFile, setGrade, LIMITS };
+/**
+ * DELETE /api/classrooms/:id/assignments/:assignmentId/grades/:studentId
+ * Ungrade: take the grade back off so it can be graded again, the way a
+ * student unsubmits and submits again. Same rule as grading: the lecturer,
+ * or a TA on this assignment. The student's work is not touched.
+ */
+async function removeGrade(req, res) {
+  const a = await findAssignment(req);
+  if (!a) return res.status(404).json({ error: 'Assignment not found' });
+  if (!await canGrade(req, a.id)) {
+    return res.status(403).json({ error: 'Only the lecturer or a TA on this assignment can ungrade it' });
+  }
+
+  const r = await q('DELETE FROM grades WHERE assignment_id = ? AND student_id = ?',
+    [a.id, Number(req.params.studentId)]);
+  if (!r.affectedRows) return res.status(404).json({ error: 'This student has no grade to take back' });
+  res.json({ ok: true, grade: null });
+}
+
+module.exports = { upload, unsubmit, mine, myFile, listForStaff, staffFile, setGrade, removeGrade, LIMITS };
