@@ -43,6 +43,9 @@ router.post('/classrooms/join', go(classrooms.join));
 router.get('/classrooms/:id', go(classrooms.detail));
 router.post('/classrooms/:id/join-code',
   mw(auth.loadMembership), auth.requireOwner, go(classrooms.resetCode));
+/* Only the lecturer who owns the class deletes it, with everything in it. */
+router.delete('/classrooms/:id',
+  mw(auth.loadMembership), auth.requireOwner, go(classrooms.remove));
 
 /* Members and roles (US-4). loadMembership runs first so each handler knows
    what the caller is inside this classroom before it does anything. */
@@ -78,6 +81,9 @@ router.get('/classrooms/:id/announcements',
   mw(auth.loadMembership), go(announcements.list));
 router.post('/classrooms/:id/announcements',
   mw(auth.loadMembership), auth.requireStaff, go(announcements.create));
+/* Only the lecturer deletes an announcement; its files go with it. */
+router.delete('/classrooms/:id/announcements/:announcementId',
+  mw(auth.loadMembership), auth.requireOwner, go(announcements.remove));
 
 /* Chat (US-12, US-13). The class chat is open to every member of the class;
    the staff chat (Admin panel) is for the lecturer, TAs and University staff

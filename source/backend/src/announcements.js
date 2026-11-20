@@ -30,6 +30,7 @@ async function list(req, res) {
   announcements.forEach(n => {
     n.attachments = files.get(n.id) || [];
     n.can_manage = req.isStaff && (Number(n.mine) === 1 || req.isOwner);
+    n.can_delete = req.isOwner;           // only the lecturer deletes an announcement
     delete n.mine;
   });
 
@@ -63,4 +64,16 @@ async function create(req, res) {
   res.status(201).json({ announcement });
 }
 
-module.exports = { list, create };
+/**
+ * DELETE /api/classrooms/:id/announcements/:announcementId
+ * Lecturer only (requireOwner has run). Its attached files are deleted with
+ * it (ON DELETE CASCADE on attachments).
+ */
+async function remove(req, res) {
+  const r = await q('DELETE FROM announcements WHERE id = ? AND classroom_id = ?',
+    [req.params.announcementId, req.params.id]);
+  if (!r.affectedRows) return res.status(404).json({ error: 'Announcement not found' });
+  res.json({ ok: true });
+}
+
+module.exports = { list, create, remove };

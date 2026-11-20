@@ -122,4 +122,17 @@ async function resetCode(req, res) {
   res.json({ join_code: code });
 }
 
-module.exports = { list, previewCode, create, join, detail, resetCode };
+/**
+ * DELETE /api/classrooms/:id   (lecturer only - requireOwner has run)
+ * Deletes the classroom and everything in it: members, assignments,
+ * submissions, grades, announcements, files, chat, staff tasks and the
+ * schedule. Every one of those tables points at classrooms with
+ * ON DELETE CASCADE, so one DELETE removes it all. It cannot be undone, so
+ * the page asks the lecturer to type the classroom name first.
+ */
+async function remove(req, res) {
+  await q('DELETE FROM classrooms WHERE id = ?', [req.params.id]);
+  res.json({ ok: true });
+}
+
+module.exports = { list, previewCode, create, join, detail, resetCode, remove };
