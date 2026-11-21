@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=48">
+<link rel="stylesheet" href="css/styles.css?v=49">
 </head>
 <body>
 
@@ -70,7 +70,8 @@
         <div class="form-row">
           <div class="field field--grow" id="f-title">
             <label class="label" for="title">Assignment Title <span class="req">*</span></label>
-            <input class="input" id="title" placeholder="e.g. Lab 4: React Autolayout Mockup" autocomplete="off">
+            <input class="input" id="title" maxlength="190" placeholder="e.g. Lab 4: React Autolayout Mockup" autocomplete="off">
+            <div class="charcount" data-for="title" aria-live="polite"></div>
             <div class="hint">A title is required.</div>
           </div>
           <div class="field field--points">
@@ -170,9 +171,10 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<script src="js/app.js?v=48"></script>
-<script src="js/api.js?v=48"></script>
-<script src="js/create-assignment.js?v=48"></script>
+<script src="js/app.js?v=49"></script>
+<script src="js/api.js?v=49"></script>
+<script src="js/charcount.js?v=49"></script>
+<script src="js/create-assignment.js?v=49"></script>
 <script>
   // Anything marked data-soon is in the design but not built yet.
   document.querySelectorAll('[data-soon]').forEach(el => {
