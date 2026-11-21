@@ -34,6 +34,7 @@ async function loadForEditing() {
   if (!a) { KU.toast('That assignment no longer exists'); return; }
 
   document.getElementById('title').value = a.title;
+  document.getElementById('title').dispatchEvent(new Event('input'));   // the counter shows the loaded title's length
   setTopic(a.topic);
   document.getElementById('points').value = a.points;
   document.getElementById('description').value = a.description || '';
