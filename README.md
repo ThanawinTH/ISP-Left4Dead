@@ -39,63 +39,85 @@ no passwords — there is no password column in the schema.
 
 ---
 
+## Quick start
+
+You need Git and Docker Desktop (showing *Engine running*). Then:
+
+```bash
+git clone https://github.com/ThanawinTH/ISP-Left4Dead.git
+cd ISP-Left4Dead/source/backend
+cp .env.example .env          # Windows: copy .env.example .env  — then fill in the Google keys
+docker compose up --build
+```
+
+Open **http://localhost:3000** and sign in with a `@ku.th` Google account. Full step-by-step
+instructions, the test command and troubleshooting are in **[Build and run](#build-and-run)**.
+
+---
+
 ## Current project status
 
-> **Phase: Iteration 5 complete — the system covers five of the seven Project D required features.**
+> **Phase: Iteration 6 complete — final release.** All 16 user stories in the SRS, plus US-17,
+> US-18 and US-19, are implemented, and 112 automated API tests run with `npm test`.
 
 | Deliverable | Status |
 |---|---|
 | Software Requirement Specification (SRS-1 … SRS-27) | ✅ Complete |
 | KAOS goal refinement (SG-1 … SG-5) | ✅ Complete |
 | Use case diagram + use case table | ✅ Complete |
-| User stories & User Requirement Specification | 🟡 US-17, US-18, US-19 built but not in the SRS — addendum due in Iteration 6 |
+| User stories & User Requirement Specification | 🟡 US-17, US-18, US-19 built but not described in the SRS (risk R-04, accepted) |
 | Activity diagrams (AD-1 … AD-9) | ✅ Complete |
 | Software Proposal — architecture, data storage, dev environment | ✅ Complete |
 | Sequence diagrams (SQD-1 … SQD-6) | ✅ Complete |
 | Traceability matrix (Sub-Goal → SRS → SQD) | ✅ Complete |
-| Iteration 1–5 reports | ✅ Complete |
+| Iteration reports | ✅ Complete |
 | Project schedule (Gantt / Plane export) | ✅ Complete |
 | UI mockups (Figma) | ✅ Complete |
 | Application source code | ✅ All 19 stories implemented |
 | Database schema (12 tables) | ✅ Complete |
 | Docker Compose environment | ✅ Complete |
-| Test suite | 🟡 Manual only — automation is the first Iteration 6 task |
+| Automated tests | ✅ 112 API tests in `source/backend/test`, run with `npm test` |
 
 ### What works
 
 | Area | Stories | SRS | State |
 |---|---|---|---|
 | Google sign-in, restricted to `@ku.th`, no passwords stored | US-16 | SRS-26, 27 | ✅ |
-| Create a classroom, unique join code, reset the code | US-1, US-2 | SRS-1, 2 | ✅ |
+| Create a classroom, unique join code, reset the code, delete the classroom | US-1, US-2 | SRS-1, 2 | ✅ |
 | Join by code, always as Student | US-3 | SRS-4, 5 | ✅ |
 | Members and roles, remove a member | US-4 | SRS-6, 7 | ✅ |
-| Create and edit assignments, topics, draft vs posted, assign TAs | US-5, US-6 | SRS-8, 10, 13, 14 | ✅ |
+| Create and edit assignments, topics, draft vs posted, assign TAs, 190-character title limit with a live counter | US-5, US-6 | SRS-8, 10, 13, 14 | ✅ |
 | Classroom dashboard and at-risk highlighting | US-7, US-8 | SRS-12, 13 | ✅ |
 | Student class schedule | US-9 | SRS-14 | ✅ |
-| Announcements, with files and links attached | US-10, US-11 | SRS-15 … 17 | ✅ |
+| Announcements with files and links, a character counter, and delete for the lecturer | US-10, US-11 | SRS-15 … 17 | ✅ |
 | Class chat, and a staff-only channel students cannot reach | US-12, US-13 | SRS-18 … 20 | ✅ |
-| Student file and link submission, late marking | US-14 | SRS-21 … 24 | ✅ |
-| Submission list and grading, read-only for roles that may not grade | US-15 | SRS-25 | ✅ |
+| Submit files and links, late marking, **Unsubmit** to change and submit again | US-14 | SRS-21 … 24 | ✅ |
+| Submission list, **Grade and Ungrade**, read-only for roles that may not grade | US-15 | SRS-25 | ✅ |
 | Class schedule — labs, consultations, milestones and due dates in one view | US-17 | — | ✅ |
 | Internal staff task board — Open, In progress, Done | US-18 | — | ✅ |
-| To-do across every class, split by the role held in each | US-19 | — | ✅ |
+| To-do across every class, split by role, with a **server-side search** (`?q=`) | US-19 | — | ✅ |
+
+### What changed in Iteration 6
+
+- **D-02 fixed:** an assignment title over 190 characters is refused with 400 instead of a 500
+  server error, on create and on edit.
+- **Hand-in and grading reworked** to work like Google Classroom: Submit / Unsubmit and Grade /
+  Ungrade.
+- **Delete controls for the lecturer:** delete an announcement, delete a classroom (type its name
+  to confirm).
+- **To-do search runs on the server**, so it also finds older finished work.
+- **112 automated API tests** in the repository (closes risk R-05).
+- **Branch → pull request → review → merge** workflow (PR #1 – #4).
 
 ### Known gaps
 
-Three honest ones, all carried into Iteration 6:
-
-- **No automated tests.** Every check is run by hand before a demo. This was an action item in
-  the Iteration 3, 4 and 5 reports and is risk **R-05**.
-- **Search is client-side.** The To-do and schedule search boxes filter rows the page has
-  already downloaded. The Project D requirement asks for a server-side query across activities,
-  tasks and announcements. No `/api/search` endpoint exists yet.
-- **No `admin` role.** `memberships.role` is `ENUM('lecturer','ta','staff','student')`. The
-  Admin role named in the requirement list has no value in the enum, so it does not exist.
-
-And one documentation gap: **US-17, US-18 and US-19 are built but have no SRS requirement
-behind them** (risk **R-04**). The Project D requirement list reached the team after the SRS was
-submitted. An addendum with their SRS numbers and traceability rows is the first writing task
-of Iteration 6.
+- **US-17, US-18 and US-19 have no SRS requirement behind them** (risk **R-04**, accepted). The
+  Project D requirement list reached the team after the SRS was submitted, and the addendum was
+  dropped in favour of tests and features in the final iteration.
+- **No separate `admin` role.** `memberships.role` is `ENUM('lecturer','ta','staff','student')`;
+  the lecturer holds every administrative action inside a class.
+- **Development secrets.** The database password and session secret in `docker-compose.yml` are
+  development defaults — see *Before this is deployed anywhere* below.
 
 **Roles.** A member's role is read from the database on every request, never cached in the
 session, so a promotion takes effect immediately without signing out and back in.
@@ -109,17 +131,19 @@ ISP-Left4Dead/
 ├── docs/                                  ← all documentation and design artefacts
 │   ├── SRS_Left4Dead.pdf                  Software Requirement Specification
 │   ├── SoftwareProposal_Left4Dead.pdf     Architecture, data storage, sequence diagrams
-│   ├── Left4Dead_Iteration1-5_Report.pdf  iteration progress reports
+│   ├── Left4Dead_Iteration*_Report.pdf    iteration progress reports
 │   ├── SRS_ActivityDiagrams_drawio/       AD-1.json … AD-9.json
 │   └── Gannt Chart/                       project schedule exported from Plane
 └── source/                                ← the application
-    ├── README.md                          how to run it, API list, what works
+    ├── README.md                          developer guide: API list, roles, tests
     ├── backend/
     │   ├── docker-compose.yml             app + MySQL containers
     │   ├── Dockerfile                     node:20-alpine
-    │   ├── package.json                   express, express-session, mysql2
+    │   ├── package.json                   express, express-session, mysql2; npm test
+    │   ├── .env.example                   copy to .env: Google keys, TEST_LOGIN
     │   ├── server.js                      app entry point, session + static files
     │   ├── db/schema.sql                  12 tables
+    │   ├── test/                          112 automated API tests (npm test)
     │   └── src/
     │       ├── db.js                      MySQL pool, q() and one() helpers
     │       ├── auth.js                    Google OAuth2, @ku.th check, requireAuth,
@@ -164,7 +188,9 @@ ISP-Left4Dead/
 | Activity diagrams (AD-1 … AD-9) | `docs/SRS_ActivityDiagrams_drawio/` |
 | Project schedule and task breakdown | `docs/Gannt Chart/` |
 | Progress narrative for each iteration | `docs/Left4Dead_Iteration*_Report.pdf` |
-| How to run the app, API endpoints, what works | `source/README.md` |
+| How to build and run the app | **Build and run**, below |
+| API endpoints, roles, developer notes | `source/README.md` |
+| Automated tests | `source/backend/test/` |
 | Backend code and database schema | `source/backend/` |
 | Front-end pages built from the Figma mockups | `source/frontend/` |
 
@@ -225,36 +251,132 @@ Two shapes worth explaining:
 
 ---
 
-## Getting started
+## Build and run
 
-**Prerequisites:** Docker Desktop installed and showing *Engine running* (WSL 2 backend on
-Windows), plus a Google OAuth2 client — see below.
+The whole application — the Node.js/Express server and the MySQL database — runs in Docker, so
+you do not install Node.js or MySQL yourself. It works the same on Windows, macOS and Linux.
+
+### 1. Prerequisites
+
+| You need | Check it with |
+|---|---|
+| [Git](https://git-scm.com/downloads) | `git --version` |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) (on Windows with the WSL 2 backend) | Docker Desktop shows **Engine running**, and `docker compose version` prints a version |
+| A Google account ending in `@ku.th` | — |
+| Port **3000** free on your computer | nothing else is running on http://localhost:3000 |
+
+### 2. Get the code
 
 ```bash
 git clone https://github.com/ThanawinTH/ISP-Left4Dead.git
 cd ISP-Left4Dead/source/backend
-
-cp .env.example .env          # then fill in the two Google values
-docker compose up --build     # starts the Express app and the MySQL container
 ```
 
-Open **http://localhost:3000** and sign in with a `@ku.th` Google account.
+> **Every `docker compose` command below runs in `source/backend/`.** That is where
+> `docker-compose.yml` lives — not the repository root.
 
-### Google sign-in
+### 3. Create the `.env` file
 
-`.env` is git-ignored and is **not** in the repository. Ask a team member for the values, or
-create your own client: Google Cloud Console → APIs & Services → Credentials → OAuth client ID
-→ Web application, with this under **Authorised redirect URIs** (not JavaScript origins):
+The Google sign-in keys are not in the repository. Make your own `.env` from the example:
+
+```bash
+cp .env.example .env          # macOS / Linux
+copy .env.example .env        # Windows (PowerShell or Command Prompt)
+```
+
+Open `.env` and fill in the two Google values:
+
+```
+GOOGLE_CLIENT_ID=<your client ID>
+GOOGLE_CLIENT_SECRET=<your client secret>
+TEST_LOGIN=0
+```
+
+Ask a team member for the values, or create your own client: **Google Cloud Console → APIs &
+Services → Credentials → Create credentials → OAuth client ID → Web application**, and add this
+under **Authorised redirect URIs** (not JavaScript origins):
 
 ```
 http://localhost:3000/api/auth/google/callback
 ```
 
-`TEST_LOGIN=1` enables a sign-in route that skips Google, for automated tests. **Leave it at
-`0`** for anything else, including the demo.
+> **Just want to try it without Google?** Set `TEST_LOGIN=1` instead. The sign-in page then shows
+> a *Test login* box that accepts any `@ku.th` address with no password. It is for local testing
+> only — set it back to `0` for the demo or anything shared.
 
-> **Note the working directory:** `docker-compose.yml` lives in `source/backend/`, not at the
-> repository root. Running `docker compose` anywhere else will not find it.
+### 4. Build and start
+
+```bash
+docker compose up --build
+```
+
+The first run downloads the Node.js and MySQL images and builds the app, which takes a few
+minutes. It is ready when the log shows:
+
+```
+KU Classroom API on http://localhost:3000
+```
+
+On the first start MySQL creates the database from `db/schema.sql` (12 tables).
+
+### 5. Open the app
+
+Go to **http://localhost:3000** and sign in with your `@ku.th` Google account.
+
+A quick tour:
+
+1. **Create classroom** — you become its lecturer and get a join code.
+2. Open a second browser (or an Incognito window), sign in as another `@ku.th` account and
+   **Join** with the code — that person joins as a Student.
+3. On **Members**, promote someone to TA or University staff.
+4. Post an **assignment**, hand it in as the student, then grade it as the lecturer.
+
+### 6. Stop and start again
+
+| To… | Run |
+|---|---|
+| Stop (keep all data) | `Ctrl + C`, or `docker compose down` |
+| Start again | `docker compose up` (add `--build` after pulling code changes) |
+| Run in the background | `docker compose up -d --build`, then `docker compose logs -f app` to watch |
+| Wipe all data and start fresh | `docker compose down -v`, then `docker compose up --build` |
+
+Back-end changes need a restart (`docker compose restart app`). Front-end changes only need a hard
+refresh in the browser (**Ctrl + Shift + R**).
+
+### 7. Run the automated tests
+
+The tests drive the real API as real signed-in users, so the app must be running with the test
+sign-in switched on:
+
+1. Set `TEST_LOGIN=1` in `.env`, then `docker compose up --build`.
+2. In a second terminal, also in `source/backend`:
+
+   ```bash
+   docker compose exec app npm test
+   ```
+
+3. Expected result: **112 tests, 112 pass**.
+
+| File | Tests | What it checks |
+|---|---|---|
+| `test/api.test.js` | 56 | acceptance tests, one block per user story (US-1 to US-19) |
+| `test/boundary.test.js` | 30 | boundary values — the last allowed value and the first refused one |
+| `test/iteration6.test.js` | 26 | D-02 on edit, Unsubmit, Ungrade, delete announcement, delete classroom, To-do search |
+
+Each run signs in new users and creates new classes, so the tests can run again and again on the
+same database. Set `TEST_LOGIN` back to `0` afterwards.
+
+### 8. If something goes wrong
+
+| Problem | Fix |
+|---|---|
+| `no configuration file provided` | You are in the wrong folder. `cd source/backend` first. |
+| `Cannot connect to the Docker daemon` | Start Docker Desktop and wait for **Engine running**. |
+| `port is already allocated` / `Bind for 0.0.0.0:3000 failed` | Something else uses port 3000. Stop it, or stop the other container (`docker ps`, then `docker stop <id>`). |
+| Google says `redirect_uri_mismatch` | The redirect URI in Google Cloud must be exactly `http://localhost:3000/api/auth/google/callback`. |
+| Sign-in page says Google sign-in is not set up | `.env` is missing or the two Google values are empty. Fill them in, then `docker compose up --build`. |
+| A page shows *Server error* after you pulled new code | The database schema changed — see the next section. |
+| Tests fail with `test sign-in failed` | The app is not running with `TEST_LOGIN=1`. |
 
 ### If you pulled a schema change, you must reset the database
 
@@ -271,10 +393,7 @@ docker compose up --build     # recreates it, so schema.sql runs again
 This **wipes every account, classroom and assignment** on your machine. There is no way to keep
 the old data and get the new tables — the old data is what blocks them.
 
-This is defect **D-01** in the Iteration 5 report, and it cost the team real time twice. In
-Iteration 5 the tables `submissions`, `grades`, `chat_messages`, `staff_tasks` and
-`timeline_events` were all added by later pushes, so anyone who skipped the reset saw pages
-fail for no visible reason.
+This is defect **D-01** in the Iteration 5 report, and it cost the team real time twice.
 
 Check it worked:
 
@@ -288,13 +407,14 @@ reset did not happen.
 
 > **Running two copies at once?** Docker Compose names the project after the folder, and both a
 > clone and a working copy sit in a folder called `backend` — so they share the volume
-> `backend_dbdata` and a `down -v` in one wipes the other. Pass `-p <name>` to keep them apart.
+> `backend_dbdata` and a `down -v` in one wipes the other. Pass `-p <name>` to keep them apart,
+> for example `docker compose -p demo up --build`.
 
 ### Before this is deployed anywhere
 
 The database password and session secret are development defaults (`password`, `dev-secret`) in
 `docker-compose.yml`. That is fine on a laptop, but they must move to the git-ignored `.env`
-before the app runs anywhere real.
+before the app runs anywhere real, and `TEST_LOGIN` must be `0`.
 
 > **Never commit `.env`.** It holds the Google OAuth2 client secret. `.env.example` lists the
 > variable names with empty values and is the only one that belongs in the repository.
@@ -303,15 +423,21 @@ before the app runs anywhere real.
 
 ## Contributing (team workflow)
 
-1. Branch from `main` — `feature/<short-description>` or `fix/<short-description>`
-2. Commit in small, described steps — one commit per task, not one per story
-3. Back end first, front end second. Each back-end push carries a README stating its endpoints
-   and response shape, so the front end is written against an agreed contract
-4. Open a pull request into `main` and have another member review it
-5. Keep documents and diagrams in step: if a requirement changes, update the SRS **and** the
-   affected activity diagram JSON
-6. If your change touches `db/schema.sql`, **say so in the commit message** — everyone else has
+From Iteration 6 every change reaches `main` through a reviewed pull request.
+
+1. Start from the newest main: `git checkout main`, `git pull origin main`
+2. Make a branch — `feature/<short-description>` or `fix/<short-description>`
+3. Commit in small, described steps — one commit per task, not one per story
+4. Back end first, front end second. Each back-end change states its endpoints and response
+   shape, so the front end is written against an agreed contract
+5. Run `docker compose exec app npm test` before opening the pull request
+6. Push the branch, open a pull request into `main`, and have another member review it
+7. Merge only after approval, then everyone pulls `main`
+8. **Never force-push `main`.** If a push is rejected, pull first, then push
+9. If your change touches `db/schema.sql`, **say so in the commit message** — everyone else has
    to run `docker compose down -v` before your commit will work on their machine
+10. Keep documents in step: if a requirement changes, update the SRS **and** the affected
+    activity diagram JSON
 
 ---
 
