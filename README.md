@@ -35,7 +35,9 @@ no passwords — there is no password column in the schema.
 | Kantanut Utamapongchai | 6810545468 | [@kan1243](https://github.com/kan1243) |
 | Thanawin Thanapornthawan | 6810545654 | [@ThanawinTH](https://github.com/ThanawinTH) |
 | Phutarak Wongpitak | 6810545841 | [@phutharakw-cmyk](https://github.com/phutharakw-cmyk) |
-| Pakhin Daonan | 6810545859 | [@pakhindaonan-netizen](https://github.com/pakhindaonan-netizen) |
+| Pakhin Daonan | 6810545859 | [@pakhindaonan-netizen](https://github.com/pakhindaonan-netizen), also [@pakhind-blip](https://github.com/pakhind-blip) ¹ |
+
+¹ Both GitHub accounts belong to Pakhin Daonan. Most of his commits are under `pakhindaonan-netizen`; the merge of pull request #4 (`dd15081`, 22 Nov 2026) was made by mistake while signed in as `pakhind-blip`.
 
 ---
 
