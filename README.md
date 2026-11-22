@@ -292,13 +292,60 @@ GOOGLE_CLIENT_SECRET=<your client secret>
 TEST_LOGIN=0
 ```
 
-Ask a team member for the values, or create your own client: **Google Cloud Console → APIs &
-Services → Credentials → Create credentials → OAuth client ID → Web application**, and add this
-under **Authorised redirect URIs** (not JavaScript origins):
+Ask a team member for the values, or get your own keys by following the steps below.
 
-```
-http://localhost:3000/api/auth/google/callback
-```
+#### Get your own Google sign-in keys (about 10 minutes, free)
+
+You only do this once. Any Google account can create the keys; the people who sign in to the app
+still need `@ku.th` accounts.
+
+1. **Open Google Cloud Console.** Go to <https://console.cloud.google.com> and sign in with your
+   Google account. Accept the terms if this is your first visit.
+2. **Create a project.** Click the project picker at the top of the page → **New project** →
+   name it `KU Classroom` → **Create**. When it is ready, make sure `KU Classroom` is the project
+   selected at the top.
+3. **Open Google Auth Platform.** Type `Google Auth Platform` in the search bar at the top and
+   open it (older consoles call this **APIs & Services → OAuth consent screen**). Click
+   **Get started**.
+4. **Fill in the app details:**
+   - **App information:** App name `KU Classroom`; User support email: your email → **Next**.
+   - **Audience:** choose **External** → **Next**.
+   - **Contact information:** your email → **Next**.
+   - **Finish:** tick the agreement → **Continue** → **Create**.
+5. **Add the people who will sign in.** The app starts in **Testing** mode, where only listed
+   accounts can sign in. In the left menu open **Audience** → under **Test users** click
+   **+ Add users** → enter every `@ku.th` account that will use the app (for example the lecturer
+   and the TAs) → **Save**.
+6. **Create the client.** In the left menu open **Clients** → **+ Create client**:
+   - **Application type:** `Web application`
+   - **Name:** `KU Classroom local`
+   - **Authorised JavaScript origins:** **+ Add URI** → `http://localhost:3000`
+   - **Authorised redirect URIs:** **+ Add URI** → exactly
+     `http://localhost:3000/api/auth/google/callback` (no slash at the end)
+   - Click **Create**.
+7. **Copy the two keys.** A window shows the **Client ID** and the **Client secret**. Copy both
+   now — newer consoles show the secret only once (you can also click **Download JSON**). Put
+   them in `.env`:
+
+   ```
+   GOOGLE_CLIENT_ID=1234567890-abc123.apps.googleusercontent.com
+   GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxxxxxxx
+   TEST_LOGIN=0
+   ```
+
+8. **Wait a few minutes.** New settings can take from a few minutes up to an hour to work.
+
+The app only asks Google for the basic `openid`, `email` and `profile` scopes, so nothing has to be
+added under **Data access**, and no Google verification is needed while the app is in Testing mode.
+
+| Google shows | What it means |
+|---|---|
+| `Error 400: redirect_uri_mismatch` | The redirect URI in step 6 is not exactly `http://localhost:3000/api/auth/google/callback`. |
+| `Error 403: access_denied` — the app has not completed verification | That account is not in **Test users** (step 5). Add it and try again. |
+| The app is blocked by your organisation's administrator | KU's Google Workspace does not allow this app for that account. Use the *Test login* below to try the system instead. |
+
+**Never commit `.env` or share the client secret.** If it leaks, open **Clients** → your client →
+**Reset secret**, and put the new one in `.env`.
 
 > **Just want to try it without Google?** Set `TEST_LOGIN=1` instead. The sign-in page then shows
 > a *Test login* box that accepts any `@ku.th` address with no password. It is for local testing
@@ -374,6 +421,7 @@ same database. Set `TEST_LOGIN` back to `0` afterwards.
 | `Cannot connect to the Docker daemon` | Start Docker Desktop and wait for **Engine running**. |
 | `port is already allocated` / `Bind for 0.0.0.0:3000 failed` | Something else uses port 3000. Stop it, or stop the other container (`docker ps`, then `docker stop <id>`). |
 | Google says `redirect_uri_mismatch` | The redirect URI in Google Cloud must be exactly `http://localhost:3000/api/auth/google/callback`. |
+| Google says `access_denied` / app not verified | Add that `@ku.th` account under **Google Auth Platform → Audience → Test users**. |
 | Sign-in page says Google sign-in is not set up | `.env` is missing or the two Google values are empty. Fill them in, then `docker compose up --build`. |
 | A page shows *Server error* after you pulled new code | The database schema changed — see the next section. |
 | Tests fail with `test sign-in failed` | The app is not running with `TEST_LOGIN=1`. |
