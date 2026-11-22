@@ -68,11 +68,12 @@ instructions, the test command and troubleshooting are in **[Build and run](#bui
 | KAOS goal refinement (SG-1 … SG-5) | ✅ Complete |
 | Use case diagram + use case table | ✅ Complete |
 | User stories & User Requirement Specification | 🟡 US-17, US-18, US-19 built but not described in the SRS (risk R-04, accepted) |
-| Activity diagrams (AD-1 … AD-9) | ✅ Complete |
+| Activity diagrams (AD-1 … AD-8) | ✅ Complete |
 | Software Proposal — architecture, data storage, dev environment | ✅ Complete |
-| Sequence diagrams (SQD-1 … SQD-6) | ✅ Complete |
+| Sequence diagrams (SQD-1 … SQD-5) | ✅ Complete |
 | Traceability matrix (Sub-Goal → SRS → SQD) | ✅ Complete |
-| Iteration reports | ✅ Complete |
+| Iteration reports | 🟡 Iterations 1–5 in `docs/` — Iteration 6 report still to be added |
+| Final Project Development Report | ✅ Complete |
 | Project schedule (Gantt / Plane export) | ✅ Complete |
 | UI mockups (Figma) | ✅ Complete |
 | Application source code | ✅ All 19 stories implemented |
@@ -134,7 +135,8 @@ ISP-Left4Dead/
 │   ├── SRS_Left4Dead.pdf                  Software Requirement Specification
 │   ├── SoftwareProposal_Left4Dead.pdf     Architecture, data storage, sequence diagrams
 │   ├── Left4Dead_Iteration*_Report.pdf    iteration progress reports
-│   ├── SRS_ActivityDiagrams_drawio/       AD-1.json … AD-9.json
+│   ├── Final Project Development Report - Left4Dead.pdf   what the software does, progress, blockers
+│   ├── SRS_ActivityDiagrams_drawio/       AD-1.json … AD-8.json
 │   └── Gannt Chart/                       project schedule exported from Plane
 └── source/                                ← the application
     ├── README.md                          developer guide: API list, roles, tests
@@ -179,7 +181,7 @@ ISP-Left4Dead/
         ├── create-event.html              add a lab, consultation or milestone (US-17)
         ├── todo.html                      to-do across all classes (US-19)
         ├── css/styles.css
-        └── js/                            one file per page, plus app.js and api.js
+        └── js/                            one file per page, plus app.js, api.js and charcount.js
 ```
 
 | Looking for… | Go to |
@@ -187,9 +189,10 @@ ISP-Left4Dead/
 | Requirements, use cases, user stories, URS/SRS | `docs/SRS_Left4Dead.pdf` |
 | Architecture, data storage and environment decisions | `docs/SoftwareProposal_Left4Dead.pdf` |
 | Sequence diagrams (SQD) and the traceability matrix | `docs/SoftwareProposal_Left4Dead.pdf` |
-| Activity diagrams (AD-1 … AD-9) | `docs/SRS_ActivityDiagrams_drawio/` |
+| Activity diagrams (AD-1 … AD-8) | `docs/SRS_ActivityDiagrams_drawio/` |
 | Project schedule and task breakdown | `docs/Gannt Chart/` |
 | Progress narrative for each iteration | `docs/Left4Dead_Iteration*_Report.pdf` |
+| How the whole project went — proposal vs final, To Do / Doing / Done, blockers | `docs/Final Project Development Report - Left4Dead.pdf` |
 | How to build and run the app | **Build and run**, below |
 | API endpoints, roles, developer notes | `source/README.md` |
 | Automated tests | `source/backend/test/` |
@@ -215,7 +218,8 @@ The Gantt data is a JSON export from [Plane](https://plane.so). To regenerate it
 
 ## Technology stack
 
-Decided in the Software Proposal, and now fully in place.
+Decided in the Software Proposal. The one change during development is file storage: files are
+kept in MySQL instead of a separate Docker volume.
 
 | Layer | Technology | Why |
 |---|---|---|
