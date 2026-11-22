@@ -4,7 +4,10 @@
      tabs     - Student: Assigned, Missing, Done, Schedule
                 Staff:   Open, Late, Done, Schedule
      controls - a class filter (All classes), search, and Student / Staff
-                when I am a student in one class and staff in another
+                when I am a student in one class and staff in another.
+                Search filters what is on screen at once, then asks the
+                server (?q=), which searches everything: older Done work,
+                done staff tasks and schedule items on any date.
      sections - by week (No due date, This week, Next week, Later; or Last
                 week, Earlier for past work), each with a count, opening
                 and closing like Google Classroom's.
@@ -35,6 +38,7 @@ const DAY_MS = 864e5;
 const WEEK_MS = 7 * DAY_MS;
 const SOON_MS = 3 * DAY_MS;                  // "due soon" = the amber date
 const REFRESH_MS = 60 * 1000;                // keeps the week sections honest
+const SEARCH_WAIT_MS = 300;                  // ask the server once typing pauses, not on every key
 const END_OF_DAY = { hour: 23, minute: 59 }; // a staff task with a date is due at the end of it
 
 const TABS = {
@@ -77,6 +81,9 @@ function groupBy(items, keyOf) {
   }
   return groups;
 }
+
+/** True when the list on screen came back from a server search. */
+const searching = () => Boolean(state.data && state.data.search);
 
 /** True when a search term or a single class is narrowing the page down. */
 const isFiltering = () => Boolean(state.search.trim()) || state.classId !== 'all';
@@ -287,7 +294,8 @@ function staffTab() {
     ], FORWARD, 'Nothing late in your classes.');
   }
   if (state.tab === 'done') {
-    return sections(all.filter(a => a.risk === 'done').map(staffItem), BACKWARD, 'Nothing marked Done this week.');
+    return sections(all.filter(a => a.risk === 'done').map(staffItem), BACKWARD,
+      searching() ? 'No Done work matches your search.' : 'Nothing marked Done this week.');
   }
   // Open: everything not Done that is still ahead, and my staff tasks not yet late.
   const now = new Date();
@@ -336,11 +344,13 @@ function dayBlock(date, list, today) {
       </div>`;
 }
 
-/** Schedule: the next two weeks, in the Schedule page's list. */
+/** Schedule: the next two weeks, in the Schedule page's list (any date while searching). */
 function scheduleTab() {
   const events = scheduleEvents();
   if (!events.length) {
-    return emptyBlock(`Nothing scheduled in the next ${state.data.schedule_days} days.`);
+    return emptyBlock(searching()
+      ? 'Nothing on the schedule matches your search.'
+      : `Nothing scheduled in the next ${state.data.schedule_days} days.`);
   }
   const today = ymd(new Date());
   const days = groupBy(events, e => e.date);
@@ -406,7 +416,27 @@ $('roleTabs').addEventListener('click', (e) => {
 });
 
 $('classPick').addEventListener('change', (e) => { state.classId = e.target.value; render(); });
-$('search').addEventListener('input', (e) => { state.search = e.target.value; render(); });
+/* Search: filter what is loaded straight away, then let the server search
+   everything once typing pauses. An older reply that arrives after a newer
+   one is thrown away. Clearing the box loads the normal page again. */
+let searchTimer = null;
+let searchSeq = 0;
+
+async function loadTodo() {
+  const term = state.search.trim();
+  const seq = ++searchSeq;
+  const data = await API.get('/todo?from=' + ymd(new Date()) + (term ? '&q=' + encodeURIComponent(term) : ''));
+  if (seq !== searchSeq) return;
+  state.data = data;
+  render();
+}
+
+$('search').addEventListener('input', (e) => {
+  state.search = e.target.value;
+  render();
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => loadTodo().catch(err => KU.toast(err.message)), SEARCH_WAIT_MS);
+});
 
 $('list').addEventListener('click', (e) => {
   const head = e.target.closest('.gsec__head');
